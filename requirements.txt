@@ -1,0 +1,13 @@
+# Core analysis
+numpy>=1.21
+scipy>=1.7
+matplotlib>=3.5
+scikit-learn>=1.0
+
+# Dashboard testing (optional)
+playwright>=1.40
+
+# GPU gradient extraction (optional - only for pythia_gradient_extraction.py)
+# torch>=2.0          # uncomment if running gradient extraction
+# transformers>=4.35  # uncomment if running gradient extraction
+# datasets>=2.0       # uncomment if running gradient extraction

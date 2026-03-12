@@ -1,0 +1,10 @@
+# Full environment including GPU gradient extraction
+numpy>=1.21
+scipy>=1.7
+matplotlib>=3.5
+scikit-learn>=1.0
+torch>=2.0
+transformers>=4.35
+datasets>=2.0
+accelerate>=0.20
+playwright>=1.40
