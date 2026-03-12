@@ -49,9 +49,14 @@ const MODELS=[
   {n:"Llama-2-70B",N:7e10,tqa:44.9,f:"Llama-2"}, {n:"Llama-3-8B",N:8e9,  tqa:44.0,f:"Llama-3"},
   {n:"Llama-3-70B",N:7e10,tqa:52.0,f:"Llama-3"}, {n:"Mistral-7B",N:7e9,  tqa:42.0,f:"Mistral"},
   {n:"Gemma-7B",  N:7e9,  tqa:45.0,f:"Gemma"},    {n:"MPT-7B",    N:7e9,  tqa:33.0,f:"MPT"},
+  {n:"Falcon-7B",   N:7e9,  tqa:35.0,f:"Falcon"},   {n:"Falcon-40B",  N:4e10, tqa:42.0,f:"Falcon"},
+  {n:"Phi-3.5-MoE", N:4.2e10,tqa:72.0,f:"Phi"},      {n:"Phi-4",       N:1.4e10,tqa:73.0,f:"Phi"},
+  {n:"Llama-3.1-8B",N:8e9,  tqa:44.0,f:"Llama-3"},   {n:"Llama-3.1-70B",N:7e10, tqa:54.0,f:"Llama-3"},
+  {n:"Llama-3.1-405B",N:4.05e11,tqa:57.0,f:"Llama-3"},{n:"Gemma-2-9B",  N:9e9,  tqa:47.0,f:"Gemma"},
+  {n:"Gemma-2-27B", N:2.7e10,tqa:50.0,f:"Gemma"},     {n:"Mistral-8x7B",N:4.68e10,tqa:46.0,f:"Mistral"},
 ];
 const FC={Pythia:"#3b82f6","Llama-1":"#6366f1","Llama-2":"#a855f7",OLMo:"#f97316",Phi:"#ef4444",
-          Mistral:"#eab308","Llama-3":"#10b981",Gemma:"#ec4899",MPT:"#64748b"};
+          Mistral:"#eab308","Llama-3":"#10b981",Gemma:"#ec4899",MPT:"#64748b",Falcon:"#065f46"};
 
 const FRONTIER=[
   {n:"Sonnet 4.5",   swe:77.2,gpqa:83.4,h:-2.6, fam:"Anthropic"},
@@ -97,7 +102,7 @@ function PhaseChart({uN,uT}){
     const nc2X=X(Math.log10(11.3e9));
     ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.setLineDash([3,4]);
     ctx.beginPath(); ctx.moveTo(nc2X,p.t); ctx.lineTo(nc2X,H-p.b); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle="#8b949e"; ctx.font="7px monospace"; ctx.textAlign="center";
+    ctx.fillStyle="#8b949e"; ctx.font="9px monospace"; ctx.textAlign="center";
     ctx.fillText("Nₒ₂",nc2X,p.t+10);
     // web-trained universal curve
     ctx.strokeStyle="#30363d"; ctx.lineWidth=2; ctx.setLineDash([5,3]);
@@ -185,7 +190,7 @@ function FrontierChart(){
         ctx.fillText(m.n==="Sonnet 4.6"?"h=−14":"h=+2",px+7,py+(m.n==="Sonnet 4.6"?5:-4));
       }
       if(["GPT-5.2 Pro","Gemini 3.1 Pro","Opus 4.6","Sonnet 4.6"].includes(m.n)){
-        ctx.fillStyle="#8b949e"; ctx.font="8px monospace"; ctx.textAlign="left";
+        ctx.fillStyle="#8b949e"; ctx.font="9px monospace"; ctx.textAlign="left";
         ctx.fillText(m.n,px+7,py-3);
       }
     });
@@ -210,7 +215,7 @@ function ThermoChart(){
   const draw=()=>{
     const cv=ref.current; if(!cv)return;
     const dpr=window.devicePixelRatio||1;
-    const W=cv.parentElement.clientWidth||560, H=200;
+    const W=cv.parentElement.clientWidth||560, H=230;
     cv.width=W*dpr; cv.height=H*dpr;
     const ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
     ctx.clearRect(0,0,W,H);
@@ -283,13 +288,13 @@ function ThermoChart(){
       ctx.stroke();
 
       // y tick labels
-      ctx.fillStyle="#8b949e"; ctx.font="7px monospace"; ctx.textAlign="right";
+      ctx.fillStyle="#8b949e"; ctx.font="9px monospace"; ctx.textAlign="right";
       [d.yMn,0.5*(d.yMn+d.yMx),d.yMx].forEach(v=>{
         if(v>=d.yMn&&v<=d.yMx) ctx.fillText(v.toFixed(1),x0+pw-2,Y(v)+3);
       });
 
       // title
-      ctx.fillStyle=d.c; ctx.font="bold 7px monospace"; ctx.textAlign="left";
+      ctx.fillStyle=d.c; ctx.font="bold 9px monospace"; ctx.textAlign="left";
       ctx.fillText(d.title,x0+3,p.t-6);
 
       // border
@@ -297,7 +302,7 @@ function ThermoChart(){
     });
   };
   useEffect(()=>{draw();window.addEventListener("resize",draw);return()=>window.removeEventListener("resize",draw);},[]);
-  return React.createElement("canvas",{ref,style:{width:"100%",height:200,display:"block"}});
+  return React.createElement("canvas",{ref,style:{width:"100%",height:230,display:"block"}});
 }
 
 /* ── CANVAS: GROUP/SYMMETRY FLOW ────────────────────────── */
@@ -306,7 +311,7 @@ function SymmetryChart(){
   const draw=()=>{
     const cv=ref.current; if(!cv)return;
     const dpr=window.devicePixelRatio||1;
-    const W=cv.parentElement.clientWidth||560, H=150;
+    const W=cv.parentElement.clientWidth||560, H=175;
     cv.width=W*dpr; cv.height=H*dpr;
     const ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
     ctx.clearRect(0,0,W,H);
@@ -330,22 +335,22 @@ function SymmetryChart(){
         ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
         ctx.beginPath(); ctx.moveTo(cx+22,midY); ctx.lineTo(nx-22,midY); ctx.stroke(); ctx.setLineDash([]);
         const mx=(cx+22+nx-22)/2;
-        ctx.fillStyle="#8b949e"; ctx.font="7px monospace"; ctx.textAlign="center";
+        ctx.fillStyle="#8b949e"; ctx.font="8px monospace"; ctx.textAlign="center";
         stages[i+1].arrow.split("\n").forEach((ln,li)=>ctx.fillText(ln,mx,midY-8+li*9));
       }
       ctx.beginPath(); ctx.arc(cx,midY,17,0,Math.PI*2);
       ctx.fillStyle="#0d1117"; ctx.strokeStyle=s.c; ctx.lineWidth=2;
       ctx.fill(); ctx.stroke();
-      ctx.fillStyle=s.c; ctx.font="bold 6.5px monospace"; ctx.textAlign="center";
+      ctx.fillStyle=s.c; ctx.font="bold 8px monospace"; ctx.textAlign="center";
       s.sym.split(" ").forEach((ln,li)=>ctx.fillText(ln,cx,midY-2+li*9));
-      ctx.fillStyle="#8b949e"; ctx.font="7px monospace";
+      ctx.fillStyle="#8b949e"; ctx.font="9px monospace";
       ctx.fillText(s.scale,cx,midY+26);
-      ctx.fillStyle=s.c; ctx.font="6.5px monospace";
+      ctx.fillStyle=s.c; ctx.font="8px monospace";
       s.top.split("\n").forEach((ln,li)=>ctx.fillText(ln,cx,midY-24-li*9));
     });
   };
   useEffect(()=>{draw();window.addEventListener("resize",draw);return()=>window.removeEventListener("resize",draw);},[]);
-  return React.createElement("canvas",{ref,style:{width:"100%",height:150,display:"block"}});
+  return React.createElement("canvas",{ref,style:{width:"100%",height:175,display:"block"}});
 }
 
 /* ── MAIN APP ─────────────────────────────────────────── */
@@ -393,13 +398,13 @@ function App(){
           )
         ),
         React.createElement("div",{style:{...Bx(),marginBottom:16}},
-          React.createElement("div",DIM(),"TRUTHFULQA vs MODEL SIZE — 26 MODELS, 9 FAMILIES"),
-          React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:10}},"U-shape is real. Loss is featureless throughout (CV=0.8%). Nₒ₂ = second transition at 11B."),
+          React.createElement("div",DIM(),"TRUTHFULQA vs MODEL SIZE — 36 MODELS, 11 FAMILIES"),
+          React.createElement("div",{style:{fontSize:11,color:"#8b949e",marginBottom:10}},"U-shape is real. Loss is featureless throughout (CV=0.8%). Nₒ₂ = second transition at 11B."),
           React.createElement(PhaseChart,{uN:N,uT:parseFloat(uT)||null}),
           React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:"5px 12px",marginTop:9}},
-            Object.entries(FC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#8b949e"}},
+            Object.entries(FC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:10,color:"#8b949e"}},
               React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:c}}),f)),
-            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#f87171"}},
+            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:5,fontSize:10,color:"#f87171"}},
               React.createElement("div",{style:{width:14,height:0,borderTop:"2px dashed #f87171"}}),"Phi (curated)")
           )
         ),
@@ -455,7 +460,7 @@ function App(){
           React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:10}},"HellaSwag/TQA saturate at frontier scale. Active coupling shifts to coding vs scientific reasoning. r = +0.34 (cooperative, n=10)."),
           React.createElement(FrontierChart,null),
           React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:"5px 12px",marginTop:9}},
-            Object.entries(FFC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#8b949e"}},
+            Object.entries(FFC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:10,color:"#8b949e"}},
               React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:c}}),f))
           )
         ),
@@ -510,6 +515,20 @@ function App(){
 
       /* ══ DEEP PHYSICS ════════════════════════════════════ */
       tab==="physics"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
+
+        React.createElement("div",{style:{...Bx(),borderLeft:"3px solid #58a6ff",padding:"14px 18px"}},
+          React.createElement("div",DIM(),"PHYSICS GLOSSARY — KEY TERMS FOR ML READERS"),
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px 16px",fontSize:11,color:"#c9d1d9",lineHeight:1.6}},
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"γ₁₂ (coupling): "),"Rate at which one benchmark changes per unit change in another. Positive = cooperative, negative = tradeoff."),
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"Nₒ (critical scale): "),"Model size where γ₁₂ crosses zero — the phase boundary between alignment tax and bonus regimes."),
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"d_eff (effective dimension): "),"PCA participation ratio measuring how many independent capability axes exist at a given scale."),
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"h-field: "),"External field from data curation/RLHF that shifts the phase boundary. Analogous to magnetic field in Landau theory."),
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"Class D (topological): "),"Symmetry classification from condensed matter. No time-reversal (T=0), particle-hole symmetry (C=+1). Predicts Z₂ invariant and domain-wall bound states."),
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"TRSB: "),"Time-reversal symmetry breaking. When Im(ψ_R*ψ_C) ≠ 0, the system distinguishes 'forward' from 'backward' in training — irreversibility onset."),
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"GL theory: "),"Ginzburg-Landau effective field theory. Writes free energy as polynomial in order parameter ψ. Used here to derive coupling ODE and predict phase boundaries."),
+            React.createElement("div",null,React.createElement("strong",{style:{color:"#60a5fa"}},"Ginzburg number (Gi): "),"Ratio of fluctuations to mean-field gap. Gi > 1 means mean-field breaks down — transition is a crossover, not sharp. CAPE: Gi = 1.35 at ~130B.")
+          )
+        ),
 
         React.createElement("div",{style:{...Bx(),...BL("#6ee7b7")}},
           React.createElement("div",DIM(),"THERMODYNAMIC OBSERVABLES — PCA + LASSO DRIVEN"),

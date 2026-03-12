@@ -45,7 +45,7 @@ The transition is confirmed with zero free parameters by OLMo (AI2) at $\gamma_{
 \textbf{Two models with identical loss can be in opposite alignment regimes.}
 
 The coupling structure extends far beyond a sign change.
-The capability manifold undergoes dimensional collapse ($d_{\rm eff}$: $2 \to 1$), a Riccati ODE governs the eigenvector rotation through the transition, and a coupled dynamical system discovered via sparse regression reproduces all five benchmark trajectories at 3.6\% error.
+The capability manifold undergoes dimensional collapse ($d_{\rm eff}$ (PCA participation ratio measuring effective capability dimensionality): $2 \to 1$), a Riccati ODE governs the eigenvector rotation through the transition, and a coupled dynamical system discovered via sparse regression reproduces all five benchmark trajectories at 3.6\% error.
 Twelve independently measured diagnostics---spanning gradient scaling, eigenvalue geometry, capability susceptibility (how sharply a benchmark responds to scale changes), and geometric phase correlation---converge on one coupling structure parameterised by two numbers.
 Three independent universality tests confirm the framework across unseen data: OLMo's zero-parameter confirmation ($\gamma_{12}=0.000$), cross-family hold-out prediction of Llama-2 at 5.6\% error, and eight independent labs converging on $r({\rm HS, TQA})=+0.770$ above $N_c$---a direct measurement of the cooperative regime.
 
@@ -443,7 +443,7 @@ The rotation satisfies a Riccati equation (a nonlinear ODE with analytic logisti
 The data-driven fixed point is $\theta^* \approx +0.37$ (positive TruthfulQA loading),
 confirmed across four independent fitting methods (L2, Huber, L1, and isotonic GP; all find $\theta^* \in [+0.28, +0.52]$).
 The fit quality is qualitative ($R^2 = 0.41$, $n = 19$ windows), consistent
-with an ODE governing a noisy empirical trajectory; the key structural claim is the
+with an ODE capturing the geometric trend of a noisy empirical trajectory; the key structural claim is the
 \emph{sign} of $\theta^*$, not the precise coefficients.
 The low $R^2$ is not unexpected: the same $d_{\rm eff} = 1.254 < 2$ that causes $\beta_{\rm measured}$ to deviate from the independent-parameter prediction ($\S$\ref{sec:gradients}) also produces large fluctuations in the eigenvector direction---the Riccati ODE is an approximation valid when fluctuations are small, and the system is in the regime where fluctuations are not small (the effective capability space is too low-dimensional for the approximation to be tight).
 At large $N$, the alignment axis $\mathbf{e}_2$ converges toward cooperation with capability:
@@ -467,7 +467,7 @@ This explains within-family heterogeneity: the Sonnet~4.6 anomaly ($\gamma_{12} 
 The running of $\gamma_{12}(N)$ is not an assumption of the model---it arises from a measurable mechanism.
 The residual of $\gamma_{12}$ above its linear baseline correlates with $\chi_2 \cdot \gamma_{12}$
 at $r = +0.629$ ($p = 0.003$, Spearman $\rho = 0.719$, $p = 0.0004$, $n = 20$ windows):
-the more sensitive benchmarks are to scale changes (high susceptibility $\chi_2$), the faster the coupling runs---a self-reinforcing feedback loop above $N_c$.\footnote{This mechanism is directly analogous to spin-fluctuation-mediated inter-band coupling in heavy-fermion superconductors~\cite{amin2020}, where susceptibility fluctuations renormalize the coupling super-linearly. The mathematical structure is identical.}
+the more sensitive benchmarks are to scale changes (high susceptibility $\chi_2$), the faster the coupling runs---a self-reinforcing feedback loop above $N_c$.\footnote{This mechanism is directly analogous to spin-fluctuation-mediated inter-band coupling in heavy-fermion superconductors~\cite{amin2020}, where susceptibility fluctuations renormalize the coupling super-linearly. The mathematical structure is identical. We emphasize this classification is an \emph{analogical} mapping that respects the symmetry structure, not a claim of microscopic equivalence: AI scaling is not a superconductor.}
 Independently, LASSO applied to a full polynomial library of coupling terms selects zero $\phi_1^2\phi_2^2$
 coupling term---confirming that the bare objective is approximately decoupled
 ($F \approx a_1\phi_1^2 + a_2\phi_2^2$) and the coupling $\gamma_{12}$ is an \emph{emergent},
@@ -488,7 +488,7 @@ Beyond these structural diagnostics, three independent universality tests confir
 \includegraphics[width=\textwidth]{fig8_topology.png}
 \caption{\textbf{Topological transition in capability space.}
 (a)~$d_{{\rm eff}}$ decreases linearly, reaching $d_{{\rm eff}} \to 1$ at $N \approx 88$B (single effective dimension).
-(b)~Eigenvalue phase portrait: $\lambda_1$ grows while $\lambda_2$ (soft mode: the eigenvector whose variance shrinks fastest) collapses.
+(b)~Eigenvalue phase portrait: $\lambda_1$ grows while $\lambda_2$ (soft mode (the benchmark-space direction whose variance vanishes at the transition): the eigenvector whose variance shrinks fastest) collapses.
 (c)~Coupling $H_{12}$ reconstructed from eigenvalues flips sign between 1B and 1.4B.
 (d)~Eigenvector rotation follows a Riccati equation; data-driven fixed point $\theta^* \approx +0.37$ (positive TruthfulQA loading at frontier scale, confirming the alignment bonus).
 (e)~$\det(H)$ approaches zero at $\sim$130B---predicting where the current effective theory breaks.}
@@ -526,7 +526,7 @@ Phi has $h$ growing from $+8$ to $+38$.
 
 The minimum alignment intervention to overcome the tax scales empirically as:
 \begin{equation}
-  h_c(N) \propto (N_c - N)^{3/2} \quad\text{for } N < N_c
+  h_c(N) \propto (N_c - N)^{3/2} \quad\text{for } N < N_c\footnote{The exponent 3/2 emerges from the cubic GL potential with an external field; standard Landau theory without field gives the mean-field exponent 1/2.}
   \label{eq:design}
 \end{equation}
 where the $3/2$ exponent follows from the mean-field scaling of
@@ -705,8 +705,9 @@ capability pair shifts to autonomous coding (SWE-bench Verified) versus
 scientific reasoning (GPQA Diamond).
 We measure $\gamma_{12}(\text{SWE}, \text{GPQA})$ across ten publicly evaluated frontier models
 (Table~\ref{tab:frontier}; scores as of February--March~2026):
-cross-family $r = +0.34$ ($n = 10$, $p = 0.34$; suggestive, not yet significant),
-consistent with cooperative coupling at frontier scale (Fig.~\ref{fig:frontier}).
+cross-family $r = +0.34$ ($n = 10$, $p = 0.34$; suggestive, not yet significant).
+With only $n=10$ frontier models and $p=0.34$, this correlation is suggestive rather than conclusive; we present it as a directional signal awaiting larger frontier datasets.
+Results are consistent with cooperative coupling at frontier scale (Fig.~\ref{fig:frontier}).
 
 \begin{table}[h]
 \centering\small
@@ -881,7 +882,7 @@ benchmarks should be treated as indicative, not calibrated.
 
 \textbf{Where CAPE fails.}
 \textbf{The transition at $N_c$ is a crossover, not a sharp phase transition.}
-The fluctuation strength at $N_c$, quantified by the Ginzburg number $\mathrm{Gi} = 1.35 > 1$---a dimensionless ratio measuring how large benchmark-score fluctuations are relative to the mean signal at the transition---means that the simple independent-component approximation breaks down near the crossing; $\chi_2$ peaks at a finite value (3.08, not a divergence), consistent with a fluctuation-driven crossover~\cite{amin2020}.
+The fluctuation strength at $N_c$, quantified by the Ginzburg number $\mathrm{Gi} = 1.35 > 1$ (ratio of fluctuation amplitude to mean-field gap; Gi > 1 signals crossover rather than sharp transition)---a dimensionless ratio measuring how large benchmark-score fluctuations are relative to the mean signal at the transition---means that the simple independent-component approximation breaks down near the crossing; $\chi_2$ peaks at a finite value (3.08, not a divergence), consistent with a fluctuation-driven crossover~\cite{amin2020}.
 $N_c$ is a well-defined, robust scale---but the rounding of the crossing is real, and claims of a sharp symmetry-breaking transition would be overstated.
 The full fluctuation treatment is in the follow-up paper.
 CAPE is an effective theory with a known validity boundary.
@@ -917,7 +918,7 @@ Applied to 26 models across 9 families, the central findings are:
   \item \textbf{The capability manifold restructures at the transition.}
     Effective dimensionality collapses ($d_{\rm eff}: 2 \to 1$),
     the second eigenvector rotates sharply at 1.4B through a Riccati ODE,
-    and twelve independent diagnostics---gradient scaling, eigenvalue geometry,
+    and twelve diagnostics (projections of a single two-parameter signal)---gradient scaling, eigenvalue geometry,
     thermodynamic susceptibility (capability sensitivity to scale), geometric phase correlation---all converge
     on one coupling structure parameterised by two numbers.
     The Hessian determinant predicts theory breakdown at $N \approx 130$B,
