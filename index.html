@@ -235,7 +235,7 @@ function SymmetryChart(){
 
 function App(){
   const [tab,setTab]=useState("main");
-  const [uN,setUN]=useState(""),uT=[uT,setUT]=useState(""),uH=[uH,setUH]=useState("");
+  const [uN,setUN]=useState(""),[uT,setUT]=useState(""),[uH,setUH]=useState("");
   const [showGloss,setShowGloss]=useState(false);
   const N=uN?parseFloat(uN):null, tqa=uT?parseFloat(uT):null, hs=uH?parseFloat(uH):null;
   const gv=N&&tqa&&hs?-0.629*(Math.log10(N)-9.544)-5.886:null;
