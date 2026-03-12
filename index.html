@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>The Alignment Tax is a Phase — CAPE Dashboard</title>
-<meta name="description" content="The alignment tax is a phase transition at 3.5B parameters. Below Nc, reasoning degrades truthfulness; above, they cooperate. Interactive CAPE scaling framework dashboard."/>
+<title>When Models Stop Lying — and When They Start Again — CAPE Dashboard</title>
+<meta name="description" content="Capability Coupling and the Alignment Tax in AI Scaling Laws. Below 3.5B parameters, scaling reasoning actively degrades truthfulness. Above 3.5B, they cooperate. Interactive CAPE scaling framework dashboard."/>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0a0e14;color:#c9d1d9;font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+body{background:#0a0e14;color:#c9d1d9;font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.65}
 input,button{font-family:inherit}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0d1117}::-webkit-scrollbar-thumb{background:#30363d;border-radius:3px}
 ::-webkit-scrollbar-thumb:hover{background:#484f58}
@@ -24,6 +24,8 @@ input,button{font-family:inherit}
 .explore-card{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .2s}
 .explore-card:hover{border-color:#484f58;background:#161b22}
 .stat-box{background:#161b22;border:1px solid #21262d;border-radius:10px;padding:16px 18px}
+.eq-box{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:12px 16px;font-family:'Courier New',monospace;font-size:14px;color:#c9d1d9}
+.ml-note{font-size:12px;color:#8b949e;margin-top:6px;line-height:1.5}
 .label{font-size:11px;color:#8b949e;letter-spacing:0.8px;font-weight:600;text-transform:uppercase;margin-bottom:6px}
 .chip{display:inline-flex;align-items:center;gap:4px;background:#0d1117;border:1px solid #30363d;border-radius:20px;padding:3px 10px;font-size:11px;color:#8b949e;cursor:pointer;transition:all .2s}
 .chip:hover{border-color:#58a6ff;color:#58a6ff}
@@ -240,661 +242,529 @@ function FrontierChart(){
   return h("canvas",{ref:ref,style:{width:"100%",height:"340px",display:"block"}});
 }
 
-/* ── CANVAS: CORRELATION FLIP ────────────────────────── */
+/* ── CANVAS: CORRELATION SIGN FLIP ──────────────────── */
 function CorrChart(){
   const ref=useRef(null);
   useEffect(()=>{
     const cv=ref.current;if(!cv)return;
     const draw=()=>{
       const dpr=window.devicePixelRatio||1;
-      const W=cv.parentElement.clientWidth||400,H=220;
+      const W=cv.parentElement.clientWidth||400,H=200;
       cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";
       const c=cv.getContext("2d");c.scale(dpr,dpr);
-      const p={l:50,r:20,t:20,b:40};
-      const yL=-1.1,yH=0.5;
-      const X=i=>p.l+i/(CE.length-1)*(W-p.l-p.r);
-      const Y=v=>p.t+(yH-v)/(yH-yL)*(H-p.t-p.b);
+      const p={l:48,r:12,t:12,b:32};
+      const lL=7,lH=11.5;
+      const X=n=>p.l+(n-lL)/(lH-lL)*(W-p.l-p.r);
+      const Y=v=>p.t+(0.5-v/2)*(H-p.t-p.b);
       c.clearRect(0,0,W,H);
-      c.strokeStyle="#1c2128";c.lineWidth=1;
-      for(let y=-1;y<=0.5;y+=0.5){const yy=Y(y);c.beginPath();c.moveTo(p.l,yy);c.lineTo(W-p.r,yy);c.stroke();}
-      c.strokeStyle="#FFD700";c.lineWidth=1.5;c.setLineDash([4,3]);
-      c.beginPath();c.moveTo(p.l,Y(0));c.lineTo(W-p.r,Y(0));c.stroke();c.setLineDash([]);
+      /* zero line */
+      const z0=Y(0);c.strokeStyle="#30363d";c.lineWidth=1;c.beginPath();c.moveTo(p.l,z0);c.lineTo(W-p.r,z0);c.stroke();
+      /* Nc */
+      const ncX=X(Math.log10(NC));c.strokeStyle="#FFD700";c.lineWidth=1;c.setLineDash([3,3]);
+      c.beginPath();c.moveTo(ncX,p.t);c.lineTo(ncX,H-p.b);c.stroke();c.setLineDash([]);
+      /* curve */
       c.strokeStyle="#3b82f6";c.lineWidth=2.5;c.beginPath();
-      CE.forEach((d,i)=>{if(i===0)c.moveTo(X(i),Y(d.corr));else c.lineTo(X(i),Y(d.corr));});
+      for(let i=lL;i<=lH;i+=0.05){const x=X(i),corr=CE[0].corr+(-CE[0].corr-CE[2].corr)*(Math.pow(10,i-Math.log10(NC))+1);
+        c.lineTo(x,Y(corr));
+      }
       c.stroke();
-      CE.forEach((d,i)=>{
-        const x=X(i),y=Y(d.corr);
-        c.fillStyle=d.corr<0?"#f87171":"#4CAF50";c.beginPath();c.arc(x,y,6,0,Math.PI*2);c.fill();
-        c.fillStyle="#c9d1d9";c.font="bold 12px Inter";c.textAlign="center";c.fillText(d.corr.toFixed(2),x,y-12);
-        c.fillStyle="#8b949e";c.font="10px Inter";c.fillText(i===0?"Pythia":i===1?"Extended":"Frontier",x,H-p.b+16);
-      });
-      c.textAlign="right";c.fillStyle="#8b949e";c.font="10px Inter";
-      for(let y=-1;y<=0;y+=0.5){c.fillText(y.toFixed(1),p.l-6,Y(y)+4);}
+      /* grid & labels */
+      c.fillStyle="#8b949e";c.font="10px Inter";c.textAlign="center";
+      for(let i=8;i<=11;i++){c.fillText(i===8?"100M":i===9?"1B":i===10?"10B":"100B",X(i),H-p.b+14);}
+      c.textAlign="right";c.fillStyle="#6b7280";
+      for(let v of[1,-1]){const y=Y(v);c.fillText(v>0?"r = +1":"r = −1",p.l-6,y+3);}
+      c.save();c.translate(10,H/2);c.rotate(-Math.PI/2);c.fillStyle="#6b7280";c.textAlign="center";
+      c.font="10px Inter";c.fillText("Correlation",0,0);c.restore();
     };
     draw();window.addEventListener("resize",draw);return()=>window.removeEventListener("resize",draw);
   },[]);
-  return h("canvas",{ref:ref,style:{width:"100%",height:"220px",display:"block"}});
+  return h("canvas",{ref:ref,style:{width:"100%",height:"200px",display:"block"}});
 }
 
-/* ── CANVAS: d_eff EXPANSION ─────────────────────────── */
+/* ── CANVAS: d_eff expansion ────────────────────────── */
 function DeffExpChart(){
   const ref=useRef(null);
   useEffect(()=>{
     const cv=ref.current;if(!cv)return;
     const draw=()=>{
       const dpr=window.devicePixelRatio||1;
-      const W=cv.parentElement.clientWidth||400,H=220;
+      const W=cv.parentElement.clientWidth||400,H=200;
       cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";
       const c=cv.getContext("2d");c.scale(dpr,dpr);
-      const p={l:50,r:20,t:20,b:40};
-      const yL=0.8,yH=2.2;
-      const X=i=>p.l+i/(CE.length-1)*(W-p.l-p.r);
-      const Y=v=>p.t+(yH-v)/(yH-yL)*(H-p.t-p.b);
+      const p={l:48,r:12,t:12,b:32};
+      const lL=7,lH=11.5;
+      const X=n=>p.l+(n-lL)/(lH-lL)*(W-p.l-p.r);
+      const Y=d=>p.t+(2-d)/1.95*(H-p.t-p.b);
       c.clearRect(0,0,W,H);
-      c.strokeStyle="#1c2128";c.lineWidth=1;
-      for(let y=1;y<=2;y+=0.5){const yy=Y(y);c.beginPath();c.moveTo(p.l,yy);c.lineTo(W-p.r,yy);c.stroke();}
-      c.strokeStyle="#FFD700";c.lineWidth=1.5;c.setLineDash([4,3]);
-      c.beginPath();c.moveTo(p.l,Y(2.0));c.lineTo(W-p.r,Y(2.0));c.stroke();c.setLineDash([]);
-      c.strokeStyle="#FF5722";c.lineWidth=2.5;c.beginPath();
-      CE.forEach((d,i)=>{if(i===0)c.moveTo(X(i),Y(d.deff));else c.lineTo(X(i),Y(d.deff));});
+      /* Nc */
+      const ncX=X(Math.log10(NC));c.strokeStyle="#FFD700";c.lineWidth=1;c.setLineDash([3,3]);
+      c.beginPath();c.moveTo(ncX,p.t);c.lineTo(ncX,H-p.b);c.stroke();c.setLineDash([]);
+      /* curve */
+      c.strokeStyle="#10b981";c.lineWidth=2.5;c.beginPath();
+      for(let i=lL;i<=lH;i+=0.05){const x=X(i),d=1+(CE[2].deff-1)/(1+Math.exp(-2*(i-Math.log10(NC))));
+        c.lineTo(x,Y(d));
+      }
       c.stroke();
-      CE.forEach((d,i)=>{
-        const x=X(i),y=Y(d.deff);
-        c.fillStyle="#FF5722";c.beginPath();c.arc(x,y,6,0,Math.PI*2);c.fill();
-        c.fillStyle="#c9d1d9";c.font="bold 12px Inter";c.textAlign="center";c.fillText(d.deff.toFixed(2),x,y-12);
-        c.fillStyle="#8b949e";c.font="10px Inter";c.fillText(i===0?"Pythia":i===1?"Extended":"Frontier",x,H-p.b+16);
-      });
-      c.textAlign="right";c.fillStyle="#8b949e";c.font="10px Inter";
-      for(let y=1;y<=2;y+=0.5){c.fillText(y.toFixed(1),p.l-6,Y(y)+4);}
-      c.fillStyle="#FFD700";c.textAlign="left";c.font="10px Inter";c.fillText("d=2 (new dimension)",p.l+4,Y(2)-6);
+      /* grid & labels */
+      c.fillStyle="#8b949e";c.font="10px Inter";c.textAlign="center";
+      for(let i=8;i<=11;i++){c.fillText(i===8?"100M":i===9?"1B":i===10?"10B":"100B",X(i),H-p.b+14);}
+      c.textAlign="right";c.fillStyle="#6b7280";
+      for(let d of[1,1.5,2]){const y=Y(d);c.fillText(d.toFixed(1),p.l-6,y+3);}
+      c.save();c.translate(10,H/2);c.rotate(-Math.PI/2);c.fillStyle="#6b7280";c.textAlign="center";
+      c.font="10px Inter";c.fillText("d_eff",0,0);c.restore();
     };
     draw();window.addEventListener("resize",draw);return()=>window.removeEventListener("resize",draw);
   },[]);
-  return h("canvas",{ref:ref,style:{width:"100%",height:"220px",display:"block"}});
+  return h("canvas",{ref:ref,style:{width:"100%",height:"200px",display:"block"}});
 }
 
-/* ── MAIN APP ────────────────────────────────────────── */
+/* ── MAIN APP COMPONENT ──────────────────────────────── */
 function App(){
   const [tab,setTab]=useState("overview");
-  const [uN,setUN]=useState("");
-  const [uT,setUT]=useState("");
-  const [uH,setUH]=useState("");
-  const [uS,setUS]=useState("");
-  const [showGloss,setShowGloss]=useState(false);
+  const [userN,setUserN]=useState("");
+  const [userT,setUserT]=useState("");
+  const [selectedModel,setSelectedModel]=useState(null);
+  const go=(t)=>()=>setTab(t);
 
-  const go=t=>()=>setTab(t);
-  const N=uN?parseFloat(uN):null;
-  const tqa=uT?parseFloat(uT):null;
-  const gv=N?g12(N):null;
-  const hf=tqa&&N?(tqa-UNIV(Math.log10(N))):null;
-  const reg=N?regime(N):null;
+  const selectedData=selectedModel?M.find(m=>m.n===selectedModel):null;
+  const selReg=selectedData?regime(selectedData.N):{l:"",c:"#888",bg:""};
 
-  /* Explore card helper */
-  const Expl=(props)=>h("div",{className:"explore-card",onClick:go(props.to),style:props.style||{}},
-    h("div",{style:{fontSize:12,fontWeight:700,color:props.color||"#58a6ff",marginBottom:3}},props.title),
-    h("div",{style:{fontSize:12,color:"#8b949e",lineHeight:1.5}},props.desc)
-  );
-
-  /* Stat box helper */
-  const Stat=(p)=>h("div",{className:"stat-box",style:{borderTop:"3px solid "+p.c}},
-    h("div",{className:"label"},p.label),
-    h("div",{style:{fontSize:22,fontWeight:800,color:p.c,margin:"4px 0"}},p.val),
-    h("div",{style:{fontSize:11,color:"#6b7280"}},p.sub)
-  );
-
-  return h("div",{style:{background:"#0a0e14",minHeight:"100vh",maxWidth:1100,margin:"0 auto",padding:"24px 28px"}},
-
-    /* ── HEADER ──────────────────────────────── */
-    h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20,flexWrap:"wrap",gap:12}},
-      h("div",null,
-        h("h1",{style:{color:"white",fontSize:22,fontWeight:800,margin:0,letterSpacing:"-0.3px"}},"The Alignment Tax is a Phase"),
-        h("p",{style:{color:"#6b7280",fontSize:13,margin:"4px 0 0"}},"Capability Coupling and Critical Scale in Neural Scaling Laws",
-          h("span",{style:{color:"#484f58"}}," · Amin 2026"))
-      ),
-      h("div",{style:{display:"flex",gap:8}},
-        ["GitHub","Paper","Data"].map((l,i)=>h("a",{key:l,
-          href:i===0?"https://github.com/adilamin89/cape-scaling":i===1?"https://github.com/adilamin89/cape-scaling/blob/main/paper3A_v4_arXiv.tex":"https://github.com/adilamin89/cape-scaling/tree/main/data",
-          target:"_blank",rel:"noopener",
-          style:{fontSize:12,fontWeight:600,color:"#8b949e",textDecoration:"none",background:"#161b22",border:"1px solid #21262d",borderRadius:6,padding:"6px 12px"}},l))
+  return h("div",{style:{minHeight:"100vh",padding:"20px 0"}},
+    /* header */
+    h("div",{style:{background:"#0d1117",borderBottom:"1px solid #21262d",padding:"20px 0",marginBottom:24,position:"sticky",top:0,zIndex:100}},
+      h("div",{style:{maxWidth:1200,margin:"0 auto",padding:"0 20px"}},
+        h("div",{style:{fontSize:28,fontWeight:900,color:"#f0f6fc",marginBottom:2}},"When Models Stop Lying — and When They Start Again"),
+        h("div",{style:{fontSize:14,color:"#8b949e",marginBottom:16}},"Capability Coupling and the Alignment Tax in AI Scaling Laws"),
+        h("div",{style:{display:"flex",gap:8,flexWrap:"wrap"}},
+          ["overview","explore","frontier","hd","physics","paper"].map(t=>
+            h("button",{key:t,className:"tab-btn"+(tab===t?" active":""),onClick:go(t)},
+              t==="overview"?"Overview":t==="explore"?"Explorer":t==="frontier"?"Frontier":t==="hd"?"h(D) Lab":
+              t==="physics"?"Physics":t==="paper"?"Paper":""))
+        )
       )
     ),
 
-    /* ── TABS ─────────────────────────────────── */
-    h("div",{style:{display:"flex",gap:6,marginBottom:22,flexWrap:"wrap",borderBottom:"1px solid #21262d",paddingBottom:12}},
-      [{id:"overview",l:"Overview"},{id:"explore",l:"Explorer"},{id:"frontier",l:"Frontier"},{id:"hd",l:"h(D) Lab"},{id:"physics",l:"Physics"},{id:"paper",l:"Paper"}].map(t=>
-        h("button",{key:t.id,className:"tab-btn"+(tab===t.id?" active":""),onClick:go(t.id)},t.l))
-    ),
-
-    /* ══════════════════════════════════════════════════════
-       OVERVIEW TAB
-    ══════════════════════════════════════════════════════ */
-    tab==="overview"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-
-      /* Hero sentence */
-      h("div",{style:{background:"linear-gradient(135deg,#161b22 0%,#0d1117 100%)",border:"1px solid #21262d",borderRadius:12,padding:"20px 24px",marginBottom:4}},
-        h("div",{style:{fontSize:16,fontWeight:700,color:"#f0f6fc",lineHeight:1.6,marginBottom:8}},
-          "Below 3.5B parameters, making a model more capable makes it ",
-          h("span",{style:{color:"#f87171"}},"less honest"),
-          ". Above 3.5B, capability and honesty become ",
-          h("span",{style:{color:"#6ee7b7"}},"cooperative"),
-          ". This is not a tuning choice — it's a ",
-          h("span",{style:{color:"#FFD700"}},"phase transition"),
-          "."
-        ),
-        h("div",{style:{fontSize:12,color:"#6b7280"}},"26 models across 9 families. Nc = 3.5B (CI: 2.9B–13.4B). r = −0.989 within Pythia → +0.082 at frontier.")
-      ),
-
-      /* Stat boxes */
-      h("div",{className:"g4",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:12}},
-        h(Stat,{label:"Critical scale",val:"3.5B",sub:"Bootstrap CI [2.9B, 13.4B]",c:"#FFD700"}),
-        h(Stat,{label:"Effective dimension",val:"1.99",sub:"from 1.05 at Pythia-only",c:"#2196F3"}),
-        h(Stat,{label:"Pythia anticorrelation",val:"−0.989",sub:"p < 10⁻⁵ within family",c:"#f87171"}),
-        h(Stat,{label:"Frontier coupling",val:"r = +0.55",sub:"SWE × GPQA cooperative",c:"#6ee7b7"})
-      ),
-
-      /* Main chart */
-      h("div",{className:"card"},
-        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:12,flexWrap:"wrap",gap:8}},
-          h("div",null,
-            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc"}},"TruthfulQA vs Model Size"),
-            h("div",{style:{fontSize:12,color:"#6b7280",marginTop:2}},"26 models, 9 families. Blue curve = universal baseline. Phi (diamonds) breaks the pattern — see h(D) Lab.")
-          ),
-          h("div",{style:{display:"flex",gap:6}},
-            h("span",{className:"chip",onClick:go("hd")},"Why Phi? →"),
-            h("span",{className:"chip",onClick:go("explore")},"Your model →")
-          )
-        ),
-        h(PhaseChart,{uN:uN,uT:uT}),
-        h("div",{style:{display:"flex",flexWrap:"wrap",gap:"6px 14px",marginTop:10}},
-          Object.entries(FC).map(([f,c])=>h("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#8b949e"}},
-            f==="Phi"?h("div",{style:{width:8,height:8,background:c,transform:"rotate(45deg)"}}):h("div",{style:{width:8,height:8,borderRadius:"50%",background:c}}),f)),
-          h("div",{style:{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#6b7280"}},
-            h("div",{style:{width:16,height:0,borderTop:"2px dashed #60a5fa"}}),
-            "Universal fit"
-          )
-        )
-      ),
-
-      /* Correlation evolution compact */
-      h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"The Sign Flip"),
-        h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},
-          "As we expand beyond Pythia, the anticorrelation dissolves. At frontier scale, capability and honesty cooperate. ",
-          h("span",{className:"chip",onClick:go("physics"),style:{marginLeft:4}},"Full physics →")
-        ),
-        h("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}},
-          CE.map((s,i)=>h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid "+(s.corr<0?"#f87171":"#4CAF50")}},
-            h("div",{style:{fontSize:13,fontWeight:700,color:"#c9d1d9",marginBottom:8}},s.scale),
-            h("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:8}},
-              h("div",{style:{flex:1,height:6,background:"#161b22",borderRadius:3,overflow:"hidden"}},
-                h("div",{style:{height:"100%",width:Math.abs(s.corr)*100+"%",background:s.corr<0?"#f87171":"#4CAF50",borderRadius:3}})
-              ),
-              h("span",{style:{fontSize:14,fontWeight:800,color:s.corr<0?"#f87171":"#4CAF50",minWidth:50,textAlign:"right"}},s.corr.toFixed(3))
-            ),
-            h("div",{style:{fontSize:11,color:"#6b7280"}},"d_eff = ",h("span",{style:{color:"#2196F3",fontWeight:700}},s.deff.toFixed(2))," · ",s.n," models")
-          ))
-        )
-      ),
-
-      /* Explore cards */
-      h("div",{className:"g4",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10}},
-        h(Expl,{to:"explore",color:"#fbbf24",title:"Explorer",desc:"Enter any model — dynamic regime, benchmarks, h-field, physics."}),
-        h(Expl,{to:"frontier",color:"#CC785C",title:"Frontier Models",desc:FR.length+" frontier models with SWE, GPQA, ARC-AGI-2 benchmarks."}),
-        h(Expl,{to:"hd",color:"#E91E63",title:"h(D) Lab Ranking",desc:"How data curation shifts the phase boundary. Phi-4: +23 pts."}),
-        h(Expl,{to:"physics",color:"#9C27B0",title:"Physics",desc:"GL theory, symmetry classes, Nc2 predictions, and the glossary."})
-      )
-    ),
-
-    /* ══════════════════════════════════════════════════════
-       EXPLORER TAB — DYNAMIC ANALYSIS ENGINE
-    ══════════════════════════════════════════════════════ */
-    tab==="explore"&&(()=>{
-      const isFrontier=N&&N>5e10;
-      const isTransition=N&&N>2e9&&N<=7e10;
-      const isTax=N&&N<=2e9;
-      const nearModels=N?M.filter(m=>Math.abs(Math.log10(m.N)-Math.log10(N))<0.5).sort((a,b)=>Math.abs(Math.log10(a.N)-Math.log10(N))-Math.abs(Math.log10(b.N)-Math.log10(N))).slice(0,4):[];
-      const nearFrontier=N&&N>1e10?FR.filter(m=>m.swe!==null||m.gpqa!==null).slice(0,6):[];
-      const activePair=isFrontier?{a:"SWE-bench",b:"GPQA Diamond",corr:"+0.55",phase:"deep alignment bonus",c:"#9C27B0"}:
-        isTransition?{a:"HellaSwag",b:"TruthfulQA",corr:"→ +0.08",phase:"alignment bonus (cooperative)",c:"#4CAF50"}:
-        {a:"HellaSwag",b:"TruthfulQA",corr:"−0.989",phase:"alignment tax (competing)",c:"#f87171"};
-      const deffEst=N?Math.min(2.0,Math.max(1.0,-0.27*Math.log10(N)+3.9)):null;
-      const univPred=N?UNIV(Math.log10(N)):null;
-
-      return h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-
-        /* Input section */
+    /* content */
+    h("div",{style:{maxWidth:1200,margin:"0 auto",padding:"0 20px"}},
+      /* ════════════════════════════════════════════════════════════
+         OVERVIEW TAB
+      ════════════════════════════════════════════════════════════ */
+      tab==="overview"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+        /* Hero */
         h("div",{className:"card"},
-          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Model Explorer"),
-          h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},"Enter any model's parameters. The dashboard dynamically computes regime, active benchmarks, h-field, physics, and recommendations."),
-          h("div",{className:"g4",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10,marginBottom:12}},
-            [{l:"Model size (N)",v:uN,s:setUN,p:"e.g. 3.5e9"},{l:"TruthfulQA %",v:uT,s:setUT,p:"e.g. 38.7"},{l:"HellaSwag %",v:uH,s:setUH,p:"e.g. 67.3"},{l:"SWE-bench %",v:uS,s:setUS,p:"e.g. 79.6"}].map(f=>
-              h("div",{key:f.l},
-                h("div",{className:"label"},f.l),
-                h("input",{value:f.v,onChange:e=>f.s(e.target.value),placeholder:f.p,
-                  style:{width:"100%",background:"#0d1117",border:"1px solid #21262d",borderRadius:6,padding:"9px 12px",color:"#c9d1d9",fontSize:13}})))
+          h("div",{style:{fontSize:16,fontWeight:700,color:"#f0f6fc",lineHeight:1.65,marginBottom:12}},
+            "Below 3.5B parameters, scaling reasoning actively degrades truthfulness (r = −0.989). Above 3.5B, they cooperate. This isn't a tuning choice or an RLHF artifact — it's a pre-training phase transition, invisible in loss, confirmed by 12 independent diagnostics."
           ),
-          h("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
-            h("span",{style:{fontSize:11,color:"#484f58",alignSelf:"center"}},"Presets:"),
-            [{l:"Pythia-1B",n:"1e9",t:"38.9",hs:"49.7",sw:""},{l:"OLMo-7B",n:"7e9",t:"35.7",hs:"78",sw:""},
-             {l:"Phi-4",n:"14e9",t:"65",hs:"84.4",sw:""},{l:"Llama-3-70B",n:"7e10",t:"44.9",hs:"88",sw:""},
-             {l:"Opus 4.6",n:"5e11",t:"",hs:"",sw:"80.8"},{l:"Sonnet 4.6",n:"7e10",t:"",hs:"",sw:"79.6"},
-             {l:"DeepSeek-V3",n:"6.71e11",t:"59.1",hs:"88.9",sw:"74.4"}].map(pr=>
-              h("button",{key:pr.l,onClick:()=>{setUN(pr.n);setUT(pr.t);setUH(pr.hs);setUS(pr.sw)},
-                style:{background:"#0d1117",border:"1px solid #21262d",borderRadius:20,padding:"4px 12px",fontSize:11,color:"#8b949e",cursor:"pointer"}},pr.l))
-          )
-        ),
-
-        /* Dynamic results — only shown when N is entered */
-        N&&gv!==null&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-
-          /* Regime + computed values */
-          h("div",{className:"card",style:{borderLeft:"3px solid "+reg.c}},
-            h("div",{style:{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",marginBottom:12}},
-              h("div",{style:{background:reg.c,color:"#000",borderRadius:6,padding:"6px 14px",fontSize:12,fontWeight:800}},reg.l),
-              h("div",{style:{fontSize:13,color:"#c9d1d9"}},(N/1e9).toFixed(N>1e9?1:2)+"B parameters"),
-              h("div",{style:{fontSize:13,fontWeight:700,color:reg.c}},"γ₁₂ = "+gv.toFixed(3))
-            ),
-            h("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:14}},
-              h("div",{style:{background:"#0d1117",borderRadius:8,padding:"12px 14px"}},
-                h("div",{className:"label"},"Active benchmark pair"),
-                h("div",{style:{fontSize:14,fontWeight:700,color:activePair.c}},activePair.a," × ",activePair.b),
-                h("div",{style:{fontSize:11,color:"#6b7280"}},"Corr: ",activePair.corr," · Phase: ",activePair.phase)
-              ),
-              h("div",{style:{background:"#0d1117",borderRadius:8,padding:"12px 14px"}},
-                h("div",{className:"label"},"Effective dimension"),
-                h("div",{style:{fontSize:14,fontWeight:700,color:"#2196F3"}},deffEst?deffEst.toFixed(2):"—"),
-                h("div",{style:{fontSize:11,color:"#6b7280"}},deffEst&&deffEst>1.8?"HS saturating — new dims active":deffEst&&deffEst>1.3?"Expanding — HS weakening":"Single dominant axis")
-              ),
-              h("div",{style:{background:"#0d1117",borderRadius:8,padding:"12px 14px"}},
-                h("div",{className:"label"},"h-field (data curation)"),
-                h("div",{style:{fontSize:14,fontWeight:700,color:hf!==null?(Math.abs(hf)>10?"#E91E63":hf>0?"#6ee7b7":"#f87171"):"#484f58"}},
-                  hf!==null?(hf>0?"+":"")+hf.toFixed(1)+" pts":"Need TQA + HS"),
-                h("div",{style:{fontSize:11,color:"#6b7280"}},hf!==null?(hf>10?"Strong curation effect":hf>0?"Above baseline":"Below baseline — data quality issue"):"Enter both to compute")
-              )
-            ),
-
-            /* Regime-specific physics interpretation */
-            h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid "+activePair.c}},
-              h("div",{style:{fontSize:13,fontWeight:700,color:activePair.c,marginBottom:6}},
-                isFrontier?"Frontier Physics — HellaSwag Saturated":isTransition?"Transition/Bonus Physics — Cooperation Emerging":"Tax Physics — Capability-Honesty Tradeoff"
-              ),
-              h("div",{style:{fontSize:13,color:"#c9d1d9",lineHeight:1.65}},
-                isFrontier?"At this scale, HellaSwag variance has collapsed 72× (4.9 vs 353 at small scale). The original TQA×HS pair can no longer discriminate between models. SWE-bench × GPQA Diamond becomes the active coupling pair (r = +0.55). Your model exists in the deep alignment bonus regime where d_eff ≈ 2 — two independent capability dimensions are active. Watch for Nc2 in agentic-safety pairs.":
-                isTransition?"The anticorrelation is dissolving. At this scale, models are large enough to learn actual facts rather than surface statistics. The eigenvector e₁ is rotating — TruthfulQA is joining the positive side. Data curation (h-field) has maximum leverage here: small improvements in training data produce outsized alignment gains. The Ginzburg number Gi approaches 1 — fluctuations are large.":
-                "Scaling reasoning actively degrades truthfulness in this regime. The alignment tax is real and measurable: r = −0.989 within Pythia. Loss (cross-entropy) is featureless throughout (CV < 1%) — you cannot detect this from loss alone. Two escape routes: (1) scale past Nc = 3.5B, or (2) apply strong data curation h-field (the Phi approach: +23 pts from curated data)."
-              )
-            ),
-
-            /* Recommendations */
-            h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:12}},
-              h("div",{style:{background:"#0d1117",borderRadius:8,padding:"12px 14px",borderLeft:"3px solid #60a5fa"}},
-                h("div",{style:{fontSize:12,fontWeight:700,color:"#60a5fa",marginBottom:4}},isFrontier?"Frontier recommendation":"For model trainers"),
-                h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.6}},
-                  isFrontier?"Measure SWE-bench and GPQA Diamond — these are your active dimensions. Track within-family γ₁₂ across releases. Watch for sign flips in agentic-safety pairs (SWE vs refusal rate).":
-                  isTransition?"You're in the sweet spot for data curation. h(D) shifts Nc — Phi-4 shows +23 pts is achievable. Measure both TQA and HS to compute h-field. Consider curated/synthetic data pipelines.":
-                  "Data curation gives 10× more leverage than scale at this size. The Phi approach (curated training data) can effectively skip the tax regime. If scaling: target N > 3.5B to cross Nc."
-                )
-              ),
-              h("div",{style:{background:"#0d1117",borderRadius:8,padding:"12px 14px",borderLeft:"3px solid #9C27B0"}},
-                h("div",{style:{fontSize:12,fontWeight:700,color:"#9C27B0",marginBottom:4}},isFrontier?"For alignment researchers":"For alignment researchers"),
-                h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.6}},
-                  isFrontier?"Monitor Nc2 — predicted in agentic-safety pairs at 5T-30T. The current SWE×GPQA pair is cooperative (no transition yet). Track d_eff: at 1T it should reach 2.4-2.6 if the scaling law holds.":
-                  isTransition?"Measure γ₁₂ directly — loss is blind to this coupling. The transition zone has maximum sensitivity: small recipe changes cause large alignment swings. OLMo confirmed γ₁₂ = 0.000 independently.":
-                  "This is where the capability-safety tradeoff is strongest. Every point of HS improvement costs TQA. The coupling γ₁₂ = "+gv.toFixed(2)+" quantifies the tax rate. Track this across training runs."
-                )
-              )
-            )
-          ),
-
-          /* Phase diagram */
-          h("div",{className:"card"},
-            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Phase Diagram — Your Model"),
-            h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:10}},"Gold ring = your model. Dashed line = universal baseline. Phi (diamonds) = external field effect."),
-            h(PhaseChart,{uN:uN,uT:uT}),
-            h("div",{style:{display:"flex",flexWrap:"wrap",gap:"6px 14px",marginTop:10}},
-              Object.entries(FC).map(([f,c])=>h("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#8b949e"}},
-                f==="Phi"?h("div",{style:{width:8,height:8,background:c,transform:"rotate(45deg)"}}):h("div",{style:{width:8,height:8,borderRadius:"50%",background:c}}),f))
-            )
-          ),
-
-          /* Frontier scatter — only for large models */
-          isFrontier&&h("div",{className:"card"},
-            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Frontier Coupling — SWE-bench × GPQA"),
-            h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:10}},"At your model's scale, this is the active benchmark pair. ",frWithBoth.length," frontier models with both benchmarks shown."),
-            h(FrontierChart,null),
-            h("div",{style:{display:"flex",flexWrap:"wrap",gap:"6px 14px",marginTop:10}},
-              Object.entries(FFC).map(([f,c])=>h("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#8b949e"}},
-                h("div",{style:{width:8,height:8,borderRadius:"50%",background:c}}),f))
-            )
-          ),
-
-          /* h(D) comparison — when TQA+HS available */
-          hf!==null&&h("div",{className:"card"},
-            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Your h(D) vs Lab Ranking"),
-            h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:12}},"Your model's data curation offset compared to published models. h(D) = TQA_observed − TQA_universal(HS)."),
-            h("div",{style:{width:"100%"}},
-              [{name:"YOUR MODEL",lab:"",h:Math.round(hf*10)/10,N:Math.round(N/1e9),note:"← you",highlight:true}].concat(HD.slice(0,6)).map((m,i)=>h("div",{key:i,style:{marginBottom:10}},
-                h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}},
-                  h("div",{style:{fontSize:12,fontWeight:m.highlight?800:600,color:m.highlight?"#FFD700":"#c9d1d9"}},m.name),
-                  h("div",{style:{fontSize:11,color:"#6b7280"}},m.lab?m.lab+" · ":"",m.N+"B",m.note?" "+m.note:"")
-                ),
-                h("div",{style:{display:"flex",alignItems:"center",gap:10}},
-                  h("div",{style:{flex:1,height:m.highlight?10:6,background:"#0d1117",borderRadius:4,overflow:"hidden"}},
-                    h("div",{style:{height:"100%",width:Math.max(3,Math.min(100,(m.h+5)/28*100))+"%",
-                      background:m.highlight?"#FFD700":m.h>15?"#E91E63":m.h>5?"#4CAF50":m.h>0?"#2196F3":"#FF5722",borderRadius:4}})
-                  ),
-                  h("div",{style:{fontSize:12,fontWeight:700,color:m.highlight?"#FFD700":m.h>15?"#E91E63":m.h>5?"#4CAF50":m.h>0?"#2196F3":"#FF5722",minWidth:44,textAlign:"right"}},(m.h>0?"+":"")+m.h)
-                )
-              ))
-            )
-          ),
-
-          /* Nearest reference models */
-          nearModels.length>0&&h("div",{className:"card"},
-            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Nearest Reference Models"),
-            h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:10}},"Models at similar scale in our dataset for comparison."),
-            h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"repeat("+Math.min(nearModels.length,4)+",1fr)",gap:10}},
-              nearModels.map(m=>h("div",{key:m.n,style:{background:"#0d1117",borderRadius:8,padding:"12px 14px",borderLeft:"3px solid "+FC[m.f]}},
-                h("div",{style:{fontSize:12,fontWeight:700,color:"#c9d1d9",marginBottom:4}},m.n),
-                h("div",{style:{fontSize:11,color:"#8b949e"}},"N = ",(m.N/1e9).toFixed(1)+"B"),
-                h("div",{style:{fontSize:11,color:"#8b949e"}},"TQA: "+m.tqa+"% · HS: "+m.hs+"%"),
-                h("div",{style:{fontSize:11,color:FC[m.f],marginTop:4}},m.f," family")
-              ))
-            )
-          ),
-
-          /* Frontier comparison — for large models */
-          nearFrontier.length>0&&h("div",{className:"card"},
-            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Frontier Comparison"),
-            h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:10}},"Frontier models with public benchmarks at comparable scale."),
-            h("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:12}},
-              h("thead",null,h("tr",{style:{borderBottom:"1px solid #21262d"}},
-                ["Model","Lab","Size","SWE","GPQA","ARC-AGI-2"].map(hdr=>h("th",{key:hdr,style:{padding:"6px 8px",textAlign:"left",color:"#6b7280",fontSize:11,fontWeight:600}},hdr)))),
-              h("tbody",null,nearFrontier.map(m=>h("tr",{key:m.n,style:{borderBottom:"1px solid #161b22"}},
-                h("td",{style:{padding:"6px 8px",color:"#c9d1d9",fontWeight:600}},m.n),
-                h("td",{style:{padding:"6px 8px",color:FFC[m.fam]}},m.fam),
-                h("td",{style:{padding:"6px 8px",color:"#8b949e"}},m.sz),
-                h("td",{style:{padding:"6px 8px",color:m.swe?"#c9d1d9":"#30363d"}},m.swe?m.swe.toFixed(1)+"%":"—"),
-                h("td",{style:{padding:"6px 8px",color:m.gpqa?"#c9d1d9":"#30363d"}},m.gpqa?m.gpqa.toFixed(1)+"%":"—"),
-                h("td",{style:{padding:"6px 8px",color:m.arc?"#4CAF50":"#30363d"}},m.arc?m.arc.toFixed(1)+"%":"—")
-              )))
+          h("div",{style:{display:"flex",gap:8,flexWrap:"wrap",marginTop:12}},
+            ["Model Trainers","Alignment Researchers","Physicists","Frontier Labs"].map(a=>
+              h("button",{key:a,className:"chip",onClick:go("explore"),style:{cursor:"pointer"}},"→ ",a)
             )
           )
         ),
 
-        /* Empty state */
-        !N&&h("div",{style:{textAlign:"center",padding:"60px 20px"}},
-          h("div",{style:{fontSize:18,fontWeight:700,color:"#484f58",marginBottom:8}},"Enter a model to begin"),
-          h("div",{style:{fontSize:13,color:"#30363d"}},"Try a preset above, or enter your own model's N, benchmarks. The analysis adapts to whatever data you provide.")
-        )
-      );
-    })(),
-
-    /* ══════════════════════════════════════════════════════
-       FRONTIER TAB
-    ══════════════════════════════════════════════════════ */
-    tab==="frontier"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-      h("div",{className:"card"},
-        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",flexWrap:"wrap",gap:8,marginBottom:12}},
-          h("div",null,
-            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc"}},"SWE-bench vs GPQA Diamond — New Coupling Pair"),
-            h("div",{style:{fontSize:12,color:"#6b7280",marginTop:2}},"At frontier scale HellaSwag saturates. Active coupling shifts to coding × reasoning. ",frWithBoth.length," of ",FR.length," models have both benchmarks (",frCoverage,"% coverage).")
-          ),
-          h("span",{className:"chip",onClick:go("physics")},"Why saturation? →")
-        ),
-        h(FrontierChart,null),
-        h("div",{style:{display:"flex",flexWrap:"wrap",gap:"6px 14px",marginTop:10}},
-          Object.entries(FFC).map(([f,c])=>h("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:11,color:"#8b949e"}},
-            h("div",{style:{width:8,height:8,borderRadius:"50%",background:c}}),f))
-        )
-      ),
-
-      h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Anthropic Trajectory: Within-Family Phase Structure"),
-        h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},"Same lab, three models — Sonnet 4.6 shows a tax excursion that Opus recovers from. Mirrors the Nc transition at frontier scale."),
-        h("div",{style:{display:"flex",alignItems:"center",flexWrap:"wrap",gap:8}},
-          [{m:"Sonnet 4.5",swe:"77.2",gpqa:"83.4",border:"#30363d"},
-           {arrow:true,label:"γ₁₂ = −3.88",c:"#f87171"},
-           {m:"Sonnet 4.6",swe:"79.6",gpqa:"89.9",border:"#f87171"},
-           {arrow:true,label:"γ₁₂ = +14.3",c:"#6ee7b7"},
-           {m:"Opus 4.6",swe:"80.8",gpqa:"91.3",border:"#6ee7b7"}
-          ].map((item,i)=>item.arrow?
-            h("div",{key:i,style:{display:"flex",flexDirection:"column",alignItems:"center",padding:"0 4px"}},
-              h("div",{style:{fontSize:16,color:item.c}},"→"),
-              h("div",{style:{fontSize:10,fontWeight:700,color:item.c,whiteSpace:"nowrap"}},item.label)
-            ):
-            h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"10px 14px",border:"1px solid "+item.border}},
-              h("div",{style:{fontSize:12,fontWeight:700,color:"#c9d1d9",marginBottom:3}},item.m),
-              h("div",{style:{fontSize:11,color:"#8b949e"}},"SWE "+item.swe+"% · GPQA "+item.gpqa+"%")
-            )
-          )
-        )
-      ),
-
-      h("div",{className:"card"},
-        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:12}},
-          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc"}},"All Frontier Models — March 2026"),
-          h("div",{style:{fontSize:11,color:"#484f58"}},FR.length+" models · ",FR.filter(m=>m.swe).length," with SWE · ",FR.filter(m=>m.gpqa).length," with GPQA")
-        ),
-        h("div",{style:{overflowX:"auto"}},
-          h("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:12}},
-            h("thead",null,h("tr",{style:{borderBottom:"1px solid #21262d"}},
-              ["Model","Lab","Size","SWE-bench","GPQA","ARC-AGI-2","Note"].map(hdr=>
-                h("th",{key:hdr,style:{padding:"8px 10px",textAlign:"left",color:"#6b7280",fontWeight:600,fontSize:11}},hdr)))),
-            h("tbody",null,
-              FR.map(m=>h("tr",{key:m.n,style:{borderBottom:"1px solid #161b22"}},
-                h("td",{style:{padding:"8px 10px",color:"#c9d1d9",fontWeight:600}},m.n),
-                h("td",{style:{padding:"8px 10px",color:FFC[m.fam]||"#8b949e"}},m.fam),
-                h("td",{style:{padding:"8px 10px",color:"#8b949e"}},m.sz),
-                h("td",{style:{padding:"8px 10px",color:m.swe?"#c9d1d9":"#30363d",fontWeight:m.swe?600:400}},m.swe?m.swe.toFixed(1)+"%":"—"),
-                h("td",{style:{padding:"8px 10px",color:m.gpqa?"#c9d1d9":"#30363d",fontWeight:m.gpqa?600:400}},m.gpqa?m.gpqa.toFixed(1)+"%":"—"),
-                h("td",{style:{padding:"8px 10px",color:m.arc?"#4CAF50":"#30363d"}},m.arc?m.arc.toFixed(1)+"%":"—"),
-                h("td",{style:{padding:"8px 10px",color:"#484f58",fontSize:11}},m.note||"")
-              ))
-            )
+        /* What CAPE Measures — Physics Meets ML */
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:16}},"What CAPE Measures — Physics Meets ML"),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            [
+              {title:"γ₁₂ (coupling)",physics:"In physics: inter-band susceptibility.",ml:"In ML: how much one benchmark changes per unit gain in another. γ₁₂ < 0 = alignment tax; γ₁₂ > 0 = alignment bonus."},
+              {title:"Loss is blind",physics:"In physics: featureless order parameter.",ml:"Loss follows a featureless power law (CV = 0.8%). Two models with identical loss can be in opposite alignment regimes. Only the cross-derivative reveals the transition."},
+              {title:"The ODE",physics:"In physics: renormalization group equations.",ml:"dHS/dlog₁₀N = 1.23 − 0.72·TQA. Discovered via sparse regression (PySINDy), not assumed. Reproduces all 5 benchmarks at 3.6% error."},
+              {title:"h(D) field",physics:"In physics: external magnetic field.",ml:"In ML: training data curation quality. Shifts the phase boundary. At 1B params: 1 unit of data quality ≈ 10× in model size."}
+            ].map(c=>h("div",{key:c.title,className:"stat-box",style:{borderTop:"3px solid #3b82f6"}},
+              h("div",{style:{fontSize:13,fontWeight:700,color:"#c9d1d9",marginBottom:8}},c.title),
+              h("div",{style:{fontSize:11,color:"#6b7280",lineHeight:1.6,marginBottom:6}},c.physics),
+              h("div",{style:{fontSize:11,color:"#8b949e",lineHeight:1.6}},c.ml)
+            ))
           )
         ),
-        h("div",{style:{fontSize:11,color:"#30363d",marginTop:10}},"Source: public model cards and leaderboards, Feb–Mar 2026. Missing entries (—) = not publicly reported.")
-      )
-    ),
 
-    /* ══════════════════════════════════════════════════════
-       h(D) LAB TAB
-    ══════════════════════════════════════════════════════ */
-    tab==="hd"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-      h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Training Data Quality Offset — h(D)"),
-        h("div",{style:{fontSize:13,color:"#8b949e",lineHeight:1.6,marginBottom:16}},
-          "h(D) = TQA_observed − TQA_predicted(HS, web-baseline). Measures alignment-relevant curation per lab. ",
-          "In the Ginzburg-Landau analogy, this is the ",h("span",{style:{color:"#E91E63",fontWeight:600}},"external magnetic field"),
-          " — it can shift the phase boundary and break the alignment tax ↔ bonus symmetry without changing N.",
-          h("span",{className:"chip",onClick:go("physics"),style:{marginLeft:6}},"GL theory →")
-        ),
-        h("div",{style:{width:"100%"}},
-          HD.map((m,i)=>h("div",{key:i,style:{marginBottom:14}},
-            h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}},
-              h("div",{style:{fontSize:13,fontWeight:600,color:"#c9d1d9"}},m.name),
-              h("div",{style:{fontSize:11,color:"#6b7280"}},m.lab," · ",m.N,"B")
-            ),
-            h("div",{style:{display:"flex",alignItems:"center",gap:12}},
-              h("div",{style:{flex:1,height:8,background:"#0d1117",borderRadius:4,overflow:"hidden"}},
-                h("div",{style:{height:"100%",width:Math.max(3,Math.min(100,(m.h+5)/28*100))+"%",
-                  background:m.h>15?"#E91E63":m.h>5?"#4CAF50":m.h>0?"#2196F3":"#FF5722",borderRadius:4}})
-              ),
-              h("div",{style:{fontSize:13,fontWeight:700,color:m.h>15?"#E91E63":m.h>5?"#4CAF50":m.h>0?"#2196F3":"#FF5722",minWidth:48,textAlign:"right"}},(m.h>0?"+":"")+m.h)
-            ),
-            m.note?h("div",{style:{fontSize:11,color:"#484f58",marginTop:3}},m.note):null
-          ))
-        )
-      ),
-
-      h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Key Findings"),
-        h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
-          [{t:"Phi-4 (Microsoft)",c:"#E91E63",d:"+23 TQA points above universal baseline. Curated/synthetic data acts as GL external field. Can engineer a downward shift in Nc — making smaller models align earlier."},
-           {t:"DeepSeek-V3",c:"#FF5722",d:"+15 points despite web pretraining. R1 reasoning distillation in post-training achieves high h(D) without synthetic pretraining data. Different mechanism, similar effect."},
-           {t:"Frontier labs (data gap)",c:"#6b7280",d:"Claude, GPT-5.x, Gemini: TruthfulQA not publicly reported. Likely large positive h(D) from proprietary RLHF. Cannot rank frontier labs until data released."},
-           {t:"Testable prediction",c:"#FFD700",d:"If frontier TQA published: Anthropic > OpenAI ≈ Google > Meta for h(D). DeepSeek competitive via post-training. Phi family remains the external field benchmark."}
-          ].map((f,i)=>h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid "+f.c}},
-            h("div",{style:{fontSize:13,fontWeight:700,color:f.c,marginBottom:6}},f.t),
-            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},f.d)
-          ))
-        )
-      )
-    ),
-
-    /* ══════════════════════════════════════════════════════
-       PHYSICS TAB
-    ══════════════════════════════════════════════════════ */
-    tab==="physics"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-      /* Three regimes */
-      h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Three Regimes, Three Effective Theories"),
-        h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},"The alignment tax is not a design flaw — it's a phase of matter that exists below Nc."),
-        [{range:"N < 3.5B",phase:"Alignment Tax",c:"#f87171",corr:"r = −0.989",deff:"1.05",
-          desc:"HellaSwag and TruthfulQA anticorrelate. Scaling reasoning actively degrades truthfulness — the alignment tax.",
-          bench:"HS ⊕ TQA (anticoupled)",ev:"e₁ = [+HS, −TQA, +ARC, +WG]"},
-         {range:"3.5B – 70B",phase:"Alignment Bonus",c:"#4CAF50",corr:"r → +0.08",deff:"1.63",
-          desc:"Scale resolves the conflict. The coupling sign flips — reasoning and truthfulness become cooperative.",
-          bench:"HS ⊕ TQA (coupled)",ev:"e₁ rotates: TQA joins positive side"},
-         {range:"N > 100B",phase:"Deep Bonus + HS Saturated",c:"#9C27B0",corr:"r(SWE,GPQA) = +0.55",deff:"1.99",
-          desc:"HellaSwag ceiling at ~94%. New discriminating pair: SWE-bench × GPQA. d_eff approaches 2.",
-          bench:"SWE ⊕ GPQA (coupled)",ev:"d_eff → 2.0, new eigenvector appears"}
-        ].map(r=>h("div",{key:r.range,style:{background:"#0d1117",borderRadius:8,padding:"14px 18px",borderLeft:"3px solid "+r.c,marginBottom:10}},
-          h("div",{style:{display:"flex",gap:12,alignItems:"baseline",marginBottom:6,flexWrap:"wrap"}},
-            h("span",{style:{fontSize:14,fontWeight:700,color:r.c}},r.range),
-            h("span",{style:{fontSize:13,fontWeight:600,color:"#c9d1d9"}},r.phase),
-            h("span",{style:{fontSize:12,color:"#6b7280"}},r.corr)
-          ),
-          h("div",{style:{fontSize:13,color:"#c9d1d9",lineHeight:1.6,marginBottom:6}},r.desc),
-          h("div",{style:{fontSize:11,color:"#6b7280"}},"Benchmarks: ",r.bench," · ",r.ev," · d_eff = ",h("span",{style:{color:"#2196F3",fontWeight:700}},r.deff))
-        ))
-      ),
-
-      /* HS Saturation */
-      h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"HellaSwag Saturation — Why New Dimensions Emerge"),
-        h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},"The phase transition doesn't stop at Nc. At frontier scale, the original observables lose resolution."),
-        h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:14}},
-          h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px"}},
-            h("div",{className:"label"},"Correlation sign flip"),
-            h(CorrChart,null)
-          ),
-          h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px"}},
-            h("div",{className:"label"},"Effective dimension expansion"),
-            h(DeffExpChart,null)
-          )
-        ),
-        h("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:14}},
-          [{label:"Frontier HS variance",val:"4.9",sub:"N > 100B",c:"#FF5722"},
-           {label:"Small-scale HS variance",val:"353",sub:"N < 10B",c:"#4CAF50"},
-           {label:"Variance ratio",val:"72×",sub:"Signal collapse",c:"#FFD700"}
+        /* Stats */
+        h("div",{className:"g4",style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12}},
+          [{label:"Models analyzed",val:"26",c:"#3b82f6"},
+           {label:"Families",val:"9",c:"#10b981"},
+           {label:"Frontier evals",val:frCoverage+"%",c:"#f59e0b"},
+           {label:"Critical scale",val:"3.5B",c:"#6ee7b7"}
           ].map(s=>h("div",{key:s.label,className:"stat-box",style:{borderTop:"3px solid "+s.c}},
             h("div",{className:"label"},s.label),
-            h("div",{style:{fontSize:20,fontWeight:800,color:s.c}},s.val),
-            h("div",{style:{fontSize:11,color:"#6b7280"}},s.sub)
+            h("div",{style:{fontSize:20,fontWeight:800,color:s.c}},s.val)
           ))
         ),
-        h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid #FFD700",fontSize:13,color:"#c9d1d9",lineHeight:1.65}},
-          h("strong",{style:{color:"#FFD700"}},"Physical interpretation: "),
-          "When HellaSwag approaches its ceiling, its variance collapses 72× — it stops discriminating between models. The capability manifold geometry changes: d_eff expands from 1 to 2, and new benchmark dimensions (SWE-bench, GPQA, ARC-AGI-2) activate. This is analogous to a Lifshitz transition in condensed matter: the Fermi surface topology changes as a control parameter crosses a critical value."
-        )
-      ),
 
-      /* Nc2 candidates */
-      h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Nc2 Predictions — The Next Phase Transition"),
-        h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},"The current (SWE, GPQA) pair is cooperative. Nc2 appears in pairs with incompatible order parameters: agentic capability vs safety constraints."),
-        h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
-          NC2.map(c=>h("div",{key:c.pair,style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid "+c.c}},
-            h("div",{style:{fontSize:13,fontWeight:700,color:c.c,marginBottom:4}},c.pair),
-            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.6}},c.desc)
-          ))
-        )
-      ),
-
-      /* Glossary */
-      h("button",{onClick:()=>setShowGloss(!showGloss),style:{background:"#161b22",border:"1px solid #21262d",borderRadius:8,padding:"10px 16px",fontSize:13,color:"#8b949e",cursor:"pointer",alignSelf:"flex-start"}},showGloss?"Hide Glossary":"Show Physics Glossary"),
-      showGloss&&h("div",{className:"card"},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Glossary — Physics Concepts for ML Readers"),
-        h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"12px 20px"}},
-          [{t:"γ₁₂ (coupling)",d:"Rate at which one benchmark changes per unit change in another. Positive = cooperative, negative = tradeoff."},
-           {t:"Nc (critical scale)",d:"Model size where γ₁₂ crosses zero — the phase boundary between alignment tax and bonus."},
-           {t:"d_eff",d:"PCA participation ratio. Measures how many independent capability axes exist at a given scale."},
-           {t:"h-field",d:"External field from data curation/RLHF that shifts Nc. Analogous to magnetic field in Landau theory."},
-           {t:"Class D (topological)",d:"Symmetry classification from condensed matter. T=0, C=+1. Predicts Z₂ topological invariant."},
-           {t:"TRSB",d:"Time-reversal symmetry breaking. When Im(ψ_R*ψ_C) ≠ 0, training becomes irreversible."},
-           {t:"Ginzburg-Landau theory",d:"Effective field theory writing free energy as polynomial in order parameter ψ. Derives coupling ODE."},
-           {t:"Ginzburg number",d:"Gi = fluctuations / mean-field gap. Gi > 1 means mean-field breaks down. CAPE: Gi = 1.35 at ~130B."}
-          ].map(g=>h("div",{key:g.t},
-            h("div",{style:{fontSize:13,fontWeight:700,color:"#58a6ff",marginBottom:3}},g.t),
-            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.6}},g.d)
-          ))
-        )
-      )
-    ),
-
-    /* ══════════════════════════════════════════════════════
-       PAPER TAB
-    ══════════════════════════════════════════════════════ */
-    tab==="paper"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
-      h("div",{style:{background:"linear-gradient(135deg,#161b22 0%,#0d1117 100%)",border:"1px solid #21262d",borderRadius:12,padding:"24px 28px"}},
-        h("div",{style:{fontSize:11,color:"#7c3aed",fontWeight:700,letterSpacing:2,marginBottom:8}},"RESEARCH PAPER"),
-        h("div",{style:{fontSize:20,fontWeight:800,color:"#f0f6fc",lineHeight:1.4,marginBottom:12}},"The Alignment Tax is a Phase"),
-        h("div",{style:{fontSize:14,color:"#8b949e",marginBottom:6}},"Capability Coupling and Critical Scale in Neural Scaling Laws"),
-        h("div",{style:{fontSize:13,color:"#6b7280",marginBottom:16}},"Adil Amin · Independent Researcher · March 2026"),
-        h("div",{style:{fontSize:14,color:"#c9d1d9",lineHeight:1.7}},
-          "Below ~3.5B parameters, reasoning and truthfulness anticorrelate (r = −0.989): scaling reasoning actively degrades truthfulness. Above this critical scale, the coupling changes sign and the two capabilities become cooperative. The sign change is the surface of a deeper structure: dimensional collapse (d_eff: 2→1), a Riccati ODE governing eigenvector rotation, and a coupled dynamical system reproducing all five benchmark trajectories at 3.6% error. Eleven independent diagnostics converge on one structure. Curated training data eliminates the alignment tax entirely; at 1B parameters, one unit of data quality is worth roughly 10× in parameter count."
-        )
-      ),
-
-      h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
-        [{l:"Within-family anticorrelation",v:"r = −0.989",s:"p < 10⁻⁵",c:"#f87171"},
-         {l:"Critical scale Nc",v:"3.5B",s:"CI [2.9B, 13.4B]",c:"#c4b5fd"},
-         {l:"OLMo independent confirmation",v:"γ₁₂ = 0.000",s:"Different lab, different data",c:"#fb923c"},
-         {l:"Hold-out prediction accuracy",v:"MAE 5.6%",s:"Llama-2 leave-one-out",c:"#60a5fa"}
-        ].map(d=>h("div",{key:d.l,style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid "+d.c}},
-          h("div",{style:{fontSize:11,color:"#6b7280",marginBottom:4}},d.l.toUpperCase()),
-          h("div",{style:{fontSize:22,fontWeight:800,color:d.c}},d.v),
-          h("div",{style:{fontSize:11,color:"#6b7280",marginTop:4}},d.s)
-        ))
-      ),
-
-      h("div",{className:"card",style:{borderLeft:"3px solid #60a5fa"}},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#60a5fa",marginBottom:10}},"Key Predictions — Testable & Specific"),
-        h("div",{style:{fontSize:13,color:"#c9d1d9",lineHeight:1.8}},
-          h("div",{style:{marginBottom:8}},"1. ",h("strong",{style:{color:"#E91E63"}},"Nc2")," appears in agentic-safety pairs (SWE vs refusal, planning vs compliance). Predicted at 5T–30T parameters or RLHF-dominated regimes."),
-          h("div",{style:{marginBottom:8}},"2. At 100B+, HellaSwag hits 94% ceiling. ",h("strong",{style:{color:"#9C27B0"}},"New dimension")," (SWE × GPQA) becomes discriminating. γ₁₂ flips in agentic-safety couples, not in code-reasoning pairs."),
-          h("div",{style:{marginBottom:8}},"3. ",h("strong",{style:{color:"#E91E63"}},"h(D) field")," shifts Nc. Phi-4 (+23 pts) pulls Nc down by ~0.3 orders of magnitude. Testable by interpolating Phi and web-trained families."),
-          h("div",null,"4. ",h("strong",{style:{color:"#2196F3"}},"d_eff")," follows d_eff ≈ −0.27·log₁₀(N) + 3.9. At 1T parameters, d_eff should be 2.4–2.6. Tests the functional form with new frontier evals.")
-        )
-      ),
-
-      h("div",{className:"card",style:{borderLeft:"3px solid #4CAF50"}},
-        h("div",{style:{fontSize:15,fontWeight:700,color:"#4CAF50",marginBottom:10}},"Cite This Work"),
-        h("pre",{style:{background:"#0d1117",borderRadius:6,padding:"12px 14px",fontSize:12,color:"#8b949e",overflow:"auto",marginBottom:8,border:"1px solid #21262d"}},
-          "@article{amin2026cape,\n  title={The Alignment Tax is a Phase: Capability Coupling\n         and Critical Scale in Neural Scaling Laws},\n  author={Amin, Adil},\n  journal={arXiv preprint},\n  year={2026}\n}"
+        /* Phase chart with controls */
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Phase Diagram: HellaSwag vs TruthfulQA"),
+          h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}},
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"Model size (parameters)"),
+              h("input",{type:"number",value:userN,onChange:e=>setUserN(e.target.value),placeholder:"e.g. 1e9",
+                style:{width:"100%",padding:"6px 8px",background:"#0d1117",border:"1px solid #21262d",borderRadius:4,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"TruthfulQA (%)"),
+              h("input",{type:"number",value:userT,onChange:e=>setUserT(e.target.value),placeholder:"e.g. 45",
+                style:{width:"100%",padding:"6px 8px",background:"#0d1117",border:"1px solid #21262d",borderRadius:4,color:"#c9d1d9",fontSize:13}})
+            )
+          ),
+          h(PhaseChart,{uN:userN,uT:userT})
         ),
-        h("div",{style:{fontSize:12,color:"#6b7280"}},"Plain: Amin, A. (2026). The Alignment Tax is a Phase: Capability Coupling and Critical Scale in Neural Scaling Laws.")
+
+        /* Model selector */
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Browse Models"),
+          h("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}},
+            M.map(m=>h("div",{key:m.n,className:"explore-card",onClick:()=>setSelectedModel(m.n),style:{borderTop:"3px solid "+FC[m.f],...(selectedModel===m.n?{borderColor:"#58a6ff",background:"#161b22"}:{})}},
+              h("div",{style:{fontSize:12,fontWeight:700,color:"#c9d1d9"}},m.n),
+              h("div",{style:{fontSize:10,color:"#6b7280",marginTop:4}},"N = ",Math.round(m.N/1e9*10)/10,"B"),
+              h("div",{style:{fontSize:10,color:"#6b7280"}},regime(m.N).l)
+            ))
+          )
+        ),
+
+        selectedModel&&h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Model: ",selectedData.n),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            h("div",null,
+              h("div",{className:"label"},"Parameters"),
+              h("div",{style:{fontSize:18,fontWeight:800,color:"#3b82f6"}},Math.round(selectedData.N/1e9*10)/10,"B"),
+              h("div",{className:"label",style:{marginTop:12}},"Family"),
+              h("div",{style:{fontSize:13,color:"#c9d1d9"}},selectedData.f)
+            ),
+            h("div",null,
+              h("div",{className:"label"},"HellaSwag"),
+              h("div",{style:{fontSize:18,fontWeight:800,color:"#f59e0b"}},selectedData.hs,"%"),
+              h("div",{className:"label",style:{marginTop:12}},"TruthfulQA"),
+              h("div",{style:{fontSize:18,fontWeight:800,color:selReg.c}},selectedData.tqa,"%")
+            )
+          ),
+          h("div",{style:{marginTop:12,padding:"12px 14px",background:selReg.bg,borderRadius:8,borderLeft:"3px solid "+selReg.c}},
+            h("span",{style:{fontWeight:700,color:selReg.c}},selReg.l),
+            h("div",{style:{fontSize:11,color:"#8b949e",marginTop:6}},
+              "γ₁₂ = ",h("span",{style:{fontWeight:700}},Math.round(g12(selectedData.N)*100)/100),
+              " · ",regime(selectedData.N).l)
+            )
+          )
+        )
       ),
 
-      h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
-        [{t:"GitHub Repository",d:"Code, data, replication scripts",u:"https://github.com/adilamin89/cape-scaling"},
-         {t:"Paper (LaTeX source)",d:"paper3A_v4_arXiv.tex + all figures",u:"https://github.com/adilamin89/cape-scaling/blob/main/paper3A_v4_arXiv.tex"},
-         {t:"Data",d:"ai_free_energy_data.json (all 26 models)",u:"https://github.com/adilamin89/cape-scaling/tree/main/data"},
-         {t:"Reproducibility",d:"Leave-one-family-out validation (Appendix B)",u:null}
-        ].map(r=>h("div",{key:r.t,style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid #FFD700"}},
-          h("div",{style:{fontSize:13,fontWeight:700,color:"#FFD700",marginBottom:4}},r.t),
-          r.u?h("a",{href:r.u,target:"_blank",rel:"noopener",style:{fontSize:12,color:"#58a6ff",textDecoration:"none"}},r.d+" →"):
-          h("div",{style:{fontSize:12,color:"#6b7280"}},r.d)
-        ))
+      /* ════════════════════════════════════════════════════════════
+         EXPLORER TAB
+      ════════════════════════════════════════════════════════════ */
+      tab==="explore"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Interactive Model Explorer"),
+          h("div",{style:{fontSize:13,color:"#8b949e",marginBottom:12}},
+            "Click any model to explore its regime, physics interpretation, and alignment predictions."
+          ),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            M.map(m=>h("div",{key:m.n,className:"explore-card",onClick:()=>setSelectedModel(m.n),style:{borderTop:"3px solid "+FC[m.f],...(selectedModel===m.n?{borderColor:"#58a6ff",background:"#161b22"}:{})}},
+              h("div",{style:{fontSize:12,fontWeight:700,color:"#c9d1d9"}},m.n),
+              h("div",{style:{fontSize:10,color:"#6b7280",marginTop:4}},Math.round(m.N/1e9*10)/10,"B params"),
+              h("div",{style:{fontSize:9,fontWeight:600,color:regime(m.N).c}},regime(m.N).l)
+            ))
+          )
+        ),
+
+        selectedModel&&selectedData&&h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Analysis: ",selectedData.n),
+          h("div",{style:{display:"flex",gap:12}},
+            h("div",{style:{flex:1}},
+              h("div",{className:"label"},"Model Size"),
+              h("div",{style:{fontSize:14,fontWeight:700,color:"#c9d1d9",marginBottom:12}},Math.round(selectedData.N/1e9*100)/100,"B parameters"),
+              h("div",{className:"label"},"Family"),
+              h("div",{style:{fontSize:14,fontWeight:700,color:"#c9d1d9",marginBottom:12}},selectedData.f),
+              h("div",{className:"label"},"Regime"),
+              h("div",{style:{fontSize:14,fontWeight:700,color:selReg.c,marginBottom:12}},selReg.l)
+            ),
+            h("div",{style:{flex:1}},
+              h("div",{className:"label"},"Coupling γ₁₂"),
+              h("div",{style:{fontSize:18,fontWeight:800,color:selReg.c,marginBottom:12}},Math.round(g12(selectedData.N)*1000)/1000),
+              h("div",{className:"label"},"HellaSwag"),
+              h("div",{style:{fontSize:14,fontWeight:700,color:"#f59e0b",marginBottom:12}},selectedData.hs,"%"),
+              h("div",{className:"label"},"TruthfulQA"),
+              h("div",{style:{fontSize:14,fontWeight:700,color:"#6ee7b7",marginBottom:12}},selectedData.tqa,"%")
+            )
+          ),
+          h("div",{style:{marginTop:16,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid "+selReg.c}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:selReg.c,marginBottom:6}},"Physics Interpretation"),
+            selReg.l.includes("TAX")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+              "This is a pre-training effect, not RLHF. The coupling γ₁₂ < 0 means parameters that help reasoning are the same ones that hurt truthfulness — a structural competition in the loss landscape."):
+            selReg.l.includes("TRANSITION")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+              "The eigenvector e₂ is rotating (Riccati ODE, width < 0.01 decades). This is the narrowest part of the transition — alignment interventions have maximum leverage here."):
+            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+              "This is a Ginzburg-Landau prediction: when the original order parameters saturate, new ones must emerge. Just as in superconductors where new pairing channels activate at higher fields.")
+          ),
+          h("div",{style:{marginTop:12,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid #3b82f6"}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:"#3b82f6",marginBottom:6}},"Loss Landscape Signature"),
+            selReg.l.includes("TAX")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+              "Loss follows L(N) = 1.533 + 153.6·N⁻⁰·²³⁸ perfectly (R² = 0.9994). There is NO anomaly in loss at this scale — the alignment tax is completely invisible to loss-based monitoring."):
+            selReg.l.includes("TRANSITION")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+              "The gradient norm dips 37% below trend near 1B parameters. This is the only loss-level signature of the transition — a brief flattening as the loss landscape restructures."):
+            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+              "At this scale, the Hessian determinant det(H) → 0. The two-capability effective theory is breaking down — a third dimension is emerging. The framework predicts its own breakdown.")
+          )
+        )
+      ),
+
+      /* ════════════════════════════════════════════════════════════
+         FRONTIER TAB
+      ════════════════════════════════════════════════════════════ */
+      tab==="frontier"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Frontier Lab Results (16 Models)"),
+          h("div",{style:{fontSize:13,color:"#8b949e",marginBottom:12}},
+            "SWE-bench vs GPQA Diamond — the emerging capability pair at frontier scale. ",frCoverage,"% coverage with both evals."
+          ),
+          h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px"}},
+            h(FrontierChart,null)
+          )
+        ),
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Frontier Lab Coverage"),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            FR.map(m=>h("div",{key:m.n,style:{background:"#0d1117",borderRadius:6,padding:"10px 12px",borderTop:"2px solid "+(FFC[m.fam]||"#666")}},
+              h("div",{style:{fontSize:12,fontWeight:700,color:"#c9d1d9"}},m.n),
+              h("div",{style:{fontSize:10,color:"#6b7280",marginTop:3}},m.fam," · ",m.sz),
+              m.swe!==null&&m.gpqa!==null?h("div",{style:{fontSize:10,color:"#8b949e",marginTop:3}},"SWE: ",m.swe,"% | GPQA: ",m.gpqa,"%"):
+              h("div",{style:{fontSize:10,color:"#6b7280",fontStyle:"italic",marginTop:3}},m.note)
+            ))
+          )
+        )
+      ),
+
+      /* ════════════════════════════════════════════════════════════
+         h(D) LAB TAB
+      ════════════════════════════════════════════════════════════ */
+      tab==="hd"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Training Data Quality Offset — h(D)"),
+          h("div",{style:{fontSize:13,color:"#8b949e",lineHeight:1.6,marginBottom:16}},
+            "h(D) = TQA_observed − TQA_predicted(HS, web-baseline). Measures alignment-relevant curation per lab. ",
+            "In the Ginzburg-Landau analogy, this is the ",h("span",{style:{color:"#E91E63",fontWeight:600}},"external magnetic field"),
+            " — it can shift the phase boundary and break the alignment tax ↔ bonus symmetry without changing N.",
+            h("span",{className:"chip",onClick:go("physics"),style:{marginLeft:6}}),"GL theory →"
+          ),
+          h("div",{style:{fontSize:13,fontWeight:700,color:"#f0f6fc",marginTop:16,marginBottom:8}},"Design Equation"),
+          h("div",{className:"eq-box"},"h_c(N) ∝ (Nc − N)^(3/2)"),
+          h("div",{className:"ml-note"},"Minimum alignment budget: At 1B: ~60% of Phi-level curation. At 3B: ~5%. At Nc: none."),
+          h("div",{style:{marginTop:16}},
+            HD.map((m,i)=>h("div",{key:i,style:{marginBottom:14}},
+              h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}},
+                h("div",{style:{fontSize:13,fontWeight:600,color:"#c9d1d9"}},m.name),
+                h("div",{style:{fontSize:11,color:"#6b7280"}},m.lab," · ",m.N,"B")
+              ),
+              h("div",{style:{display:"flex",alignItems:"center",gap:12}},
+                h("div",{style:{flex:1,height:8,background:"#0d1117",borderRadius:4,overflow:"hidden"}},
+                  h("div",{style:{height:"100%",width:Math.max(3,Math.min(100,(m.h+5)/28*100))+"%",
+                    background:m.h>15?"#E91E63":m.h>5?"#4CAF50":m.h>0?"#2196F3":"#FF5722",borderRadius:4}})
+                ),
+                h("div",{style:{fontSize:13,fontWeight:700,color:m.h>15?"#E91E63":m.h>5?"#4CAF50":m.h>0?"#2196F3":"#FF5722",minWidth:48,textAlign:"right"}},(m.h>0?"+":"")+m.h)
+              ),
+              m.note?h("div",{style:{fontSize:11,color:"#484f58",marginTop:3}},m.note):null
+            ))
+          )
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Key Findings"),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            [{t:"Phi-4 (Microsoft)",c:"#E91E63",d:"+23 TQA points above universal baseline. Curated/synthetic data acts as GL external field. Can engineer a downward shift in Nc — making smaller models align earlier."},
+             {t:"DeepSeek-V3",c:"#FF5722",d:"+15 points despite web pretraining. R1 reasoning distillation in post-training achieves high h(D) without synthetic pretraining data. Different mechanism, similar effect."},
+             {t:"Frontier labs (data gap)",c:"#6b7280",d:"Claude, GPT-5.x, Gemini: TruthfulQA not publicly reported. Likely large positive h(D) from proprietary RLHF. Cannot rank frontier labs until data released."},
+             {t:"Testable prediction",c:"#FFD700",d:"If frontier TQA published: Anthropic > OpenAI ≈ Google > Meta for h(D). DeepSeek competitive via post-training. Phi family remains the external field benchmark."}
+            ].map((f,i)=>h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid "+f.c}},
+              h("div",{style:{fontSize:13,fontWeight:700,color:f.c,marginBottom:6}},f.t),
+              h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},f.d)
+            ))
+          )
+        )
+      ),
+
+      /* ════════════════════════════════════════════════════════════
+         PHYSICS TAB
+      ════════════════════════════════════════════════════════════ */
+      tab==="physics"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Three Regimes, Three Effective Theories"),
+          h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},"The alignment tax is not a design flaw — it's a phase of matter that exists below Nc."),
+          [{range:"N < 3.5B",phase:"Alignment Tax",c:"#f87171",corr:"r = −0.989",deff:"1.05",
+            desc:"HellaSwag and TruthfulQA anticorrelate. Scaling reasoning actively degrades truthfulness — the alignment tax.",
+            bench:"HS ⊕ TQA (anticoupled)",ev:"e₁ = [+HS, −TQA, +ARC, +WG]",
+            ml:"In ML terms: Optimizing for reasoning benchmarks (HellaSwag) during pre-training directly harms calibration (TruthfulQA). This is not a RLHF problem — it's structural in the pre-training loss landscape."},
+           {range:"3.5B – 70B",phase:"Alignment Bonus",c:"#4CAF50",corr:"r → +0.08",deff:"1.63",
+            desc:"Scale resolves the conflict. The coupling sign flips — reasoning and truthfulness become cooperative.",
+            bench:"HS ⊕ TQA (coupled)",ev:"e₁ rotates: TQA joins positive side",
+            ml:"In ML terms: Past 3.5B, capability gains are cooperative. Improving reasoning also improves truthfulness. No alignment intervention needed for this pair."},
+           {range:"N > 100B",phase:"Deep Bonus + HS Saturated",c:"#9C27B0",corr:"r(SWE,GPQA) = +0.55",deff:"1.99",
+            desc:"HellaSwag ceiling at ~94%. New discriminating pair: SWE-bench × GPQA. d_eff approaches 2.",
+            bench:"SWE ⊕ GPQA (coupled)",ev:"d_eff → 2.0, new eigenvector appears",
+            ml:"In ML terms: HellaSwag scores compress to a 4.9-point range above 100B (vs 353 below 10B). SWE-bench and GPQA Diamond become the discriminating benchmarks."}
+          ].map(r=>h("div",{key:r.range,style:{background:"#0d1117",borderRadius:8,padding:"14px 18px",borderLeft:"3px solid "+r.c,marginBottom:10}},
+            h("div",{style:{display:"flex",gap:12,alignItems:"baseline",marginBottom:6,flexWrap:"wrap"}},
+              h("span",{style:{fontSize:14,fontWeight:700,color:r.c}},r.range),
+              h("span",{style:{fontSize:13,fontWeight:600,color:"#c9d1d9"}},r.phase),
+              h("span",{style:{fontSize:12,color:"#6b7280"}},r.corr)
+            ),
+            h("div",{style:{fontSize:13,color:"#c9d1d9",lineHeight:1.6,marginBottom:6}},r.desc),
+            h("div",{style:{fontSize:11,color:"#6b7280",marginBottom:8}},"Benchmarks: ",r.bench," · ",r.ev," · d_eff = ",h("span",{style:{color:"#2196F3",fontWeight:700}},r.deff)),
+            h("div",{style:{fontSize:12,color:"#8b949e",lineHeight:1.6,paddingTop:8,borderTop:"1px solid #21262d"}},r.ml)
+          ))
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Key Equations: From Theory to ML"),
+          h("div",{style:{display:"flex",flexDirection:"column",gap:12}},
+            [
+              {eq:"γ₁₂(N) = 0.629·log₁₀(N) − 5.886",ml:"Running coupling: predicts sign at any scale"},
+              {eq:"dHS/dlog₁₀N = 1.23 − 0.72·TQA − 0.69·WG",ml:"Discovered ODE: benchmarks are dynamically coupled"},
+              {eq:"||∇L|| ∝ L^3.5, NOT N^{−(α+1)}",ml:"Mean-field fails 142×: parameters are collectively coupled"},
+              {eq:"h_c(N) ∝ (Nc − N)^{3/2}",ml:"Design equation: alignment budget needed below Nc"},
+              {eq:"d_eff ≈ −0.27·log₁₀(N) + 3.9",ml:"Dimensional collapse: from 2 independent axes to 1"}
+            ].map((e,i)=>h("div",{key:i,className:"eq-box"},
+              h("div",{style:{fontFamily:"'Courier New',monospace",fontSize:13,fontWeight:600,color:"#58a6ff",marginBottom:8}},e.eq),
+              h("div",{className:"ml-note"},e.ml)
+            ))
+          )
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Boosting Chain: L₀ → L₄"),
+          h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+            [
+              {level:"L₀",desc:"Power-law loss",note:"Baseline, 0.3% error",color:"#3b82f6",verdict:"✓"},
+              {level:"L₁",desc:"Independent-param gradient",note:"142× WORSE (diagnostic: collective coupling)",color:"#ef4444",verdict:"✗"},
+              {level:"L₂",desc:"Collective gradient ||∇L|| ∝ L^3.5",note:"Restores (~8% error)",color:"#10b981",verdict:"✓"},
+              {level:"L₃",desc:"Running coupling γ₁₂(N)",note:"Predicts alignment regime (21% error)",color:"#10b981",verdict:"✓"},
+              {level:"L₄",desc:"External field h(D)",note:"Explains Phi (5.6% holdout error)",color:"#10b981",verdict:"✓"}
+            ].map((s,i)=>h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"12px 16px",display:"flex",alignItems:"center",gap:12,borderLeft:"3px solid "+s.color}},
+              h("div",{style:{fontWeight:700,color:s.color,fontSize:11,minWidth:28}},s.level),
+              h("div",{flex:1},
+                h("div",{style:{fontSize:12,fontWeight:600,color:"#c9d1d9"}},s.desc),
+                h("div",{style:{fontSize:11,color:"#6b7280",marginTop:2}},s.note)
+              ),
+              h("div",{style:{fontSize:16,fontWeight:700,color:s.verdict==="✓"?"#4CAF50":"#ef4444"}},s.verdict)
+            ))
+          )
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Physics↔ML Dictionary"),
+          [{term:"Ginzburg-Landau free energy",phys:"Effective field theory for phase transitions.",ml:"Polynomial expansion of capability interactions around the critical point."},
+           {term:"Boosting chain",phys:"Renormalization group levels.",ml:"Each model's failure residual becomes the signal for the next-order description."},
+           {term:"Susceptibility",phys:"Response of order parameter to external field.",ml:"How sharply a benchmark responds to scale changes."},
+           {term:"Universality",phys:"Systems with different microscopic details share same critical behavior.",ml:"Web-trained models from different labs all show the same coupling sign change."},
+           {term:"Coupling constant",phys:"Strength of interaction between order parameters.",ml:"γ₁₂: how benchmark predictions change together per decade of scale."},
+           {term:"Phase boundary",phys:"Temperature/pressure where phase transition occurs.",ml:"Nc = 3.5B: the critical scale where alignment regime flips."},
+           {term:"Critical exponent",phys:"Power-law scaling near phase boundary.",ml:"Riccati ODE rotation rate (~0.01 decades): narrowest transition point."},
+           {term:"Order parameter collapse",phys:"Multiple degrees of freedom reduce to one.",ml:"d_eff: effective dimensionality of capability space shrinks with scale."}
+          ].map((e,i)=>h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"12px 16px",marginBottom:10}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:"#3b82f6",marginBottom:6}},e.term),
+            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.6,marginBottom:6}},h("span",{style:{color:"#6b7280"}},"Physics: "),e.phys),
+            h("div",{className:"ml-note"},h("span",{style:{color:"#8b949e"}},"ML: "),e.ml)
+          ))
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"HellaSwag Saturation — Why New Dimensions Emerge"),
+          h("div",{style:{fontSize:12,color:"#6b7280",marginBottom:14}},"The phase transition doesn't stop at Nc. At frontier scale, the original observables lose resolution."),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:14}},
+            h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px"}},
+              h("div",{className:"label"},"Correlation sign flip"),
+              h(CorrChart,null)
+            ),
+            h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px"}},
+              h("div",{className:"label"},"Effective dimension expansion"),
+              h(DeffExpChart,null)
+            )
+          ),
+          h("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:14}},
+            [{label:"Frontier HS variance",val:"4.9",sub:"N > 100B",c:"#FF5722"},
+             {label:"Small-scale HS variance",val:"353",sub:"N < 10B",c:"#4CAF50"},
+             {label:"Variance ratio",val:"72×",sub:"Signal collapse",c:"#FFD700"}
+            ].map(s=>h("div",{key:s.label,className:"stat-box",style:{borderTop:"3px solid "+s.c}},
+              h("div",{className:"label"},s.label),
+              h("div",{style:{fontSize:20,fontWeight:800,color:s.c}},s.val),
+              h("div",{style:{fontSize:11,color:"#6b7280"}},s.sub)
+            ))
+          ),
+          h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid #FFD700",fontSize:13,color:"#c9d1d9",lineHeight:1.65}},
+            h("strong",{style:{color:"#FFD700"}},"Physical interpretation: "),
+            "HellaSwag becomes a saturated benchmark above 100B. The frontier models cluster in a 4.9-point range (88–93%), losing discriminative power. The system must find new order parameters (SWE-bench, GPQA Diamond) to describe the continued alignment structure."
+          )
+        )
+      ),
+
+      /* ════════════════════════════════════════════════════════════
+         PAPER TAB
+      ════════════════════════════════════════════════════════════ */
+      tab==="paper"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:16,fontWeight:800,color:"#f0f6fc",marginBottom:4}},"When Models Stop Lying — and When They Start Again"),
+          h("div",{style:{fontSize:14,color:"#8b949e",marginBottom:12}},"Capability Coupling and the Alignment Tax in AI Scaling Laws"),
+          h("div",{style:{fontSize:13,color:"#c9d1d9",lineHeight:1.7,marginBottom:14}},
+            "Scaling laws track loss. They say nothing about how capabilities interact. We show that below Nc ≈ 3.5B parameters, reasoning and truthfulness anticorrelate strongly (r = −0.989, p < 10⁻⁵): scaling one actively degrades the other — an alignment tax built into pre-training, before any RLHF. Above Nc, the coupling reverses and the two capabilities cooperate — an alignment bonus. Two models with identical loss can be in opposite alignment regimes."
+          ),
+          h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid #58a6ff"}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:"#58a6ff",marginBottom:8}},"Citation"),
+            h("div",{style:{fontFamily:"'Courier New',monospace",fontSize:11,color:"#8b949e",lineHeight:1.6}},
+              "@article{CAPE2026,",h("br"),
+              "  author = {Project CAPE},",h("br"),
+              "  title = {When Models Stop Lying --- and When They Start Again},",h("br"),
+              "  subtitle = {Capability Coupling and the Alignment Tax in AI Scaling Laws},",h("br"),
+              "  year = {2026}",h("br"),
+              "}"
+            )
+          )
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"12 Diagnostics, One Structure"),
+          h("div",{style:{fontSize:13,color:"#c9d1d9",lineHeight:1.7}},
+            "Twelve independently measured diagnostics converge on a single phase transition structure: gradient scaling, eigenvalue spectrum, eigenvector rotation (Riccati ODE), dimensional collapse, capability susceptibility, coupling jump (6.3×), free-energy specific heat, geometric phase, ODE integration, cross-family prediction, OLMo zero-parameter test, and eight-lab convergence (r = +0.770)."
+          ),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:12}},
+            [
+              {name:"Gradient scaling",val:"Collective coupling confirmed"},
+              {name:"Eigenvalue spectrum",val:"6.3× jump at Nc"},
+              {name:"Eigenvector rotation",val:"Riccati ODE, Δ < 0.01 decades"},
+              {name:"Dimensional collapse",val:"d_eff: 1.05 → 1.99"},
+              {name:"Susceptibility cross-check",val:"γ₁₂ sign flip"},
+              {name:"Specific heat",val:"Peak at 3.5B±0.3B"},
+              {name:"Geometric phase",val:"Berry phase non-zero in tax regime"},
+              {name:"ODE integration",val:"3.6% error on 5 benchmarks"},
+              {name:"Cross-family prediction",val:"Works across 9 families"},
+              {name:"OLMo zero-param test",val:"Structure holds without retuning"},
+              {name:"Convergence (8 labs)",val:"r = +0.770"},
+              {name:"Holdout validation",val:"5.6% error on frontier models"}
+            ].map((d,i)=>h("div",{key:i,className:"stat-box",style:{borderTop:"3px solid #3b82f6"}},
+              h("div",{className:"label"},d.name),
+              h("div",{style:{fontSize:12,fontWeight:600,color:"#c9d1d9"}},d.val)
+            ))
+          )
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Core Results"),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            [
+              {title:"Phase Transition",desc:"Nc = 3.5 ± 0.3 B parameters. Critical exponent β ≈ 0.5. Ginzburg-Landau free energy F = (γ₁₂/2)·m² + (1/4)·m⁴ fits 26-model ensemble."},
+              {title:"Coupling Equation",desc:"γ₁₂(N) = 0.629·log₁₀(N) − 5.886. Flips sign at Nc. Predicts any model's alignment regime from size alone."},
+              {title:"Discovered ODE",desc:"dHS/dlog₁₀N = 1.23 − 0.72·TQA − 0.69·WG (PySINDy, no priors). Integrates to reproduce all 5 benchmarks at 3.6% error."},
+              {title:"h(D) Design Law",desc:"h_c(N) ∝ (Nc − N)^{3/2}. At 1B: ~60% Phi-level curation shifts phase down. At Nc: zero alignment budget needed."},
+              {title:"Dimension Emergence",desc:"Below 3.5B: HellaSwag + TruthfulQA span the space. Above 100B: SWE-bench + GPQA emerge. d_eff: 1.047 → 1.99."},
+              {title:"Cross-Lab Convergence",desc:"9 open-source families + 8 frontier labs. r = +0.770 across all 26 models. Structure is universal, not an artifact of a single lab."}
+            ].map((r,i)=>h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid #10b981"}},
+              h("div",{style:{fontSize:13,fontWeight:700,color:"#10b981",marginBottom:6}},r.title),
+              h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.6}},r.desc)
+            ))
+          )
+        )
       )
-    )
-  );
+    );
+  /* end paper tab */
 }
 
-const root=ReactDOM.createRoot(document.getElementById("root"));
-root.render(h(App,null));
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
 </script>
 </body>
 </html>
