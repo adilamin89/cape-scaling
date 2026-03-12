@@ -8,11 +8,14 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#080e1a;color:#e2e8f0;font-family:'IBM Plex Mono','Courier New',monospace;-webkit-font-smoothing:antialiased}
+body{background:#0d1117;color:#c9d1d9;font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
 input,button{font-family:inherit}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0d1829}::-webkit-scrollbar-thumb{background:#1e2d45;border-radius:3px}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#161b22}::-webkit-scrollbar-thumb{background:#30363d;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#484f58}
 @media(max-width:580px){.g3{grid-template-columns:1fr!important}.g2{grid-template-columns:1fr!important}}
 </style>
 </head>
@@ -66,10 +69,10 @@ const FFC={Anthropic:"#CC785C",OpenAI:"#10a37f",Google:"#4285f4",
            DeepSeek:"#1e40af",Kimi:"#7c3aed",Alibaba:"#f97316"};
 
 /* ── HELPERS ──────────────────────────────────────────── */
-const Bx=(ex)=>({background:"#0d1829",borderRadius:10,padding:"15px 17px",...ex});
+const Bx=(ex)=>({background:"#161b22",border:"1px solid #30363d",borderRadius:8,padding:"16px 18px",...ex});
 const BL=(c)=>({borderLeft:`3px solid ${c}`});
-const MN=(ex)=>({style:{fontFamily:"monospace",...ex}});
-const DIM=(ex)=>({style:{fontSize:9,color:"#334155",letterSpacing:1,marginBottom:4,...ex}});
+const MN=(ex)=>({style:{fontFamily:"'IBM Plex Mono',monospace",...ex}});
+const DIM=(ex)=>({style:{fontSize:11,color:"#8b949e",letterSpacing:1,marginBottom:6,fontWeight:600,textTransform:"uppercase",...ex}});
 
 /* ── CANVAS: PHASE DIAGRAM ────────────────────────────── */
 function PhaseChart({uN,uT}){
@@ -88,16 +91,16 @@ function PhaseChart({uN,uT}){
     const ncX=X(Math.log10(NC));
     ctx.fillStyle="rgba(220,38,38,0.045)"; ctx.fillRect(p.l,p.t,ncX-p.l,H-p.t-p.b);
     ctx.fillStyle="rgba(16,185,129,0.045)"; ctx.fillRect(ncX,p.t,W-p.r-ncX,H-p.t-p.b);
-    ctx.strokeStyle="#1e3a5f"; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+    ctx.strokeStyle="#30363d"; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
     ctx.beginPath(); ctx.moveTo(ncX,p.t); ctx.lineTo(ncX,H-p.b); ctx.stroke(); ctx.setLineDash([]);
     // Nc2 line
     const nc2X=X(Math.log10(11.3e9));
-    ctx.strokeStyle="#1e2d45"; ctx.lineWidth=1; ctx.setLineDash([3,4]);
+    ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.setLineDash([3,4]);
     ctx.beginPath(); ctx.moveTo(nc2X,p.t); ctx.lineTo(nc2X,H-p.b); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle="#1e3a5f"; ctx.font="7px monospace"; ctx.textAlign="center";
+    ctx.fillStyle="#8b949e"; ctx.font="7px monospace"; ctx.textAlign="center";
     ctx.fillText("Nₒ₂",nc2X,p.t+10);
     // web-trained universal curve
-    ctx.strokeStyle="#334155"; ctx.lineWidth=2; ctx.setLineDash([5,3]);
+    ctx.strokeStyle="#30363d"; ctx.lineWidth=2; ctx.setLineDash([5,3]);
     ctx.beginPath();
     for(let l=lMn,first=true;l<=lMx;l+=0.04){
       const py=Y(UNIV(l)); first?ctx.moveTo(X(l),py):ctx.lineTo(X(l),py); first=false;
@@ -128,19 +131,19 @@ function PhaseChart({uN,uT}){
     if(uN&&uT){ const l=Math.log10(uN);
       if(l>=lMn&&l<=lMx){
         ctx.beginPath(); ctx.arc(X(l),Y(uT),8,0,Math.PI*2);
-        ctx.fillStyle="#080e1a"; ctx.strokeStyle="#c4b5fd"; ctx.lineWidth=2.5; ctx.fill(); ctx.stroke();
+        ctx.fillStyle="#0d1117"; ctx.strokeStyle="#c4b5fd"; ctx.lineWidth=2.5; ctx.fill(); ctx.stroke();
         ctx.fillStyle="#c4b5fd"; ctx.font="bold 8px monospace"; ctx.textAlign="left";
         ctx.fillText("YOU",X(l)+10,Y(uT)+4);
       }
     }
-    ctx.strokeStyle="#1e2d45"; ctx.lineWidth=1; ctx.strokeRect(p.l,p.t,W-p.l-p.r,H-p.t-p.b);
-    ctx.fillStyle="#334155"; ctx.font="10px monospace"; ctx.textAlign="center";
+    ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.strokeRect(p.l,p.t,W-p.l-p.r,H-p.t-p.b);
+    ctx.fillStyle="#8b949e"; ctx.font="10px monospace"; ctx.textAlign="center";
     [{N:1e8,l:"100M"},{N:1e9,l:"1B"},{N:1e10,l:"10B"},{N:1e11,l:"100B"}].forEach(({N:n,l})=>{
       const ln=Math.log10(n); if(ln<lMn||ln>lMx)return; ctx.fillText(l,X(ln),H-p.b+14);
     });
     ctx.textAlign="right";
     [30,40,50,60,70,80].forEach(v=>{if(v>=tMn&&v<=tMx)ctx.fillText(v,p.l-5,Y(v)+4);});
-    ctx.textAlign="center"; ctx.fillStyle="#1e3a5f"; ctx.font="9px monospace";
+    ctx.textAlign="center"; ctx.fillStyle="#8b949e"; ctx.font="9px monospace";
     ctx.fillText("model size (parameters)",W/2,H-3);
     ctx.save(); ctx.translate(11,H/2); ctx.rotate(-Math.PI/2); ctx.fillText("TruthfulQA (%)",0,0); ctx.restore();
     ctx.font="bold 8px monospace"; ctx.textAlign="left";
@@ -166,7 +169,7 @@ function FrontierChart(){
     const Y=g=>p.t+(gMax-g)/(gMax-gMin)*(H-p.t-p.b);
     ctx.clearRect(0,0,W,H);
     const sl=(93.2-83.4)/(80-77.2), ic=83.4-sl*77.2;
-    ctx.strokeStyle="#1e3a5f"; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+    ctx.strokeStyle="#30363d"; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
     ctx.beginPath(); ctx.moveTo(X(sMin),Y(sl*sMin+ic)); ctx.lineTo(X(sMax),Y(sl*sMax+ic)); ctx.stroke(); ctx.setLineDash([]);
     FRONTIER.forEach(m=>{
       const px=X(m.swe), py=Y(m.gpqa);
@@ -182,16 +185,16 @@ function FrontierChart(){
         ctx.fillText(m.n==="Sonnet 4.6"?"h=−14":"h=+2",px+7,py+(m.n==="Sonnet 4.6"?5:-4));
       }
       if(["GPT-5.2 Pro","Gemini 3.1 Pro","Opus 4.6","Sonnet 4.6"].includes(m.n)){
-        ctx.fillStyle="#334155"; ctx.font="8px monospace"; ctx.textAlign="left";
+        ctx.fillStyle="#8b949e"; ctx.font="8px monospace"; ctx.textAlign="left";
         ctx.fillText(m.n,px+7,py-3);
       }
     });
-    ctx.strokeStyle="#1e2d45"; ctx.lineWidth=1; ctx.strokeRect(p.l,p.t,W-p.l-p.r,H-p.t-p.b);
-    ctx.fillStyle="#334155"; ctx.font="10px monospace"; ctx.textAlign="center";
+    ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.strokeRect(p.l,p.t,W-p.l-p.r,H-p.t-p.b);
+    ctx.fillStyle="#8b949e"; ctx.font="10px monospace"; ctx.textAlign="center";
     [74,76,78,80,82].forEach(v=>ctx.fillText(v+"",X(v),H-p.b+14));
     ctx.textAlign="right";
     [70,80,90].forEach(v=>{if(v>=gMin&&v<=gMax)ctx.fillText(v,p.l-5,Y(v)+4);});
-    ctx.textAlign="center"; ctx.fillStyle="#1e3a5f"; ctx.font="9px monospace";
+    ctx.textAlign="center"; ctx.fillStyle="#8b949e"; ctx.font="9px monospace";
     ctx.fillText("SWE-bench Verified (%)",W/2,H-3);
     ctx.save(); ctx.translate(11,H/2); ctx.rotate(-Math.PI/2); ctx.fillText("GPQA Diamond (%)",0,0); ctx.restore();
   };
@@ -240,7 +243,7 @@ function ThermoChart(){
       const Y=v=>p.t+(d.yMx-v)/(d.yMx-d.yMn)*(H-p.t-p.b);
 
       // background
-      ctx.fillStyle="#0a1120"; ctx.fillRect(x0,p.t,pw,H-p.t-p.b);
+      ctx.fillStyle="#161b22"; ctx.fillRect(x0,p.t,pw,H-p.t-p.b);
 
       // phase shading
       const ncX=X(Math.log10(NC));
@@ -250,7 +253,7 @@ function ThermoChart(){
       // zero line
       if(d.zeroLine){
         const zy=Y(0);
-        ctx.strokeStyle="#1e2d45"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+        ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
         ctx.beginPath(); ctx.moveTo(x0,zy); ctx.lineTo(x0+pw,zy); ctx.stroke(); ctx.setLineDash([]);
       }
       // Nc line
@@ -280,7 +283,7 @@ function ThermoChart(){
       ctx.stroke();
 
       // y tick labels
-      ctx.fillStyle="#334155"; ctx.font="7px monospace"; ctx.textAlign="right";
+      ctx.fillStyle="#8b949e"; ctx.font="7px monospace"; ctx.textAlign="right";
       [d.yMn,0.5*(d.yMn+d.yMx),d.yMx].forEach(v=>{
         if(v>=d.yMn&&v<=d.yMx) ctx.fillText(v.toFixed(1),x0+pw-2,Y(v)+3);
       });
@@ -290,7 +293,7 @@ function ThermoChart(){
       ctx.fillText(d.title,x0+3,p.t-6);
 
       // border
-      ctx.strokeStyle="#1e2d45"; ctx.lineWidth=1; ctx.strokeRect(x0,p.t,pw,H-p.t-p.b);
+      ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.strokeRect(x0,p.t,pw,H-p.t-p.b);
     });
   };
   useEffect(()=>{draw();window.addEventListener("resize",draw);return()=>window.removeEventListener("resize",draw);},[]);
@@ -317,25 +320,25 @@ function SymmetryChart(){
     ];
 
     const midY=H*0.48;
-    ctx.strokeStyle="#1e2d45"; ctx.lineWidth=1;
+    ctx.strokeStyle="#30363d"; ctx.lineWidth=1;
     ctx.beginPath(); ctx.moveTo(W*0.02,midY); ctx.lineTo(W*0.98,midY); ctx.stroke();
 
     stages.forEach((s,i)=>{
       const cx=W*s.x;
       if(i<stages.length-1&&stages[i+1].arrow){
         const nx=W*stages[i+1].x;
-        ctx.strokeStyle="#1e2d45"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+        ctx.strokeStyle="#30363d"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
         ctx.beginPath(); ctx.moveTo(cx+22,midY); ctx.lineTo(nx-22,midY); ctx.stroke(); ctx.setLineDash([]);
         const mx=(cx+22+nx-22)/2;
-        ctx.fillStyle="#334155"; ctx.font="7px monospace"; ctx.textAlign="center";
+        ctx.fillStyle="#8b949e"; ctx.font="7px monospace"; ctx.textAlign="center";
         stages[i+1].arrow.split("\n").forEach((ln,li)=>ctx.fillText(ln,mx,midY-8+li*9));
       }
       ctx.beginPath(); ctx.arc(cx,midY,17,0,Math.PI*2);
-      ctx.fillStyle="#080e1a"; ctx.strokeStyle=s.c; ctx.lineWidth=2;
+      ctx.fillStyle="#0d1117"; ctx.strokeStyle=s.c; ctx.lineWidth=2;
       ctx.fill(); ctx.stroke();
       ctx.fillStyle=s.c; ctx.font="bold 6.5px monospace"; ctx.textAlign="center";
       s.sym.split(" ").forEach((ln,li)=>ctx.fillText(ln,cx,midY-2+li*9));
-      ctx.fillStyle="#334155"; ctx.font="7px monospace";
+      ctx.fillStyle="#8b949e"; ctx.font="7px monospace";
       ctx.fillText(s.scale,cx,midY+26);
       ctx.fillStyle=s.c; ctx.font="6.5px monospace";
       s.top.split("\n").forEach((ln,li)=>ctx.fillText(ln,cx,midY-24-li*9));
@@ -355,24 +358,27 @@ function App(){
   const hf=N&&uT?(parseFloat(uT)-UNIV(Math.log10(N))):null;
   const TABS=[{id:"explore",l:"EXPLORER"},{id:"frontier",l:"FRONTIER"},{id:"physics",l:"OBSERVABLES"},{id:"how",l:"HOW IT WORKS"},{id:"paper",l:"KEY RESULTS"}];
 
-  return React.createElement("div",{style:{background:"#080e1a",minHeight:"100vh",color:"#e2e8f0",fontFamily:"'IBM Plex Mono','Courier New',monospace"}},
+  return React.createElement("div",{style:{background:"#0d1117",minHeight:"100vh",color:"#c9d1d9",fontFamily:"'Inter',system-ui,-apple-system,sans-serif"}},
     /* HEADER */
-    React.createElement("div",{style:{background:"linear-gradient(180deg,#0a1120,#080e1a)",borderBottom:"1px solid #0d1829",padding:"20px 18px 0"}},
-      React.createElement("div",{style:{maxWidth:880,margin:"0 auto"}},
-        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:13,marginBottom:14}},
-          React.createElement("div",{style:{background:"linear-gradient(135deg,#dc2626,#7c3aed)",borderRadius:7,padding:"6px 11px",fontSize:20,fontWeight:900,color:"#fff",letterSpacing:-1,lineHeight:1}},"CAPE"),
+    React.createElement("div",{style:{background:"#161b22",borderBottom:"1px solid #30363d",padding:"24px 24px 0"}},
+      React.createElement("div",{style:{maxWidth:920,margin:"0 auto"}},
+        React.createElement("div",{style:{display:"flex",alignItems:"center",gap:16,marginBottom:18}},
+          React.createElement("div",{style:{background:"linear-gradient(135deg,#f97316,#7c3aed)",borderRadius:8,padding:"8px 14px",fontSize:22,fontWeight:900,color:"#fff",letterSpacing:-1,lineHeight:1}},"CAPE"),
           React.createElement("div",null,
-            React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#f1f5f9",lineHeight:1.35}},"Capability Coupling at 3.5 Billion Parameters"),
-            React.createElement("div",{style:{fontSize:10,color:"#334155",marginTop:3}},"The moment models stopped lying — alignment tax, bonus & the physics beneath")
+            React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"white",lineHeight:1.4}},"Capability Coupling at 3.5 Billion Parameters"),
+            React.createElement("div",{style:{fontSize:12,color:"#8b949e",marginTop:4}},
+              "The moment models stopped lying — alignment tax, bonus & the physics beneath",
+              React.createElement("span",{style:{marginLeft:12,color:"#FFD700",fontWeight:600}},"Nc~3.5B · r=\u2212" + "0.989 · 10\u00d7 data lever")
+            )
           )
         ),
-        React.createElement("div",{style:{display:"flex"}},
-          TABS.map(t=>React.createElement("button",{key:t.id,onClick:()=>setTab(t.id),style:{background:"none",border:"none",cursor:"pointer",padding:"7px 11px",fontSize:10,fontWeight:700,letterSpacing:0.8,color:tab===t.id?"#c4b5fd":"#334155",borderBottom:tab===t.id?"2px solid #7c3aed":"2px solid transparent",transition:"color 0.1s"}},t.l))
+        React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",paddingBottom:0}},
+          TABS.map(t=>React.createElement("button",{key:t.id,"data-tab":t.id,onClick:()=>setTab(t.id),style:{padding:"8px 16px",borderRadius:"6px 6px 0 0",border:"1px solid",cursor:"pointer",fontSize:12,fontWeight:600,letterSpacing:0.3,transition:"all 0.15s",marginBottom:-1,background:tab===t.id?"#238636":"transparent",borderColor:tab===t.id?"#238636":"transparent",color:tab===t.id?"white":"#8b949e"}},t.l))
         )
       )
     ),
 
-    React.createElement("div",{style:{maxWidth:880,margin:"0 auto",padding:"18px 18px 56px"}},
+    React.createElement("div",{style:{maxWidth:920,margin:"0 auto",padding:"24px 24px 56px"}},
 
       /* ══ EXPLORE ══════════════════════════════════════════ */
       tab==="explore"&&React.createElement("div",null,
@@ -381,17 +387,17 @@ function App(){
            {v:"Nₒ = 3.5B",s:"critical scale — coupling flips",c:"#c4b5fd"},
            {v:"10× data",s:"quality beats scale at 1B",c:"#6ee7b7"}].map(d=>
             React.createElement("div",{key:d.v,style:{...Bx(),...BL(d.c)}},
-              React.createElement("div",{...MN({fontSize:17,fontWeight:900,color:d.c})},d.v),
-              React.createElement("div",{style:{fontSize:9,color:"#475569",marginTop:4,lineHeight:1.5}},d.s)
+              React.createElement("div",{...MN({fontSize:22,fontWeight:900,color:d.c})},d.v),
+              React.createElement("div",{style:{fontSize:11,color:"#8b949e",marginTop:6,lineHeight:1.5}},d.s)
             )
           )
         ),
         React.createElement("div",{style:{...Bx(),marginBottom:16}},
           React.createElement("div",DIM(),"TRUTHFULQA vs MODEL SIZE — 26 MODELS, 9 FAMILIES"),
-          React.createElement("div",{style:{fontSize:10,color:"#1e3a5f",marginBottom:10}},"U-shape is real. Loss is featureless throughout (CV=0.8%). Nₒ₂ = second transition at 11B."),
+          React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:10}},"U-shape is real. Loss is featureless throughout (CV=0.8%). Nₒ₂ = second transition at 11B."),
           React.createElement(PhaseChart,{uN:N,uT:parseFloat(uT)||null}),
           React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:"5px 12px",marginTop:9}},
-            Object.entries(FC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#334155"}},
+            Object.entries(FC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#8b949e"}},
               React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:c}}),f)),
             React.createElement("div",{style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#f87171"}},
               React.createElement("div",{style:{width:14,height:0,borderTop:"2px dashed #f87171"}}),"Phi (curated)")
@@ -404,29 +410,29 @@ function App(){
              {l:"TruthfulQA %",k:"t",v:uT,s:setUT,p:"e.g. 38.7"},
              {l:"HellaSwag %",k:"h",v:uH,s:setUH,p:"e.g. 67.3"}].map(f=>
               React.createElement("div",{key:f.k},
-                React.createElement("div",{style:{fontSize:9,color:"#334155",marginBottom:4,letterSpacing:1}},f.l.toUpperCase()),
-                React.createElement("input",{value:f.v,onChange:e=>f.s(e.target.value),placeholder:f.p,style:{width:"100%",background:"#080e1a",border:"1px solid #1e2d45",borderRadius:5,padding:"7px 8px",color:"#e2e8f0",fontSize:11}})
+                React.createElement("div",{style:{fontSize:9,color:"#8b949e",marginBottom:4,letterSpacing:1}},f.l.toUpperCase()),
+                React.createElement("input",{value:f.v,onChange:e=>f.s(e.target.value),placeholder:f.p,style:{width:"100%",background:"#0d1117",border:"1px solid #30363d",borderRadius:5,padding:"7px 8px",color:"#c9d1d9",fontSize:11}})
               )
             )
           ),
           React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}},
-            React.createElement("span",{style:{fontSize:9,color:"#1e3a5f",alignSelf:"center"}},"PRESETS →"),
+            React.createElement("span",{style:{fontSize:9,color:"#8b949e",alignSelf:"center"}},"PRESETS →"),
             [{l:"Pythia-1B",n:"1e9",t:"38.7",h:"47.2"},{l:"OLMo-7B",n:"7e9",t:"36.0",h:"76.4"},
              {l:"Phi-3-mini",n:"3.8e9",t:"65.0",h:"78.0"},{l:"Llama-3-70B",n:"7e10",t:"52.0",h:"88.0"}].map(pr=>
               React.createElement("button",{key:pr.l,onClick:()=>{setUN(pr.n);setUT(pr.t);setUH(pr.h)},
-                style:{background:"#080e1a",border:"1px solid #1e2d45",borderRadius:4,padding:"3px 9px",fontSize:9,color:"#475569",cursor:"pointer"}},pr.l)
+                style:{background:"#0d1117",border:"1px solid #30363d",borderRadius:4,padding:"3px 9px",fontSize:9,color:"#8b949e",cursor:"pointer"}},pr.l)
             )
           ),
-          N&&gv!==null&&React.createElement("div",{style:{background:"#080e1a",border:`1px solid ${reg.c}33`,borderRadius:8,padding:"13px 15px"}},
+          N&&gv!==null&&React.createElement("div",{style:{background:"#0d1117",border:`1px solid ${reg.c}33`,borderRadius:8,padding:"13px 15px"}},
             React.createElement("div",{style:{display:"flex",gap:10,alignItems:"flex-start"}},
               React.createElement("div",{style:{background:reg.c,color:"#000",borderRadius:5,padding:"4px 9px",fontSize:10,fontWeight:900,flexShrink:0,letterSpacing:0.5}},reg.l),
               React.createElement("div",null,
-                React.createElement("div",{...MN({fontSize:12,color:"#e2e8f0",marginBottom:4})},
+                React.createElement("div",{...MN({fontSize:12,color:"#c9d1d9",marginBottom:4})},
                   "γ₁₂ = ",React.createElement("span",{style:{color:reg.c,fontWeight:700}},gv.toFixed(3)),
                   "  ·  ",(N/1e9).toFixed(2),"B",
-                  hf!==null&&React.createElement("span",{style:{color:Math.abs(hf)>5?(hf>0?"#6ee7b7":"#f87171"):"#475569"}},"  ·  h=",hf>0?"+":"",hf.toFixed(1))
+                  hf!==null&&React.createElement("span",{style:{color:Math.abs(hf)>5?(hf>0?"#6ee7b7":"#f87171"):"#8b949e"}},"  ·  h=",hf>0?"+":"",hf.toFixed(1))
                 ),
-                React.createElement("div",{style:{fontSize:11,color:"#64748b",lineHeight:1.7}},
+                React.createElement("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.7}},
                   gv<-0.5&&"Scaling reasoning actively degrades truthfulness. Data curation gives ~10× more alignment per unit cost than scaling.",
                   gv>=-0.5&&gv<0&&"Alignment tax regime. Loss is blind to this. Curated data or scaling past 3.5B resolves it.",
                   gv>=0&&gv<0.5&&"Critical transition zone — max sensitivity. OLMo sits here exactly at γ₁₂ = 0.000 (topological domain wall).",
@@ -446,10 +452,10 @@ function App(){
       tab==="frontier"&&React.createElement("div",null,
         React.createElement("div",{style:{...Bx(),marginBottom:14}},
           React.createElement("div",DIM(),"SWE-BENCH vs GPQA DIAMOND — FRONTIER (FEB–MAR 2026)"),
-          React.createElement("div",{style:{fontSize:10,color:"#1e3a5f",marginBottom:10}},"HellaSwag/TQA saturate at frontier scale. Active coupling shifts to coding vs scientific reasoning. r = +0.34 (cooperative, n=10)."),
+          React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:10}},"HellaSwag/TQA saturate at frontier scale. Active coupling shifts to coding vs scientific reasoning. r = +0.34 (cooperative, n=10)."),
           React.createElement(FrontierChart,null),
           React.createElement("div",{style:{display:"flex",flexWrap:"wrap",gap:"5px 12px",marginTop:9}},
-            Object.entries(FFC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#334155"}},
+            Object.entries(FFC).map(([f,c])=>React.createElement("div",{key:f,style:{display:"flex",alignItems:"center",gap:5,fontSize:9,color:"#8b949e"}},
               React.createElement("div",{style:{width:7,height:7,borderRadius:"50%",background:c}}),f))
           )
         ),
@@ -466,16 +472,16 @@ function App(){
                 React.createElement("div",{style:{fontSize:14}},"→"),
                 React.createElement("div",{style:{whiteSpace:"pre",lineHeight:1.4,marginTop:2,fontSize:9}},item.arrow)
               ):
-              React.createElement("div",{key:i,style:{background:"#080e1a",borderRadius:7,padding:"10px 13px",minWidth:100,border:item.h<-5?"1px solid #f87171":item.h>1?"1px solid #6ee7b7":"1px solid #1e2d45"}},
+              React.createElement("div",{key:i,style:{background:"#0d1117",borderRadius:7,padding:"10px 13px",minWidth:100,border:item.h<-5?"1px solid #f87171":item.h>1?"1px solid #6ee7b7":"1px solid #30363d"}},
                 React.createElement("div",{...MN({fontSize:11,fontWeight:700,color:"#f1f5f9"})},item.m),
-                React.createElement("div",{style:{fontSize:9,color:"#475569",marginTop:3}},"SWE ",item.swe,"%"),
-                React.createElement("div",{style:{fontSize:9,color:"#475569"}},"GPQA ",item.gpqa,"%"),
-                React.createElement("div",{...MN({fontSize:11,fontWeight:700,marginTop:5,color:item.h<-5?"#f87171":item.h>1?"#6ee7b7":"#475569"})},
+                React.createElement("div",{style:{fontSize:9,color:"#8b949e",marginTop:3}},"SWE ",item.swe,"%"),
+                React.createElement("div",{style:{fontSize:9,color:"#8b949e"}},"GPQA ",item.gpqa,"%"),
+                React.createElement("div",{...MN({fontSize:11,fontWeight:700,marginTop:5,color:item.h<-5?"#f87171":item.h>1?"#6ee7b7":"#8b949e"})},
                   "h=",item.h>0?"+":"",item.h)
               )
             )
           ),
-          React.createElement("div",{style:{padding:"8px 11px",background:"#080e1a",borderRadius:5,...BL("#7c3aed"),fontSize:10,color:"#475569",lineHeight:1.7}},
+          React.createElement("div",{style:{padding:"8px 11px",background:"#0d1117",borderRadius:5,...BL("#7c3aed"),fontSize:10,color:"#8b949e",lineHeight:1.7}},
             "Sonnet 4.6 boosted coding (SWE +2.4pp) at cost of reasoning (GPQA −9.3pp) — same sign-flip structure as the Nₒ transition, operating via h-field at frontier scale. Opus 4.6 recovers. Not a failure; CAPE predicted this structure."
           )
         ),
@@ -483,22 +489,22 @@ function App(){
           React.createElement("div",DIM({marginBottom:10}),"ALL FRONTIER MODELS"),
           React.createElement("table",{style:{width:"100%",borderCollapse:"collapse",fontSize:10,fontFamily:"monospace"}},
             React.createElement("thead",null,
-              React.createElement("tr",{style:{borderBottom:"1px solid #1e2d45"}},
+              React.createElement("tr",{style:{borderBottom:"1px solid #30363d"}},
                 ["Model","Family","SWE","GPQA","h","Regime"].map(h=>
-                  React.createElement("th",{key:h,style:{padding:"4px 7px",textAlign:"left",color:"#1e3a5f",fontWeight:700,fontSize:9}},h)))),
+                  React.createElement("th",{key:h,style:{padding:"4px 7px",textAlign:"left",color:"#8b949e",fontWeight:700,fontSize:9}},h)))),
             React.createElement("tbody",null,
-              FRONTIER.map(m=>React.createElement("tr",{key:m.n,style:{borderBottom:"1px solid #0d1829",background:m.h<-8?"rgba(220,38,38,0.04)":"transparent"}},
-                React.createElement("td",{style:{padding:"6px 7px",color:"#e2e8f0",fontWeight:700}},m.n),
+              FRONTIER.map(m=>React.createElement("tr",{key:m.n,style:{borderBottom:"1px solid #161b22",background:m.h<-8?"rgba(220,38,38,0.04)":"transparent"}},
+                React.createElement("td",{style:{padding:"6px 7px",color:"#c9d1d9",fontWeight:700}},m.n),
                 React.createElement("td",{style:{padding:"6px 7px",color:FFC[m.fam]||"#64748b"}},m.fam),
-                React.createElement("td",{style:{padding:"6px 7px",color:"#475569"}},m.swe),
-                React.createElement("td",{style:{padding:"6px 7px",color:"#475569"}},m.gpqa),
-                React.createElement("td",{style:{padding:"6px 7px",fontWeight:700,color:m.h<-5?"#f87171":m.h>3?"#6ee7b7":"#475569"}},m.h>0?"+":"",m.h),
+                React.createElement("td",{style:{padding:"6px 7px",color:"#8b949e"}},m.swe),
+                React.createElement("td",{style:{padding:"6px 7px",color:"#8b949e"}},m.gpqa),
+                React.createElement("td",{style:{padding:"6px 7px",fontWeight:700,color:m.h<-5?"#f87171":m.h>3?"#6ee7b7":"#8b949e"}},m.h>0?"+":"",m.h),
                 React.createElement("td",{style:{padding:"6px 7px",fontSize:9,color:m.h<-8?"#f87171":m.h>3?"#6ee7b7":"#334155"}},
                   m.h<-8?"⚠ tax":m.h>3?"✓ above":"cooperative")
               ))
             )
           ),
-          React.createElement("div",{style:{fontSize:9,color:"#1e2d45",marginTop:7}},"h = GPQA − GPQA_universal(SWE). Source: public model cards Feb–Mar 2026.")
+          React.createElement("div",{style:{fontSize:9,color:"#30363d",marginTop:7}},"h = GPQA − GPQA_universal(SWE). Source: public model cards Feb–Mar 2026.")
         )
       ),
 
@@ -507,7 +513,7 @@ function App(){
 
         React.createElement("div",{style:{...Bx(),...BL("#6ee7b7")}},
           React.createElement("div",DIM(),"THERMODYNAMIC OBSERVABLES — PCA + LASSO DRIVEN"),
-          React.createElement("div",{style:{fontSize:10,color:"#1e3a5f",marginBottom:10}},"Four quantities computed directly from data. Yellow line = Nₒ. Green = Nₒ₂. Each shows a different derivative of the free energy — analogous to measuring specific heat, susceptibility, and order parameter simultaneously."),
+          React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:10}},"Four quantities computed directly from data. Yellow line = Nₒ. Green = Nₒ₂. Each shows a different derivative of the free energy — analogous to measuring specific heat, susceptibility, and order parameter simultaneously."),
           React.createElement(ThermoChart,null),
           React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:10}},
             [{c:"#c4b5fd",l:"γ₁₂(N): 1st moment",b:"Running coupling = ∂F/∂(ψ₁ψ₂). Sign flip at Nₒ is the order-parameter switch. Zero-crossing of the 1st derivative of the free energy with respect to inter-capability coupling."},
@@ -516,14 +522,14 @@ function App(){
              {c:"#60a5fa",l:"λ₂: soft eigenvalue",b:"Second PCA eigenvalue decays as N^−0.72 (R²=0.95). The 'soft mode' — the direction in benchmark space that becomes massless at Nₒ. Its collapse is what drives the d_eff reduction. Direct signature of the transition in observable space."},
             ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
               React.createElement("div",{style:{fontSize:10,fontWeight:700,color:d.c,marginBottom:4}},d.l),
-              React.createElement("div",{style:{fontSize:10,color:"#64748b",lineHeight:1.7}},d.b)
+              React.createElement("div",{style:{fontSize:10,color:"#c9d1d9",lineHeight:1.7}},d.b)
             ))
           )
         ),
 
         React.createElement("div",{style:{...Bx(),...BL("#fbbf24")}},
           React.createElement("div",DIM(),"GROUP / SUBGROUP FLOW — SYMMETRY BREAKING SEQUENCE"),
-          React.createElement("div",{style:{fontSize:10,color:"#1e3a5f",marginBottom:10}},"Two transitions required by group theory for a 2D order parameter (ψ_R, ψ_C). This is a theorem from the SFEE/PRR 2020 analysis — not an observation. Ratio Nₒ₂/Nₒ = 3.2 = SFEE renormalization factor."),
+          React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:10}},"Two transitions required by group theory for a 2D order parameter (ψ_R, ψ_C). This is a theorem from the SFEE/PRR 2020 analysis — not an observation. Ratio Nₒ₂/Nₒ = 3.2 = SFEE renormalization factor."),
           React.createElement(SymmetryChart,null),
           React.createElement("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:10}},
             [{c:"#fbbf24",l:"Nₒ: Z₂ breaks (1st order)",b:"Discrete symmetry γ₁₂ → −γ₁₂ breaks. OLMo at γ=0 is the domain wall — not noise, topologically required. Analogous to lattice sublattice symmetry breaking in CeRh₂As₂."},
@@ -531,7 +537,7 @@ function App(){
              {c:"#34d399",l:"Class D topological phase",b:"T=0 (no time reversal), C=+1 (particle-hole). Topological invariant Z₂=1 above Nₒ. Domain wall hosts Majorana zero mode. This is WHY OLMo γ=0 is exact — bulk-edge correspondence, not coincidence."},
             ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
               React.createElement("div",{style:{fontSize:10,fontWeight:700,color:d.c,marginBottom:4}},d.l),
-              React.createElement("div",{style:{fontSize:10,color:"#64748b",lineHeight:1.7}},d.b)
+              React.createElement("div",{style:{fontSize:10,color:"#c9d1d9",lineHeight:1.7}},d.b)
             ))
           )
         ),
@@ -545,7 +551,7 @@ function App(){
              {c:"#60a5fa",l:"Multiple AI temperatures",b:"AI systems have at least 3 distinct 'temperatures': T_train (loss floor E = irreducible entropy), T_sample (inference temperature — controls diversity vs accuracy), T_RLHF (effective temperature of the alignment process — how much capability the aligner is willing to sacrifice). CAPE operates at T_train. The Arrhenius form ∥∇L∥ ~ exp(−C/L) shows L plays the role of T. The 10× data multiplier is a T_train reduction. Paper 3B: h-field = T_RLHF coupling to the order parameter."},
             ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
               React.createElement("div",{style:{fontSize:10,fontWeight:700,color:d.c,marginBottom:4}},d.l),
-              React.createElement("div",{style:{fontSize:10,color:"#64748b",lineHeight:1.7}},d.b)
+              React.createElement("div",{style:{fontSize:10,color:"#c9d1d9",lineHeight:1.7}},d.b)
             ))
           )
         ),
@@ -559,7 +565,7 @@ function App(){
              {c:"#f87171",l:"Energy scaling + d_eff consistency",b:"The gradient exponent β=0.40 ≈ α=0.238 because d_eff=1.254 < 2 (below lower critical dimension of mean-field). This is NOT a bug — it is a prediction. LASSO confirms: dimensional reduction in each phase. Tax phase: 2D (two competing modes). Bonus phase: 1D (single cooperative mode). The d_eff trajectory from PCA is quantitatively consistent with β_measured to within 1σ."},
             ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
               React.createElement("div",{style:{fontSize:10,fontWeight:700,color:d.c,marginBottom:4}},d.l),
-              React.createElement("div",{style:{fontSize:10,color:"#64748b",lineHeight:1.7}},d.b)
+              React.createElement("div",{style:{fontSize:10,color:"#c9d1d9",lineHeight:1.7}},d.b)
             ))
           )
         )
@@ -569,13 +575,13 @@ function App(){
       tab==="how"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
         React.createElement("div",{style:{...Bx(),...BL("#7c3aed")}},
           React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#f1f5f9",marginBottom:8}},"The Core Idea"),
-          React.createElement("div",{style:{fontSize:11,color:"#64748b",lineHeight:1.8}},
+          React.createElement("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.8}},
             "Scaling laws describe how loss changes with model size. Loss is featureless at the transition.",
             React.createElement("br"),React.createElement("br"),
             "CAPE measures the ",React.createElement("strong",{style:{color:"#c4b5fd"}},"coupling"),
             ": how much does one capability change per unit gain in another?",
             React.createElement("br"),React.createElement("br"),
-            React.createElement("code",{style:{background:"#080e1a",padding:"3px 8px",borderRadius:4,color:"#c4b5fd",fontFamily:"monospace"}},"γ₁₂(N) = ΔTQA / ΔHellaSwag"),
+            React.createElement("code",{style:{background:"#0d1117",padding:"3px 8px",borderRadius:4,color:"#c4b5fd",fontFamily:"monospace"}},"γ₁₂(N) = ΔTQA / ΔHellaSwag"),
             React.createElement("br"),React.createElement("br"),
             "γ₁₂ < 0 → reasoning degrades truthfulness → ",React.createElement("strong",{style:{color:"#f87171"}},"alignment tax"),React.createElement("br"),
             "γ₁₂ > 0 → both improve together → ",React.createElement("strong",{style:{color:"#6ee7b7"}},"alignment bonus"),React.createElement("br"),React.createElement("br"),
@@ -591,20 +597,20 @@ function App(){
           React.createElement("div",{style:{color:s.c,fontWeight:900,fontSize:20,fontFamily:"monospace",opacity:0.4,flexShrink:0,width:28,lineHeight:1.4}},s.n),
           React.createElement("div",null,
             React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#f1f5f9",marginBottom:5}},s.t),
-            React.createElement("div",{style:{fontSize:11,color:"#64748b",lineHeight:1.7}},s.b)
+            React.createElement("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.7}},s.b)
           )
         ))
       ),
 
       /* ══ KEY RESULTS ══════════════════════════════════════ */
       tab==="paper"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
-        React.createElement("div",{style:{...Bx(),background:"linear-gradient(135deg,#0d1829,#080e1a)",border:"1px solid #1e2d45"}},
+        React.createElement("div",{style:{...Bx(),background:"linear-gradient(135deg,#161b22,#0d1117)",border:"1px solid #30363d"}},
           React.createElement("div",{style:{fontSize:9,color:"#7c3aed",fontWeight:700,marginBottom:4,letterSpacing:2}},"PAPER"),
           React.createElement("div",{style:{fontSize:14,fontWeight:700,color:"#f1f5f9",lineHeight:1.5,marginBottom:5}},"When Models Stop Lying — and When They Start Again: Capability Coupling and the Alignment Tax in AI Scaling Laws"),
-          React.createElement("div",{...MN({fontSize:10,color:"#334155"})},"Adil Amin · Independent Researcher · 2026"),
+          React.createElement("div",{...MN({fontSize:10,color:"#8b949e"})},"Adil Amin · Independent Researcher · 2026"),
           React.createElement("div",{style:{marginTop:12,display:"flex",gap:8,flexWrap:"wrap"}},
-            React.createElement("a",{href:"https://github.com/adilamin89/cape-scaling",target:"_blank",style:{background:"#1e2d45",color:"#94a3b8",padding:"5px 11px",borderRadius:5,fontSize:10,fontWeight:700,textDecoration:"none"}},"github →"),
-            React.createElement("div",{style:{background:"#1e2d45",color:"#475569",padding:"5px 11px",borderRadius:5,fontSize:10,fontWeight:700}},"arXiv: pending")
+            React.createElement("a",{href:"https://github.com/adilamin89/cape-scaling",target:"_blank",style:{background:"#30363d",color:"#94a3b8",padding:"5px 11px",borderRadius:5,fontSize:10,fontWeight:700,textDecoration:"none"}},"github →"),
+            React.createElement("div",{style:{background:"#30363d",color:"#8b949e",padding:"5px 11px",borderRadius:5,fontSize:10,fontWeight:700}},"arXiv: pending")
           )
         ),
         React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
@@ -618,20 +624,20 @@ function App(){
            {l:"Loss at transition",v:"Featureless",s:"CV = 0.8% — zero signal in loss",c:"#334155"},
            {l:"Data quality multiplier",v:"~10×",s:"Phi at 1B vs web-trained at 10B",c:"#6ee7b7"},
            {l:"Second transition Nₒ₂",v:"~11B",s:"χ₂ peak = 3.08, 26 models",c:"#c4b5fd"},
-           {l:"Framework validity end",v:"~130B",s:"det(H) → 0 predicted",c:"#475569"},
+           {l:"Framework validity end",v:"~130B",s:"det(H) → 0 predicted",c:"#8b949e"},
            {l:"Frontier cooperative phase",v:"r = +0.34",s:"SWE vs GPQA, n=10 frontier",c:"#34d399"},
            {l:"Topological class",v:"Class D",s:"Z₂ invariant, Majorana @ OLMo",c:"#fbbf24"},
            {l:"TRSB onset (Nₒ₂)",v:"θ* = 38.8°",s:"Im(ψ_R*ψ_C) ≠ 0, irreversible",c:"#6ee7b7"},
           ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
-            React.createElement("div",{style:{fontSize:9,color:"#334155",marginBottom:2,letterSpacing:0.5}},d.l.toUpperCase()),
-            React.createElement("div",{...MN({fontSize:16,fontWeight:900,color:d.c})},d.v),
-            React.createElement("div",{style:{fontSize:9,color:"#1e2d45",marginTop:2}},d.s)
+            React.createElement("div",{style:{fontSize:11,color:"#8b949e",marginBottom:4,letterSpacing:0.5,fontWeight:600}},d.l.toUpperCase()),
+            React.createElement("div",{...MN({fontSize:20,fontWeight:900,color:d.c})},d.v),
+            React.createElement("div",{style:{fontSize:11,color:"#8b949e",marginTop:4}},d.s)
           ))
         ),
         React.createElement("div",{style:{...Bx(),...BL("#fb923c")}},
-          React.createElement("div",{style:{fontSize:9,color:"#475569",fontWeight:700,marginBottom:6,letterSpacing:1}},"KEY SENTENCE"),
+          React.createElement("div",{style:{fontSize:9,color:"#8b949e",fontWeight:700,marginBottom:6,letterSpacing:1}},"KEY SENTENCE"),
           React.createElement("div",{style:{fontSize:14,color:"#f1f5f9",fontStyle:"italic",lineHeight:1.6}},'"Two models with identical loss can be in opposite alignment regimes."'),
-          React.createElement("div",{style:{fontSize:10,color:"#334155",marginTop:7,lineHeight:1.7}},"Capability coupling, not individual capability scaling, governs alignment. CAPE makes this coupling measurable, predictable, and designable. Code: github.com/adilamin89/cape-scaling · Contact: adilamin@uwm.edu · adil89aminx@gmail.com")
+          React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginTop:7,lineHeight:1.7}},"Capability coupling, not individual capability scaling, governs alignment. CAPE makes this coupling measurable, predictable, and designable. Code: github.com/adilamin89/cape-scaling · Contact: adilamin@uwm.edu · adil89aminx@gmail.com")
         )
       )
     )
