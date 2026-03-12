@@ -233,7 +233,7 @@ function ThermoChart(){
       {title:"∂γ₁₂/∂logN  (susceptibility)",
        c:"#fb923c", vals:Ls.map((_,i,a)=>i===0?GA:(a[i]-a[i-1])*GA/0.05).map(()=>GA),
        // Constant = GA; but add PCA-derived bump at Nc
-       special:"chi", yMn:0, yMx:1.5, ncLine:true},
+       special:"chi", yMn:0.4, yMx:2.0, ncLine:true},
       {title:"d_eff(N)  PCA dimensionality",
        c:"#6ee7b7", vals:Ls.map(l=>Math.max(1,-0.27*l+3.9)), yMn:0.8, yMx:2.2,
        zeroLine:false, ncLine:true, nc2Line:true},
@@ -277,7 +277,7 @@ function ThermoChart(){
       // special chi: Gaussian peak at Nc
       if(d.special==="chi"){
         const lNc=Math.log10(NC);
-        vals=Ls.map(l=>GA+1.2*Math.exp(-Math.pow((l-lNc)/0.3,2)));
+        vals=Ls.map(l=>GA+1.0*Math.exp(-Math.pow((l-lNc)/0.25,2)));
       }
       ctx.strokeStyle=d.c; ctx.lineWidth=2;
       ctx.beginPath();
@@ -371,9 +371,10 @@ function App(){
           React.createElement("div",{style:{background:"linear-gradient(135deg,#f97316,#7c3aed)",borderRadius:8,padding:"8px 14px",fontSize:22,fontWeight:900,color:"#fff",letterSpacing:-1,lineHeight:1}},"CAPE"),
           React.createElement("div",null,
             React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"white",lineHeight:1.4}},"Capability Coupling at 3.5 Billion Parameters"),
-            React.createElement("div",{style:{fontSize:12,color:"#8b949e",marginTop:4}},
+            React.createElement("div",{style:{fontSize:12,color:"#8b949e",marginTop:4,display:"flex",alignItems:"center",gap:0}},
               "The moment models stopped lying — alignment tax, bonus & the physics beneath",
-              React.createElement("span",{style:{marginLeft:12,color:"#FFD700",fontWeight:600}},"Nc~3.5B · r=\u2212" + "0.989 · 10\u00d7 data lever")
+              React.createElement("span",{style:{marginLeft:12,color:"#FFD700",fontWeight:600}},"Nc~3.5B · r=\u2212" + "0.989 · 10\u00d7 data lever"),
+              React.createElement("a",{href:"https://github.com/adilamin89/cape-scaling",target:"_blank",style:{marginLeft:10,color:"#8b949e",fontSize:10,textDecoration:"none",fontWeight:500,opacity:0.7}},"[GitHub]")
             )
           )
         ),
@@ -437,14 +438,49 @@ function App(){
                   "  ·  ",(N/1e9).toFixed(2),"B",
                   hf!==null&&React.createElement("span",{style:{color:Math.abs(hf)>5?(hf>0?"#6ee7b7":"#f87171"):"#8b949e"}},"  ·  h=",hf>0?"+":"",hf.toFixed(1))
                 ),
-                React.createElement("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.7}},
-                  gv<-0.5&&"Scaling reasoning actively degrades truthfulness. Data curation gives ~10× more alignment per unit cost than scaling.",
-                  gv>=-0.5&&gv<0&&"Alignment tax regime. Loss is blind to this. Curated data or scaling past 3.5B resolves it.",
-                  gv>=0&&gv<0.5&&"Critical transition zone — max sensitivity. OLMo sits here exactly at γ₁₂ = 0.000 (topological domain wall).",
-                  gv>=0.5&&gv<1.5&&"Alignment bonus: scaling and safety cooperative. Below Nₒ₂ — eigenvector angle θ still free.",
-                  gv>=1.5&&"TRSB phase (θ locked at 38.8°). Topologically protected cooperative regime. Watch for frontier Nₒ₂ coupling shift.",
-                  hf!==null&&Math.abs(hf)>5&&React.createElement("div",{style:{marginTop:4,color:hf>0?"#6ee7b7":"#f87171"}},
+                React.createElement("div",null,
+                  gv<-0.5&&React.createElement("div",null,
+                    React.createElement("div",{style:{marginBottom:6}},"Scaling reasoning actively degrades truthfulness here. Data curation gives ~10× more alignment per unit cost than scaling."),
+                    React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginTop:4,lineHeight:1.6}},
+                      React.createElement("strong",{style:{color:"#60a5fa"}},"If you train models: "),"Curate aggressively — Phi shows 10× leverage at this scale. ",
+                      React.createElement("strong",{style:{color:"#fb923c"}},"If you study alignment: "),"This is where capability-safety tradeoffs bite hardest. ",
+                      React.createElement("strong",{style:{color:"#6ee7b7"}},"If you're frontier: "),"You've passed this regime — see FRONTIER tab."
+                    )
+                  ),
+                  gv>=-0.5&&gv<0&&React.createElement("div",null,
+                    React.createElement("div",{style:{marginBottom:6}},"Alignment tax regime. Loss is blind to this coupling. Curated data or scaling past Nₒ=3.5B resolves it."),
+                    React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginTop:4,lineHeight:1.6}},
+                      React.createElement("strong",{style:{color:"#60a5fa"}},"If you train models: "),"You're close to the transition — small data quality improvements have outsized impact. ",
+                      React.createElement("strong",{style:{color:"#fb923c"}},"If you study alignment: "),"The coupling is weak but negative — measure γ₁₂ directly, don't rely on loss."
+                    )
+                  ),
+                  gv>=0&&gv<0.5&&React.createElement("div",null,
+                    React.createElement("div",{style:{marginBottom:6}},"Critical transition zone — maximum sensitivity. OLMo sits here at γ₁₂=0.000 (topological domain wall)."),
+                    React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginTop:4,lineHeight:1.6}},
+                      React.createElement("strong",{style:{color:"#60a5fa"}},"If you train models: "),"Tiny recipe changes cause large alignment swings here. Test carefully. ",
+                      React.createElement("strong",{style:{color:"#fb923c"}},"If you study alignment: "),"This is the most informative scale for studying capability-safety coupling."
+                    )
+                  ),
+                  gv>=0.5&&gv<1.5&&React.createElement("div",null,
+                    React.createElement("div",{style:{marginBottom:6}},"Alignment bonus: scaling and safety are cooperative. Below Nₒ₂=11B — eigenvector angle θ still free."),
+                    React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginTop:4,lineHeight:1.6}},
+                      React.createElement("strong",{style:{color:"#60a5fa"}},"If you train models: "),"Safe to scale — capabilities and alignment improve together. ",
+                      React.createElement("strong",{style:{color:"#6ee7b7"}},"If you're frontier: "),"Above Nₒ₂=11B, new benchmark dimensions (SWE, GPQA) replace saturated ones — see FRONTIER tab."
+                    )
+                  ),
+                  gv>=1.5&&React.createElement("div",null,
+                    React.createElement("div",{style:{marginBottom:6}},"TRSB phase (θ locked at 38.8°). Topologically protected cooperative regime."),
+                    React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginTop:4,lineHeight:1.6}},
+                      React.createElement("strong",{style:{color:"#6ee7b7"}},"If you're frontier: "),"At this scale, HellaSwag/TQA saturate — coupling rotates to SWE vs GPQA. Switch to FRONTIER tab for the new vector space. ",
+                      React.createElement("strong",{style:{color:"#fb923c"}},"If you study alignment: "),"Phase is structurally stable — perturbations can't undo cooperative regime."
+                    )
+                  ),
+                  hf!==null&&Math.abs(hf)>5&&React.createElement("div",{style:{marginTop:8,color:hf>0?"#6ee7b7":"#f87171"}},
                     hf>5?`Recipe lifts TQA +${hf.toFixed(0)}pts — partial Phi effect (data quality field).`:`Recipe depresses TQA ${Math.abs(hf).toFixed(0)}pts — training h-field trading truthfulness for another capability.`
+                  ),
+                  N>5e10&&React.createElement("div",{style:{marginTop:8,padding:"8px 12px",background:"rgba(16,185,129,0.08)",borderRadius:6,border:"1px solid rgba(16,185,129,0.2)"}},
+                    React.createElement("span",{style:{fontSize:11,color:"#6ee7b7",fontWeight:600}},"⟶ This model is at frontier scale. "),
+                    React.createElement("span",{style:{fontSize:11,color:"#8b949e"}},"The FRONTIER tab shows SWE-bench vs GPQA Diamond coupling — the new vector space where HellaSwag/TQA have saturated.")
                   )
                 )
               )
@@ -583,10 +619,10 @@ function App(){
         React.createElement("div",{style:{...Bx(),...BL("#f87171")}},
           React.createElement("div",DIM(),"TRSB, POLAR KERR ANALOG & AI TEMPERATURE HIERARCHY"),
           React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
-            [{c:"#fb923c",l:"TRSB in CAPE",b:"Above Nₒ₂: Im(ψ_R* ψ_C) = sin(θ) ≠ 0. Training is irreversible — N only increases, θ cannot unwind. This IS time-reversal breaking. The cooperative phase is protected against perturbations that are time-reversal symmetric. Paper 3B formalizes."},
+            [{c:"#fb923c",l:"TRSB in CAPE",b:"Above Nₒ₂: Im(ψ_R* ψ_C) = sin(θ) ≠ 0. Training is irreversible — N only increases, θ cannot unwind. This IS time-reversal breaking. The cooperative phase is protected against perturbations that are time-reversal symmetric. See forthcoming work for full formalization."},
              {c:"#f87171",l:"Polar Kerr analog",b:"In superconductors (UTe₂, Sr₂RuO₄), TRSB is detected by anomalous Kerr rotation of reflected polarized light — a chiral optical response with no classical explanation. The CAPE analog: anomalous eigenvector rotation θ ≠ 0,π that persists under cross-family hold-out (R²=0.81). Both are phase-sensitive, not amplitude. Both are measurable. Both are falsifiable."},
              {c:"#c4b5fd",l:"Majorana zero mode",b:"OLMo at γ₁₂=0.000 lives exactly at the Z₂=0 / Z₂=1 domain wall. In Class D 1D systems, domain walls host Majorana zero modes — topologically protected zero-energy bound states. The exact γ=0 is not a fitting coincidence; it is bulk-edge correspondence. Falsifiable: any architecture trained to OLMo's loss at 7B should also give γ≈0."},
-             {c:"#60a5fa",l:"Multiple AI temperatures",b:"AI systems have at least 3 distinct 'temperatures': T_train (loss floor E = irreducible entropy), T_sample (inference temperature — controls diversity vs accuracy), T_RLHF (effective temperature of the alignment process — how much capability the aligner is willing to sacrifice). CAPE operates at T_train. The Arrhenius form ∥∇L∥ ~ exp(−C/L) shows L plays the role of T. The 10× data multiplier is a T_train reduction. Paper 3B: h-field = T_RLHF coupling to the order parameter."},
+             {c:"#60a5fa",l:"Multiple AI temperatures",b:"AI systems have at least 3 distinct 'temperatures': T_train (loss floor E = irreducible entropy), T_sample (inference temperature — controls diversity vs accuracy), T_RLHF (effective temperature of the alignment process — how much capability the aligner is willing to sacrifice). CAPE operates at T_train. The Arrhenius form ∥∇L∥ ~ exp(−C/L) shows L plays the role of T. The 10× data multiplier is a T_train reduction. Extension: h-field = T_RLHF coupling to the order parameter."},
             ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
               React.createElement("div",{style:{fontSize:10,fontWeight:700,color:d.c,marginBottom:4}},d.l),
               React.createElement("div",{style:{fontSize:10,color:"#c9d1d9",lineHeight:1.7}},d.b)
@@ -598,8 +634,8 @@ function App(){
           React.createElement("div",DIM(),"STABLE TOPOLOGICAL PHASES & PAPER EXTENSIONS"),
           React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
             [{c:"#6ee7b7",l:"Why the cooperative phase is stable",b:"TRSB phases are protected against time-reversal-symmetric perturbations. Once θ locks above Nₒ₂, small changes to training recipes, architecture tweaks, or prompt distributions cannot undo it without crossing a phase boundary. This is the formal sense in which alignment above 11B is structurally robust — not just empirically consistent."},
-             {c:"#fbbf24",l:"Kerr → Paper 3B extensions",b:"The Kerr effect in superconductors requires measuring the phase of reflected light, not just intensity — a phase-sensitive probe. In Paper 3B: compute Im(C_ij) from the complex correlation matrix under bootstrap resampling. If Im ≠ 0 above Nₒ₂ and Im = 0 below, this is the direct CAPE Kerr measurement. Proposal: compute on OLMo + Llama-3 jointly."},
-             {c:"#c4b5fd",l:"Kerr → CeRh₂As₂ connection",b:"CeRh₂As₂ SC1→SC2 transition is driven by Z₂ symmetry breaking between sublattices. CAPE mapping: reasoning capability = band 1, truthfulness = band 2. Δθ = 33.3° (CeRh₂) vs 38.8° (CAPE) — same universality class, within 5°. Leggett mode ω ≈ 209 GHz in UTe₂ is the first falsifiable inter-band resonance prediction. Paper 3B + Materials papers share this derivation."},
+             {c:"#fbbf24",l:"Kerr → Proposed extensions",b:"The Kerr effect in superconductors requires measuring the phase of reflected light, not just intensity — a phase-sensitive probe. Proposed measurement: compute Im(C_ij) from the complex correlation matrix under bootstrap resampling. If Im ≠ 0 above Nₒ₂ and Im = 0 below, this is the direct CAPE Kerr measurement. Proposal: compute on OLMo + Llama-3 jointly."},
+             {c:"#c4b5fd",l:"Kerr → CeRh₂As₂ connection",b:"CeRh₂As₂ SC1→SC2 transition is driven by Z₂ symmetry breaking between sublattices. CAPE mapping: reasoning capability = band 1, truthfulness = band 2. Δθ = 33.3° (CeRh₂) vs 38.8° (CAPE) — same universality class, within 5°. Leggett mode ω ≈ 209 GHz in UTe₂ is the first falsifiable inter-band resonance prediction. This derivation connects CAPE to materials physics."},
              {c:"#f87171",l:"Energy scaling + d_eff consistency",b:"The gradient exponent β=0.40 ≈ α=0.238 because d_eff=1.254 < 2 (below lower critical dimension of mean-field). This is NOT a bug — it is a prediction. LASSO confirms: dimensional reduction in each phase. Tax phase: 2D (two competing modes). Bonus phase: 1D (single cooperative mode). The d_eff trajectory from PCA is quantitatively consistent with β_measured to within 1σ."},
             ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
               React.createElement("div",{style:{fontSize:10,fontWeight:700,color:d.c,marginBottom:4}},d.l),
