@@ -80,7 +80,7 @@ The standard formulation predicts loss $L(N) = E + AN^{-\alpha}$ as a function o
 However, practitioners care not only about loss but about \emph{capabilities}: reasoning, factual accuracy, calibration, instruction following.
 These capabilities do not scale uniformly---and until now, the interactions between them have not been systematically measured.
 
-We introduce \textbf{CAPE} (Coupling Analysis of Phase Emergence), a framework that measures how capabilities couple as models scale, and apply it to a simple empirical observation with far-reaching consequences:
+We introduce \textbf{CAPE} (Coupling Analysis of Phase Emergence), a framework that measures how capabilities couple as models scale, and apply it to a simple empirical observation with far-reaching consequences:\footnote{An interactive dashboard with a model-specific phase calculator, all data, and reproduction scripts is available at \url{https://adilamin89.github.io/cape-scaling}.}
 \textbf{the correlation between reasoning (HellaSwag) and truthfulness (TruthfulQA) is $r = -0.989$ for Pythia models below 3B parameters, but flips to $r > +0.78$ for Llama~\cite{touvron2023} models above 7B.}
 This sign change is not gradual.
 The local coupling $\gamma_{12}(N) \equiv \Delta\mathrm{TQA}/\Delta\mathrm{HS}$, measured between consecutive model sizes within each family, crosses zero at $N_c \approx 3.5$B and grows linearly in $\log_{10} N$ thereafter.
@@ -967,6 +967,8 @@ CAPE makes this coupling measurable, predictable, and designable.
 \noindent\textbf{Code, data, and interactive dashboard.}
 All benchmark data, figure-generation scripts, and an interactive phase explorer are available at
 \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
+The live interactive dashboard---including a model-specific phase calculator, frontier coupling explorer, and all thermodynamic observables---is hosted at
+\href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}}.
 Correspondence: \href{mailto:adilamin@uwm.edu}{\texttt{adilamin@uwm.edu}} $\cdot$ \href{mailto:adil89aminx@gmail.com}{\texttt{adil89aminx@gmail.com}}.
 
 \begin{thebibliography}{99}

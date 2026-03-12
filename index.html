@@ -312,7 +312,7 @@ function SymmetryChart(){
     ctx.clearRect(0,0,W,H);
 
     const stages=[
-      {x:0.09,sym:"O(2)×ℤ₂",scale:"<1B",c:"#334155",top:"Full symmetry\nno broken generator",bot:"tax/bonus degenerate"},
+      {x:0.09,sym:"O(2)×ℤ₂",scale:"<1B",c:"#8b949e",top:"Full symmetry\nno broken generator",bot:"tax/bonus degenerate"},
       {x:0.32,sym:"ℤ₂ breaks",scale:"Nₒ 3.5B",c:"#fbbf24",top:"discrete Z₂ breaks\nγ₁₂ sign flips",bot:"OLMo γ=0 = domain wall",arrow:"1st order\n(discrete)"},
       {x:0.55,sym:"O(2) free",scale:"3.5–11B",c:"#c4b5fd",top:"θ oscillates\nU(1) not locked",bot:"bonus but unstable"},
       {x:0.77,sym:"U(1) locks",scale:"Nₒ₂ 11B",c:"#6ee7b7",top:"θ→38.8° fixed\nTRSB onset",bot:"Im(ψ₁*ψ₂)≠0\nirreversible",arrow:"2nd order\n(continuous)"},
@@ -499,7 +499,7 @@ function App(){
                 React.createElement("td",{style:{padding:"6px 7px",color:"#8b949e"}},m.swe),
                 React.createElement("td",{style:{padding:"6px 7px",color:"#8b949e"}},m.gpqa),
                 React.createElement("td",{style:{padding:"6px 7px",fontWeight:700,color:m.h<-5?"#f87171":m.h>3?"#6ee7b7":"#8b949e"}},m.h>0?"+":"",m.h),
-                React.createElement("td",{style:{padding:"6px 7px",fontSize:9,color:m.h<-8?"#f87171":m.h>3?"#6ee7b7":"#334155"}},
+                React.createElement("td",{style:{padding:"6px 7px",fontSize:9,color:m.h<-8?"#f87171":m.h>3?"#6ee7b7":"#8b949e"}},
                   m.h<-8?"⚠ tax":m.h>3?"✓ above":"cooperative")
               ))
             )
@@ -575,7 +575,7 @@ function App(){
           )
         ),
 
-        React.createElement("div",{style:{...Bx(),...BL("#334155")}},
+        React.createElement("div",{style:{...Bx(),...BL("#8b949e")}},
           React.createElement("div",DIM(),"STABLE TOPOLOGICAL PHASES & PAPER EXTENSIONS"),
           React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}},
             [{c:"#6ee7b7",l:"Why the cooperative phase is stable",b:"TRSB phases are protected against time-reversal-symmetric perturbations. Once θ locks above Nₒ₂, small changes to training recipes, architecture tweaks, or prompt distributions cannot undo it without crossing a phase boundary. This is the formal sense in which alignment above 11B is structurally robust — not just empirically consistent."},
@@ -654,7 +654,7 @@ function App(){
            {l:"ODE trajectory error",v:"3.6%",s:"Discovered ODE reproduces all 5 benchmarks",c:"#60a5fa"},
            {l:"κ_GL at Nc",v:"0.767",s:"> 1/√2 — Type II confirmed",c:"#fb923c"},
            {l:"Coupling flip magnitude",v:"Δr = +1.76",s:"−0.989 → +0.770 across Nₒ",c:"#6ee7b7"},
-           {l:"Loss at transition",v:"Featureless",s:"CV = 0.8% — zero signal in loss",c:"#334155"},
+           {l:"Loss at transition",v:"Featureless",s:"CV = 0.8% — zero signal in loss",c:"#8b949e"},
            {l:"Data quality multiplier",v:"~10×",s:"Phi at 1B vs web-trained at 10B",c:"#6ee7b7"},
            {l:"Second transition Nₒ₂",v:"~11B",s:"χ₂ peak = 3.08, 26 models",c:"#c4b5fd"},
            {l:"Framework validity end",v:"~130B",s:"det(H) → 0 predicted",c:"#8b949e"},
