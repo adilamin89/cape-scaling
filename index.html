@@ -527,6 +527,25 @@ function App(){
           )
         ),
 
+        React.createElement("div",{style:{...Bx(),...BL("#2196F3")}},
+          React.createElement("div",DIM(),"CORRELATION EVOLUTION & BENCHMARK CEILING"),
+          React.createElement("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:12}},
+            [{l:"Pythia only (70M–12B)",v:"r = −0.989",s:"d_eff = 1.05",c:"#f87171"},
+             {l:"Extended (70M–40B)",v:"r = −0.481",s:"d_eff = 1.63",c:"#fbbf24"},
+             {l:"Frontier (all N)",v:"r = +0.082",s:"d_eff = 1.99",c:"#4CAF50"}].map(d=>
+              React.createElement("div",{key:d.l,style:{background:"#0d1117",border:"1px solid #30363d",borderRadius:6,padding:"12px 14px"}},
+                React.createElement("div",{style:{fontSize:11,color:"#8b949e",marginBottom:4}},d.l),
+                React.createElement("div",{...MN({fontSize:18,fontWeight:900,color:d.c})},d.v),
+                React.createElement("div",{style:{fontSize:11,color:"#8b949e",marginTop:4}},d.s)
+              )
+            )
+          ),
+          React.createElement("div",{style:{padding:"10px 14px",background:"#0d1117",borderRadius:6,borderLeft:"3px solid #FFD700",fontSize:12,lineHeight:1.7,color:"#c9d1d9"}},
+            React.createElement("strong",{style:{color:"#FFD700"}},"HellaSwag benchmark ceiling: "),
+            "Frontier HS variance = 4.9 vs small-scale variance = 353 — a 72× signal collapse. When HellaSwag saturates above ~90% (all models >70B), new benchmark dimensions (SWE-bench, GPQA, ARC-AGI-2) activate as the old ones lose resolution. This is the d_eff expansion: the capability manifold geometry changes."
+          )
+        ),
+
         React.createElement("div",{style:{...Bx(),...BL("#fbbf24")}},
           React.createElement("div",DIM(),"GROUP / SUBGROUP FLOW — SYMMETRY BREAKING SEQUENCE"),
           React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:10}},"Two transitions required by group theory for a 2D order parameter (ψ_R, ψ_C). This is a theorem from the SFEE/PRR 2020 analysis — not an observation. Ratio Nₒ₂/Nₒ = 3.2 = SFEE renormalization factor."),
@@ -566,6 +585,21 @@ function App(){
             ].map(d=>React.createElement("div",{key:d.l,style:{...Bx(),...BL(d.c)}},
               React.createElement("div",{style:{fontSize:10,fontWeight:700,color:d.c,marginBottom:4}},d.l),
               React.createElement("div",{style:{fontSize:10,color:"#c9d1d9",lineHeight:1.7}},d.b)
+            ))
+          )
+        )
+      ),
+
+        React.createElement("div",{style:{...Bx(),...BL("#E91E63")}},
+          React.createElement("div",DIM(),"FOUR TESTABLE PREDICTIONS & Nₒ₂ CANDIDATES"),
+          React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
+            [{c:"#E91E63",l:"Prediction 1: OLMo γ₁₂=0 universality",b:"Any architecture trained to OLMo-7B's loss (L≈2.46) should land at γ₁₂≈0 — topological domain wall protected by bulk-edge correspondence. Test with new 7B models."},
+             {c:"#FFD700",l:"Prediction 2: h_c(N) design equation",b:"h_c(N) ∝ (Nₒ−N)^(3/2). At 1B: ~60% of Phi curation needed. At 3B: ~5%. Data curation effort has a quantitative scaling law — not just 'more data helps'."},
+             {c:"#4CAF50",l:"Prediction 3: γ(SWE,IFEval) at frontier",b:"The next coupling flip Nₒ₂ appears in a pair where one measures agentic capability (SWE-bench) and the other safety compliance (IFEval/refusal). Predicted at N~5–30T effective params or heavy RLHF."},
+             {c:"#2196F3",l:"Prediction 4: per-phase coupling 6.3× jump",b:"Coupling rate jumps 6.3× across Nₒ (tax phase: 0.12, bonus phase: 0.75). Reproducible by any group with benchmark data on 3+ model families spanning 100M–70B."},
+            ].map(d=>React.createElement("div",{key:d.l,style:{background:"#0d1117",border:"1px solid #30363d",borderRadius:6,padding:"12px 14px",borderLeft:"3px solid "+d.c}},
+              React.createElement("div",{style:{fontSize:12,fontWeight:700,color:d.c,marginBottom:6}},d.l),
+              React.createElement("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.7}},d.b)
             ))
           )
         )
