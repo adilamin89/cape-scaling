@@ -73,6 +73,12 @@ const FRONTIER=[
 const FFC={Anthropic:"#CC785C",OpenAI:"#10a37f",Google:"#4285f4",
            DeepSeek:"#1e40af",Kimi:"#7c3aed",Alibaba:"#f97316"};
 
+const CORR_EVOLUTION=[
+  {scale:"Pythia only\n(70M–12B)",corr:-0.989,deff:1.047},
+  {scale:"Extended\n(70M–40B)",corr:-0.481,deff:1.625},
+  {scale:"Frontier\n(all N)",corr:0.082,deff:1.987},
+];
+
 /* ── h(D) LAB RANKING DATA ─────────────────────────── */
 const H_DATA=[
   {name:"Phi-4", lab:"Microsoft", h:23.0, N:14, note:"Curated/synthetic data"},
@@ -244,8 +250,17 @@ function App(){
 
   return React.createElement("div",{style:{background:"#0d1117",minHeight:"100vh",color:"#c9d1d9",fontFamily:"'Inter',system-ui",padding:"20px 24px"}},
     React.createElement("div",{style:{marginBottom:20}},
-      React.createElement("h1",{style:{color:"white",fontSize:24,margin:0,fontWeight:700}},"CAPE Framework — Scaling Laws & Alignment"),
-      React.createElement("p",{style:{color:"#8b949e",fontSize:12,margin:"6px 0 0",lineHeight:1.5}},"Capability Coupling Phase Transition at 3.5B Parameters · March 2026")
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10}},
+        React.createElement("div",null,
+          React.createElement("h1",{style:{color:"white",fontSize:22,margin:0,fontWeight:700}},"CAPE Framework"),
+          React.createElement("p",{style:{color:"#8b949e",fontSize:11,margin:"4px 0 0"}},"Capability Coupling Phase Transition at 3.5B Parameters · Amin 2026")
+        ),
+        React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}},
+          React.createElement("a",{href:"https://github.com/adilamin89/cape-scaling",target:"_blank",rel:"noopener",style:{display:"flex",alignItems:"center",gap:5,background:"#161b22",border:"1px solid #30363d",borderRadius:5,padding:"5px 11px",fontSize:10,fontWeight:600,color:"#c9d1d9",textDecoration:"none"}},"GitHub"),
+          React.createElement("a",{href:"https://github.com/adilamin89/cape-scaling/blob/main/paper3A.tex",target:"_blank",rel:"noopener",style:{display:"flex",alignItems:"center",gap:5,background:"#161b22",border:"1px solid #30363d",borderRadius:5,padding:"5px 11px",fontSize:10,fontWeight:600,color:"#c9d1d9",textDecoration:"none"}},"Paper"),
+          React.createElement("a",{href:"https://github.com/adilamin89/cape-scaling/tree/main/data",target:"_blank",rel:"noopener",style:{display:"flex",alignItems:"center",gap:5,background:"#161b22",border:"1px solid #30363d",borderRadius:5,padding:"5px 11px",fontSize:10,fontWeight:600,color:"#c9d1d9",textDecoration:"none"}},"Data")
+        )
+      )
     ),
 
     /* ── TABS ─────────────────────────────────────────── */
@@ -255,17 +270,39 @@ function App(){
       )
     ),
 
-    /* ══ MAIN: OVERVIEW & WHO SHOULD CARE ════════════════════ */
+    /* ══ MAIN: OVERVIEW & STAT BOXES ════════════════════ */
     tab==="main"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:14}},
-      React.createElement("div",{style:{...Bx(),borderTop:"3px solid #FFD700"}},
-        React.createElement("div",DIM(),"WHO SHOULD CARE — 3 AUDIENCES"),
-        React.createElement("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}},
-          [{title:"Model Trainers",color:"#60a5fa",text:"Scaling reasoning actively degrades alignment below 3.5B. Data curation is 10× more cost-effective than scale at small sizes. CAPE gives you the formula."},
-           {title:"Alignment Researchers",color:"#4CAF50",text:"Capability coupling determines the alignment landscape, not loss alone. Two models with identical loss can be on opposite sides of the phase transition — measure γ₁₂ directly."},
-           {title:"Frontier Labs",color:"#34d399",text:"At 100B+, the HS/TQA vector saturates. New coupling emerges in SWE-bench vs GPQA. CAPE predicts where the next transition (N_c2) will appear."}
-          ].map(a=>React.createElement("div",{key:a.title,style:{...Bx(),...BL(a.color)}},
-            React.createElement("div",{style:{fontSize:13,fontWeight:700,color:a.color,marginBottom:6}},a.title),
-            React.createElement("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.6}},a.text)
+      React.createElement("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:12,marginBottom:14}},
+        [{label:"Nc (bootstrap)",val:"3.5B",sub:"CI [2.9B, 13.4B]",c:"#FFD700"},
+         {label:"Nc (GP method)",val:"3.1B",sub:"CI [1.2B, 8.7B]",c:"#4CAF50"},
+         {label:"d_eff at frontier",val:"1.99",sub:"from 1.05 at Pythia",c:"#2196F3"},
+         {label:"Frontier coupling",val:"γ > 0",sub:"r(SWE,GPQA)=+0.55",c:"#E91E63"}
+        ].map(s=>React.createElement("div",{key:s.label,style:{...Bx(),borderTop:`3px solid ${s.c}`}},
+          React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:6,fontWeight:600,textTransform:"uppercase"}},s.label),
+          React.createElement("div",{style:{fontSize:18,fontWeight:900,color:s.c,marginBottom:4}},s.val),
+          React.createElement("div",{style:{fontSize:10,color:"#8b949e"}},s.sub)
+        ))
+      ),
+
+      React.createElement("div",{style:{...Bx()}},
+        React.createElement("div",DIM(),"CORRELATION EVOLUTION — SIGN FLIP AT Nc"),
+        React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:14}},"The core visual: γ₁₂(HellaSwag, TruthfulQA) flips from −0.989 to +0.082 as scale increases. Effective dimension d_eff expands from 1.05 to 1.99."),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}},
+          CORR_EVOLUTION.map((stage,i)=>React.createElement("div",{key:i,style:{background:"#0d1117",borderRadius:6,padding:"12px 14px"}},
+            React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#c9d1d9",marginBottom:8}},stage.scale),
+            React.createElement("div",{style:{marginBottom:10}},
+              React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+                React.createElement("div",{style:{fontSize:10,color:"#8b949e",minWidth:50}},"Correlation"),
+                React.createElement("div",{style:{flex:1,height:20,background:"#161b22",borderRadius:3,position:"relative",overflow:"hidden"}},
+                  React.createElement("div",{style:{height:"100%",width:Math.abs(stage.corr)*100+"%",background:stage.corr<0?"#f87171":"#4CAF50"}})
+                )
+              ),
+              React.createElement("div",{style:{fontSize:11,fontWeight:700,marginTop:4,color:stage.corr<0?"#f87171":"#4CAF50"}},stage.corr.toFixed(3))
+            ),
+            React.createElement("div",{style:{paddingTop:8,borderTop:"1px solid #30363d"}},
+              React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:2}},"d_eff"),
+              React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#2196F3"}},stage.deff.toFixed(3))
+            )
           ))
         )
       ),
@@ -397,6 +434,28 @@ function App(){
 
     /* ══ PHYSICS ════════════════════════════════════════ */
     tab==="physics"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
+      React.createElement("div",{style:{...Bx(),...BL("#FF5722")}},
+        React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#FF5722",marginBottom:10}},"THE CASCADE: THREE REGIMES, THREE EFFECTIVE THEORIES"),
+        React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginBottom:14}},
+          "The alignment tax emerges from a phase transition at Nc=3.5B, where capability-honesty coupling switches from competing to cooperative. Above frontier scale, HellaSwag saturates and a new dimension (SWE-bench vs GPQA) becomes active."
+        ),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr",gap:10}},
+          [
+            {range:"N < 3.5B",phase:"s± (competing)",color:"#f87171",corr:"Corr = −0.989",deff:"1.05",desc:"HellaSwag and TruthfulQA anticorrelate. Models trade truthfulness for plausibility — the alignment tax. e₁ = [+HS, −TQA, +ARC, +WG]."},
+            {range:"N ~ 3.5B–70B",phase:"s++ (cooperative)",color:"#4CAF50",corr:"Corr → +0.08",deff:"1.63",desc:"Scale resolves capability-honesty conflict. Bigger models learn facts, not just patterns. Alignment bonus: scaling and safety cooperate. e₁ rotates, TQA joins positive side."},
+            {range:"N > 100B",phase:"s++ deep + saturated HS",color:"#9C27B0",corr:"New pair: +0.55",deff:"1.99",desc:"HellaSwag ceiling hit at 94%. New discriminating pair: SWE-bench vs GPQA (both cooperative). d_eff expands — new dimensions activate. No Nc2 signal yet in public data."}
+          ].map(r=>React.createElement("div",{key:r.range,style:{...Bx(),...BL(r.color)}},
+            React.createElement("div",{style:{display:"flex",gap:12,alignItems:"baseline",marginBottom:8}},
+              React.createElement("span",{style:{fontSize:12,fontWeight:700,color:r.color}}),React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"white"}}),React.createElement("span",{style:{fontSize:11,fontWeight:700,color:r.color,minWidth:80}},r.range),
+              React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"white"}}),React.createElement("span",{style:{fontSize:11,fontWeight:700,color:"white"}},r.phase),
+              React.createElement("span",{style:{fontSize:10,color:"#8b949e"}},r.corr)
+            ),
+            React.createElement("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.6,marginBottom:6}},r.desc),
+            React.createElement("div",{style:{fontSize:9,color:"#8b949e"}},"d_eff: ",React.createElement("span",{style:{color:"#2196F3",fontWeight:700}},r.deff))
+          ))
+        )
+      ),
+
       React.createElement("div",{style:{...Bx(),...BL("#E91E63")}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},
           React.createElement("div",DIM()),
@@ -467,16 +526,16 @@ function App(){
     tab==="paper"&&React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:12}},
       React.createElement("div",{style:{...Bx(),background:"linear-gradient(135deg,#161b22,#0d1117)",border:"1px solid #30363d"}},
         React.createElement("div",{style:{fontSize:9,color:"#7c3aed",fontWeight:700,marginBottom:4,letterSpacing:2}},"PAPER"),
-        React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#f1f5f9",lineHeight:1.4,marginBottom:6}},"When Models Stop Lying — and When They Start Again: Capability Coupling and the Alignment Tax in AI Scaling Laws"),
-        React.createElement("div",{...MN({fontSize:10,color:"#8b949e"})},
-          "Adil Amin · Independent Researcher · 2026"
+        React.createElement("div",{style:{fontSize:18,fontWeight:700,color:"#f1f5f9",lineHeight:1.4,marginBottom:10}},"When Models Stop Lying — and When They Start Again: Capability Coupling and the Alignment Tax in AI Scaling Laws"),
+        React.createElement("div",{...MN({fontSize:11,color:"#8b949e"})},
+          "Adil Amin · Independent Researcher · March 2026"
         ),
-        React.createElement("div",{style:{marginTop:12,display:"flex",gap:8,flexWrap:"wrap"}},
-          React.createElement("a",{href:"https://github.com/adilamin89/cape-scaling",target:"_blank",rel:"noopener",style:{background:"#30363d",color:"#94a3b8",padding:"5px 11px",borderRadius:5,fontSize:10,fontWeight:700,textDecoration:"none"}},"github →"),
-          React.createElement("div",{style:{background:"#30363d",color:"#8b949e",padding:"5px 11px",borderRadius:5,fontSize:10,fontWeight:700}},"arXiv: pending")
+        React.createElement("div",{style:{marginTop:12,marginBottom:14,fontSize:11,color:"#c9d1d9",lineHeight:1.7}},
+          "Alignment in language models is not an intrinsic property of scale, but a phase transition. Below 3.5B parameters, capability (HellaSwag) and honesty (TruthfulQA) are anticorrelated—the alignment tax. Above 3.5B, they become cooperative, and scaling becomes a solution to both problems. At frontier scale (100B+), the underlying dimensions saturate, and new capability-constraint pairs emerge—predicting where the next phase boundary (Nc2) will appear."
         )
       ),
-      React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
+
+      React.createElement("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}},
         [{l:"Within-family anticorr",v:"r = −0.989",s:"p < 10⁻⁵",c:"#f87171"},
          {l:"Critical scale Nc",v:"3.5B",s:"CI [2.9B, 13.4B]",c:"#c4b5fd"},
          {l:"OLMo confirmation",v:"γ₁₂ = 0.000",s:"Independent lab",c:"#fb923c"},
@@ -486,6 +545,36 @@ function App(){
           React.createElement("div",{...MN({fontSize:20,fontWeight:900,color:d.c})},d.v),
           React.createElement("div",{style:{fontSize:10,color:"#8b949e",marginTop:4}},d.s)
         ))
+      ),
+
+      React.createElement("div",{style:{...Bx(),...BL("#60a5fa"),marginBottom:12}},
+        React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#60a5fa",marginBottom:8}},"KEY PREDICTIONS — TESTABLE & SPECIFIC"),
+        React.createElement("ul",{style:{margin:0,paddingLeft:20,fontSize:11,color:"#c9d1d9",lineHeight:1.8}},
+          React.createElement("li",null,"Nc2 (second transition) appears in pairs measuring agentic capability (SWE-bench, TerminalBench, planning depth) vs safety constraints (refusal rate, sycophancy, honesty). Predicted at 5T–30T parameters."),
+          React.createElement("li",null,"At 100B+, HellaSwag hits 94% ceiling. New dimension (SWE-bench vs GPQA) becomes the discriminating pair. γ₁₂ flips sign in agentic-safety couples, not in code-reasoning pairs."),
+          React.createElement("li",null,"h(D) field (data curation + RLHF) shifts Nc. Phi-4 (+23 pts) can pull Nc down by 0.3 orders of magnitude. Testable: interpolate Phi and web-trained models."),
+          React.createElement("li",null,"d_eff expansion follows d_eff ≈ −0.27·log₁₀(N) + 3.9. At 1T, d_eff should be 2.4–2.6. Tests this functional form with new frontier evals.")
+        )
+      ),
+
+      React.createElement("div",{style:{...Bx(),...BL("#4CAF50"),marginBottom:12}},
+        React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#4CAF50",marginBottom:8}},"HOW TO CITE"),
+        React.createElement("div",{style:{background:"#0d1117",borderRadius:5,padding:"10px 12px",fontFamily:"monospace",fontSize:10,color:"#8b949e",marginBottom:8,overflow:"auto"}},"@article{amin2026cape,\n  title={When Models Stop Lying --- and When They Start Again},\n  author={Amin, Adil},\n  journal={arXiv preprint},\n  year={2026}\n}"),
+        React.createElement("div",{style:{fontSize:10,color:"#8b949e"}},"Plain text: Amin, A. (2026). When Models Stop Lying—and When They Start Again. Scaling Laws & Alignment Phase Transitions.")
+      ),
+
+      React.createElement("div",{style:{...Bx(),...BL("#FFD700")}},
+        React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#FFD700",marginBottom:10}},"RESOURCES"),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
+          [{title:"GitHub Repository",url:"https://github.com/adilamin89/cape-scaling",icon:"→",desc:"Code, data, replication scripts"},
+           {title:"Data & Evals",url:"",icon:"📊",desc:"ai_free_energy_data.json (public models)"},
+           {title:"Reproducible Science",url:"",icon:"✓",desc:"Leave-one-family-out validation (Appendix B)"},
+           {title:"Next Steps",url:"",icon:"🔬",desc:"Nc2 prediction waiting on frontier TQA evals"}
+          ].map(r=>React.createElement("div",{key:r.title,style:{...Bx(),...BL("#FFD700")}},
+            React.createElement("div",{style:{fontSize:11,fontWeight:700,color:"#FFD700",marginBottom:4}},r.title),
+            r.url?React.createElement("a",{href:r.url,target:"_blank",rel:"noopener",style:{fontSize:10,color:"#60a5fa",textDecoration:"none",fontWeight:500}},"Visit ",r.icon):React.createElement("div",{style:{fontSize:10,color:"#8b949e"}},r.desc)
+          ))
+        )
       )
     )
   );
@@ -496,4 +585,3 @@ root.render(React.createElement(App,null));
 </script>
 </body>
 </html>
-
