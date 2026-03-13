@@ -1140,8 +1140,8 @@ function App(){
           h("div",{style:{background:"#0d1117",borderRadius:8,padding:"14px 16px",borderLeft:"3px solid #58a6ff"}},
             h("div",{style:{fontSize:13,fontWeight:700,color:"#58a6ff",marginBottom:8}},"Citation"),
             h("div",{style:{fontFamily:"'Courier New',monospace",fontSize:11,color:"#8b949e",lineHeight:1.6}},
-              "@article{CAPE2026,",h("br"),
-              "  author = {Project CAPE},",h("br"),
+              "@article{amin2026cape,",h("br"),
+              "  author = {Amin, Adil},",h("br"),
               "  title = {When Models Stop Lying --- and When They Start Again},",h("br"),
               "  subtitle = {Capability Coupling and the Alignment Tax in AI Scaling Laws},",h("br"),
               "  year = {2026}",h("br"),
@@ -1173,6 +1173,29 @@ function App(){
               h("div",{className:"label"},d.name),
               h("div",{style:{fontSize:12,fontWeight:600,color:"#c9d1d9"}},d.val)
             ))
+          )
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:8}},"How to Use This Dashboard"),
+          h("div",{style:{fontSize:12,color:"#8b949e",lineHeight:1.7,marginBottom:12}},
+            "This dashboard is a live computation engine for the CAPE framework. It doesn't just display data — it computes coupling, regime classification, eigenvectors, and thermodynamic derivatives in real time for any model you enter."
+          ),
+          h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            [{t:"Explorer Tab",d:"Enter any model's parameters (size + benchmarks). The engine computes γ₁₂, regime, d_eff, h(D), susceptibility χ(N), eigenvectors, and scaling predictions. Click 'Browse Models' to auto-fill from known models."},
+             {t:"Frontier Tab",d:"Tracks SWE-bench vs GPQA Diamond across 16 frontier models — the emerging capability pair where HellaSwag saturates."},
+             {t:"h(D) Lab Tab",d:"Ranks labs by data curation quality offset. Measures how much training data shifts the phase boundary beyond what model size alone predicts."},
+             {t:"Physics Tab",d:"Full dual-language reference: every equation, diagnostic, and concept shown in both physics and ML terms. Includes the boosting chain (L₀→L₄) and physics↔ML dictionary."}
+            ].map((f,i)=>h("div",{key:i,style:{background:"#0d1117",borderRadius:8,padding:"12px 14px",borderLeft:"3px solid #58a6ff"}},
+              h("div",{style:{fontSize:12,fontWeight:700,color:"#58a6ff",marginBottom:4}},f.t),
+              h("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.6}},f.d)
+            ))
+          ),
+          h("div",{style:{marginTop:12,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid #fbbf24"}},
+            h("div",{style:{fontSize:12,fontWeight:700,color:"#fbbf24",marginBottom:4}},"CLI Tool (coming soon)"),
+            h("div",{style:{fontSize:11,color:"#c9d1d9",lineHeight:1.6}},
+              "cape-cli.js — A standalone Node.js tool that runs the same PCA engine, coupling computation, and regime classification from the command line. Feed it a JSON of model benchmarks and get back the full CAPE analysis. See the GitHub repo for details."
+            )
           )
         ),
 
