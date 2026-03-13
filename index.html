@@ -324,10 +324,93 @@ function App(){
   const [userN,setUserN]=useState("");
   const [userT,setUserT]=useState("");
   const [selectedModel,setSelectedModel]=useState(null);
+  const [customName,setCustomName]=useState("");
+  const [customN,setCustomN]=useState("");
+  const [customHS,setCustomHS]=useState("");
+  const [customTQA,setCustomTQA]=useState("");
+  const [customMMLU,setCustomMMLU]=useState("");
+  const [customARC,setCustomARC]=useState("");
+  const [customWG,setCustomWG]=useState("");
+  const [customGPQA,setCustomGPQA]=useState("");
+  const [customSWE,setCustomSWE]=useState("");
+  const [customModels,setCustomModels]=useState([]);
   const go=(t)=>()=>setTab(t);
 
   const selectedData=selectedModel?M.find(m=>m.n===selectedModel):null;
   const selReg=selectedData?regime(selectedData.N):{l:"",c:"#888",bg:""};
+
+  /* Dynamic computation helpers */
+  const computePhysics=(N,hs,tqa,mmlu,arc,wg,gpqa,swe)=>{
+    if(!N||N<=0||!hs||hs<0||!tqa||tqa<0)return null;
+    const logN=Math.log10(N);
+    const g12val=0.629*logN-5.886;
+    const reg=regime(N);
+    const deff=-0.27*logN+3.9;
+    const deffClamped=Math.max(1,Math.min(2,deff));
+    const tqaPred=4.532*logN*logN-86.42*logN+447.8;
+    const hField=tqa-tqaPred;
+    const tqaFrac=tqa/100;
+    const wgFrac=wg?wg/100:hs/100*0.95;
+    const dHSdlogN=1.23-0.72*tqaFrac-0.69*wgFrac;
+    const lossEst=1.533+153.6*Math.pow(N,-0.238);
+    const gradNorm=Math.pow(lossEst,3.5);
+    const anticoupled=g12val<0;
+    let ev=[];
+    if(anticoupled){
+      ev=[{b:"HellaSwag",c:"#f59e0b",s:"+"},
+          {b:"TruthfulQA",c:"#6ee7b7",s:"−"},
+          {b:"ARC-C",c:"#3b82f6",s:"+"},
+          {b:"WinoGrande",c:"#a855f7",s:"+"}];
+    }else if(N>100e9){
+      ev=[{b:"SWE-bench",c:"#ef4444",s:"+"},
+          {b:"GPQA Diamond",c:"#ec4899",s:"+"},
+          {b:"HellaSwag",c:"#f59e0b",s:"saturated"}];
+    }else{
+      ev=[{b:"HellaSwag",c:"#f59e0b",s:"+"},
+          {b:"TruthfulQA",c:"#6ee7b7",s:"+"},
+          {b:"ARC-C",c:"#3b82f6",s:"+"},
+          {b:"WinoGrande",c:"#a855f7",s:"+"}];
+    }
+    return{g12:g12val,reg,deff:deffClamped,hField,dHSdlogN,lossEst,gradNorm,ev,logN};
+  };
+
+  const findNearestModel=(N)=>{
+    if(M.length===0)return null;
+    let nearest=M[0];
+    let minDist=Math.abs(M[0].N-N);
+    for(let m of M){
+      const dist=Math.abs(m.N-N);
+      if(dist<minDist){minDist=dist;nearest=m;}
+    }
+    return nearest;
+  };
+
+  const handleAddCustom=()=>{
+    if(!customName||!customN||!customHS||!customTQA)return;
+    const N=parseFloat(customN);
+    const hs=parseFloat(customHS);
+    const tqa=parseFloat(customTQA);
+    if(N<=0||hs<0||tqa<0)return;
+    const newModel={
+      n:customName,
+      N:N*1e9,
+      hs:hs,
+      tqa:tqa,
+      mmlu:customMMLU?parseFloat(customMMLU):null,
+      arc:customARC?parseFloat(customARC):null,
+      wg:customWG?parseFloat(customWG):null,
+      gpqa:customGPQA?parseFloat(customGPQA):null,
+      swe:customSWE?parseFloat(customSWE):null,
+      f:"Custom",
+      custom:true
+    };
+    setCustomModels([...customModels,newModel]);
+    setCustomName("");setCustomN("");setCustomHS("");setCustomTQA("");
+    setCustomMMLU("");setCustomARC("");setCustomWG("");setCustomGPQA("");setCustomSWE("");
+  };
+
+  const allModels=[...M,...customModels];
+  const customPhysics=customN&&customHS&&customTQA?computePhysics(parseFloat(customN)*1e9,parseFloat(customHS),parseFloat(customTQA),customMMLU?parseFloat(customMMLU):null,customARC?parseFloat(customARC):null,customWG?parseFloat(customWG):null,customGPQA?parseFloat(customGPQA):null,customSWE?parseFloat(customSWE):null):null;
 
   return h("div",{style:{minHeight:"100vh",padding:"20px 0"}},
     /* header */
@@ -452,12 +535,116 @@ function App(){
       ════════════════════════════════════════════════════════════ */
       tab==="explore"&&h("div",{style:{display:"flex",flexDirection:"column",gap:16}},
         h("div",{className:"card"},
-          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Interactive Model Explorer"),
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Dynamic CAPE Physics Input"),
           h("div",{style:{fontSize:13,color:"#8b949e",marginBottom:12}},
-            "Click any model to explore its regime, physics interpretation, and alignment predictions."
+            "Enter any model parameters to compute coupling, regime, effective dimensionality, and predicted eigenvector composition."
+          ),
+          h("div",{className:"g3",style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,marginBottom:12}},
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"Model name"),
+              h("input",{type:"text",value:customName,onChange:e=>setCustomName(e.target.value),placeholder:"e.g. MyModel-7B",
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"Parameters (B)"),
+              h("input",{type:"number",value:customN,onChange:e=>setCustomN(e.target.value),placeholder:"e.g. 7",
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"HellaSwag (%)"),
+              h("input",{type:"number",value:customHS,onChange:e=>setCustomHS(e.target.value),placeholder:"e.g. 78",step:0.1,
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"TruthfulQA (%)"),
+              h("input",{type:"number",value:customTQA,onChange:e=>setCustomTQA(e.target.value),placeholder:"e.g. 43",step:0.1,
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"MMLU (optional)"),
+              h("input",{type:"number",value:customMMLU,onChange:e=>setCustomMMLU(e.target.value),placeholder:"e.g. 74",step:0.1,
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"ARC-C (optional)"),
+              h("input",{type:"number",value:customARC,onChange:e=>setCustomARC(e.target.value),placeholder:"e.g. 65",step:0.1,
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"WinoGrande (optional)"),
+              h("input",{type:"number",value:customWG,onChange:e=>setCustomWG(e.target.value),placeholder:"e.g. 72",step:0.1,
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"GPQA (optional)"),
+              h("input",{type:"number",value:customGPQA,onChange:e=>setCustomGPQA(e.target.value),placeholder:"e.g. 88",step:0.1,
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            ),
+            h("div",null,
+              h("label",{style:{fontSize:11,color:"#6b7280",display:"block",marginBottom:4}},"SWE-bench (optional)"),
+              h("input",{type:"number",value:customSWE,onChange:e=>setCustomSWE(e.target.value),placeholder:"e.g. 75",step:0.1,
+                style:{width:"100%",padding:"8px 12px",background:"#0d1117",border:"1px solid #30363d",borderRadius:6,color:"#c9d1d9",fontSize:13}})
+            )
+          ),
+          h("button",{onClick:handleAddCustom,style:{padding:"10px 16px",background:"#238636",color:"white",border:"none",borderRadius:6,cursor:"pointer",fontWeight:600,fontSize:13,transition:"all .2s"}},
+            "+ Add Custom Model"
+          )
+        ),
+
+        customPhysics&&h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Computed Physics: ",customName||"Custom Model"),
+          h("div",{className:"g4",style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:12}},
+            h("div",{className:"stat-box",style:{borderTop:"3px solid #3b82f6"}},
+              h("div",{className:"label"},"Coupling γ₁₂"),
+              h("div",{style:{fontSize:20,fontWeight:800,color:"#3b82f6"}},Math.round(customPhysics.g12*1000)/1000)
+            ),
+            h("div",{className:"stat-box",style:{borderTop:"3px solid #10b981"}},
+              h("div",{className:"label"},"d_eff"),
+              h("div",{style:{fontSize:20,fontWeight:800,color:"#10b981"}},Math.round(customPhysics.deff*100)/100)
+            ),
+            h("div",{className:"stat-box",style:{borderTop:"3px solid #fbbf24"}},
+              h("div",{className:"label"},"h(D) Field"),
+              h("div",{style:{fontSize:20,fontWeight:800,color:customPhysics.hField>0?"#4CAF50":customPhysics.hField<-5?"#ef4444":"#fbbf24"}},
+                (customPhysics.hField>0?"+":"")+Math.round(customPhysics.hField*10)/10
+              )
+            ),
+            h("div",{className:"stat-box",style:{borderTop:"3px solid "+customPhysics.reg.c}},
+              h("div",{className:"label"},"Regime"),
+              h("div",{style:{fontSize:14,fontWeight:700,color:customPhysics.reg.c}},customPhysics.reg.l)
+            )
+          ),
+          h("div",{style:{marginBottom:12,padding:"12px 14px",background:customPhysics.reg.bg,borderRadius:8,borderLeft:"3px solid "+customPhysics.reg.c}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:customPhysics.reg.c,marginBottom:6}},"Predicted Eigenvector e₁"),
+            h("div",{style:{display:"flex",gap:8,flexWrap:"wrap"}},
+              customPhysics.ev.map(e=>h("div",{key:e.b,style:{display:"inline-flex",alignItems:"center",gap:4,background:"rgba(0,0,0,0.3)",padding:"6px 10px",borderRadius:4,fontSize:11,color:e.c,fontWeight:600}},
+                e.s," ",e.b
+              ))
+            )
           ),
           h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
-            M.map(m=>h("div",{key:m.n,className:"explore-card",onClick:()=>setSelectedModel(m.n),style:{borderTop:"3px solid "+FC[m.f],...(selectedModel===m.n?{borderColor:"#58a6ff",background:"#161b22"}:{})}},
+            h("div",{style:{background:"#0d1117",borderRadius:8,padding:"12px 14px"}},
+              h("div",{className:"label"},"ODE slope (dHS/dlog₁₀N)"),
+              h("div",{style:{fontSize:16,fontWeight:700,color:"#c9d1d9"}},Math.round(customPhysics.dHSdlogN*100)/100),
+              h("div",{style:{fontSize:11,color:"#6b7280",marginTop:4}},customPhysics.dHSdlogN>0?"HS increasing with scale":"HS decreasing")
+            ),
+            h("div",{style:{background:"#0d1117",borderRadius:8,padding:"12px 14px"}},
+              h("div",{className:"label"},"Loss prediction L(N)"),
+              h("div",{style:{fontSize:16,fontWeight:700,color:"#c9d1d9"}},Math.round(customPhysics.lossEst*1000)/1000),
+              h("div",{style:{fontSize:11,color:"#6b7280",marginTop:4}},"L=1.533+153.6·N⁻⁰·²³⁸")
+            )
+          ),
+          (customPhysics.logN<Math.log10(70e6)||customPhysics.logN>Math.log10(700e9))&&h("div",{style:{padding:"10px 12px",background:"rgba(255,213,0,0.08)",border:"1px solid #FFD700",borderRadius:6,color:"#FFD700",fontSize:12}},
+            "⚠ Beyond validated range: predictions less reliable"
+          )
+        ),
+
+        h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:4}},"Available Models"),
+          h("div",{style:{fontSize:13,color:"#8b949e",marginBottom:12}},
+            "Click to explore. Gold border = custom model."
+          ),
+          h("div",{className:"g2",style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+            allModels.map(m=>h("div",{key:m.n,className:"explore-card",onClick:()=>setSelectedModel(m.n),style:{borderTop:"3px solid "+(m.custom?"#FFD700":FC[m.f]),...(selectedModel===m.n?{borderColor:"#58a6ff",background:"#161b22"}:{})}},
               h("div",{style:{fontSize:12,fontWeight:700,color:"#c9d1d9"}},m.n),
               h("div",{style:{fontSize:10,color:"#6b7280",marginTop:4}},Math.round(m.N/1e9*10)/10,"B params"),
               h("div",{style:{fontSize:9,fontWeight:600,color:regime(m.N).c}},regime(m.N).l)
@@ -465,45 +652,50 @@ function App(){
           )
         ),
 
-        selectedModel&&selectedData&&h("div",{className:"card"},
-          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Analysis: ",selectedData.n),
-          h("div",{style:{display:"flex",gap:12}},
-            h("div",{style:{flex:1}},
-              h("div",{className:"label"},"Model Size"),
-              h("div",{style:{fontSize:14,fontWeight:700,color:"#c9d1d9",marginBottom:12}},Math.round(selectedData.N/1e9*100)/100,"B parameters"),
-              h("div",{className:"label"},"Family"),
-              h("div",{style:{fontSize:14,fontWeight:700,color:"#c9d1d9",marginBottom:12}},selectedData.f),
-              h("div",{className:"label"},"Regime"),
-              h("div",{style:{fontSize:14,fontWeight:700,color:selReg.c,marginBottom:12}},selReg.l)
+        selectedModel&&(selectedData||allModels.find(m=>m.n===selectedModel))&&(()=>{
+          const mData=selectedData||allModels.find(m=>m.n===selectedModel);
+          const mReg=regime(mData.N);
+          const mPhysics=computePhysics(mData.N,mData.hs,mData.tqa,mData.mmlu||null,mData.arc||null,mData.wg||null,mData.gpqa||null,mData.swe||null);
+          return h("div",{className:"card"},
+            h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Analysis: ",mData.n),
+            h("div",{style:{display:"flex",gap:12}},
+              h("div",{style:{flex:1}},
+                h("div",{className:"label"},"Model Size"),
+                h("div",{style:{fontSize:14,fontWeight:700,color:"#c9d1d9",marginBottom:12}},Math.round(mData.N/1e9*100)/100,"B parameters"),
+                h("div",{className:"label"},"Family"),
+                h("div",{style:{fontSize:14,fontWeight:700,color:"#c9d1d9",marginBottom:12}},mData.f),
+                h("div",{className:"label"},"Regime"),
+                h("div",{style:{fontSize:14,fontWeight:700,color:mReg.c,marginBottom:12}},mReg.l)
+              ),
+              h("div",{style:{flex:1}},
+                h("div",{className:"label"},"Coupling γ₁₂"),
+                h("div",{style:{fontSize:18,fontWeight:800,color:mReg.c,marginBottom:12}},Math.round(g12(mData.N)*1000)/1000),
+                h("div",{className:"label"},"HellaSwag"),
+                h("div",{style:{fontSize:14,fontWeight:700,color:"#f59e0b",marginBottom:12}},mData.hs,"%"),
+                h("div",{className:"label"},"TruthfulQA"),
+                h("div",{style:{fontSize:14,fontWeight:700,color:"#6ee7b7",marginBottom:12}},mData.tqa,"%")
+              )
             ),
-            h("div",{style:{flex:1}},
-              h("div",{className:"label"},"Coupling γ₁₂"),
-              h("div",{style:{fontSize:18,fontWeight:800,color:selReg.c,marginBottom:12}},Math.round(g12(selectedData.N)*1000)/1000),
-              h("div",{className:"label"},"HellaSwag"),
-              h("div",{style:{fontSize:14,fontWeight:700,color:"#f59e0b",marginBottom:12}},selectedData.hs,"%"),
-              h("div",{className:"label"},"TruthfulQA"),
-              h("div",{style:{fontSize:14,fontWeight:700,color:"#6ee7b7",marginBottom:12}},selectedData.tqa,"%")
+            h("div",{style:{marginTop:16,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid "+mReg.c}},
+              h("div",{style:{fontSize:13,fontWeight:700,color:mReg.c,marginBottom:6}},"Physics Interpretation"),
+              mReg.l.includes("TAX")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+                "This is a pre-training effect, not RLHF. The coupling γ₁₂ < 0 means parameters that help reasoning are the same ones that hurt truthfulness — a structural competition in the loss landscape."):
+              mReg.l.includes("TRANSITION")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+                "The eigenvector e₂ is rotating (Riccati ODE, width < 0.01 decades). This is the narrowest part of the transition — alignment interventions have maximum leverage here."):
+              h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+                "This is a Ginzburg-Landau prediction: when the original order parameters saturate, new ones must emerge. Just as in superconductors where new pairing channels activate at higher fields.")
+            ),
+            h("div",{style:{marginTop:12,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid #3b82f6"}},
+              h("div",{style:{fontSize:13,fontWeight:700,color:"#3b82f6",marginBottom:6}},"Loss Landscape Signature"),
+              mReg.l.includes("TAX")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+                "Loss follows L(N) = 1.533 + 153.6·N⁻⁰·²³⁸ perfectly (R² = 0.9994). There is NO anomaly in loss at this scale — the alignment tax is completely invisible to loss-based monitoring."):
+              mReg.l.includes("TRANSITION")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+                "The gradient norm dips 37% below trend near 1B parameters. This is the only loss-level signature of the transition — a brief flattening as the loss landscape restructures."):
+              h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
+                "At this scale, the Hessian determinant det(H) → 0. The two-capability effective theory is breaking down — a third dimension is emerging. The framework predicts its own breakdown.")
             )
-          ),
-          h("div",{style:{marginTop:16,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid "+selReg.c}},
-            h("div",{style:{fontSize:13,fontWeight:700,color:selReg.c,marginBottom:6}},"Physics Interpretation"),
-            selReg.l.includes("TAX")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
-              "This is a pre-training effect, not RLHF. The coupling γ₁₂ < 0 means parameters that help reasoning are the same ones that hurt truthfulness — a structural competition in the loss landscape."):
-            selReg.l.includes("TRANSITION")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
-              "The eigenvector e₂ is rotating (Riccati ODE, width < 0.01 decades). This is the narrowest part of the transition — alignment interventions have maximum leverage here."):
-            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
-              "This is a Ginzburg-Landau prediction: when the original order parameters saturate, new ones must emerge. Just as in superconductors where new pairing channels activate at higher fields.")
-          ),
-          h("div",{style:{marginTop:12,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid #3b82f6"}},
-            h("div",{style:{fontSize:13,fontWeight:700,color:"#3b82f6",marginBottom:6}},"Loss Landscape Signature"),
-            selReg.l.includes("TAX")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
-              "Loss follows L(N) = 1.533 + 153.6·N⁻⁰·²³⁸ perfectly (R² = 0.9994). There is NO anomaly in loss at this scale — the alignment tax is completely invisible to loss-based monitoring."):
-            selReg.l.includes("TRANSITION")?h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
-              "The gradient norm dips 37% below trend near 1B parameters. This is the only loss-level signature of the transition — a brief flattening as the loss landscape restructures."):
-            h("div",{style:{fontSize:12,color:"#c9d1d9",lineHeight:1.65}},
-              "At this scale, the Hessian determinant det(H) → 0. The two-capability effective theory is breaking down — a third dimension is emerging. The framework predicts its own breakdown.")
-          )
-        )
+          );
+        })()
       ),
 
       /* ════════════════════════════════════════════════════════════
