@@ -34,7 +34,7 @@ input,button{font-family:inherit}
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useRef,useEffect,useCallback}=React;
+const {useState,useRef,useEffect,useCallback,useMemo}=React;
 const h=React.createElement;
 
 /* ── CORE CONSTANTS ──────────────────────────────────── */
@@ -318,6 +318,83 @@ function DeffExpChart(){
   return h("canvas",{ref:ref,style:{width:"100%",height:"200px",display:"block"}});
 }
 
+/* ── PCA MATH HELPERS ────────────────────────────────── */
+function pearsonR(xs, ys) {
+  const n = xs.length;
+  if (n < 3) return null;
+  const mx = xs.reduce((a,b) => a+b, 0) / n;
+  const my = ys.reduce((a,b) => a+b, 0) / n;
+  let num = 0, dx2 = 0, dy2 = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx, dy = ys[i] - my;
+    num += dx * dy; dx2 += dx * dx; dy2 += dy * dy;
+  }
+  const den = Math.sqrt(dx2 * dy2);
+  return den === 0 ? 0 : num / den;
+}
+
+function covMatrix(data) {
+  const n = data.length, p = data[0].length;
+  const means = Array(p).fill(0);
+  for (let i = 0; i < n; i++) for (let j = 0; j < p; j++) means[j] += data[i][j];
+  for (let j = 0; j < p; j++) means[j] /= n;
+  const cov = Array.from({length: p}, () => Array(p).fill(0));
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < p; j++)
+      for (let k = j; k < p; k++) {
+        cov[j][k] += (data[i][j] - means[j]) * (data[i][k] - means[k]);
+      }
+  for (let j = 0; j < p; j++)
+    for (let k = j; k < p; k++) {
+      cov[j][k] /= (n - 1);
+      cov[k][j] = cov[j][k];
+    }
+  return { cov, means };
+}
+
+function jacobiEigen(A) {
+  const n = A.length;
+  const a = A.map(r => [...r]);
+  const v = Array.from({length: n}, (_, i) => {
+    const row = Array(n).fill(0); row[i] = 1; return row;
+  });
+  for (let iter = 0; iter < 100; iter++) {
+    let maxVal = 0, p = 0, q = 1;
+    for (let i = 0; i < n; i++)
+      for (let j = i + 1; j < n; j++)
+        if (Math.abs(a[i][j]) > maxVal) { maxVal = Math.abs(a[i][j]); p = i; q = j; }
+    if (maxVal < 1e-10) break;
+    const theta = (a[q][q] - a[p][p]) / (2 * a[p][q]);
+    const t = Math.sign(theta) / (Math.abs(theta) + Math.sqrt(theta * theta + 1));
+    const c = 1 / Math.sqrt(t * t + 1), s = t * c;
+    const ap = [...a[p]], aq = [...a[q]];
+    for (let i = 0; i < n; i++) {
+      a[p][i] = c * ap[i] - s * aq[i];
+      a[q][i] = s * ap[i] + c * aq[i];
+      a[i][p] = a[p][i];
+      a[i][q] = a[q][i];
+    }
+    a[p][p] = c*c*ap[p] - 2*s*c*ap[q] + s*s*aq[q];
+    a[q][q] = s*s*ap[p] + 2*s*c*ap[q] + c*c*aq[q];
+    a[p][q] = 0; a[q][p] = 0;
+    for (let i = 0; i < n; i++) {
+      const vp = v[i][p], vq = v[i][q];
+      v[i][p] = c * vp - s * vq;
+      v[i][q] = s * vp + c * vq;
+    }
+  }
+  const eigs = [];
+  for (let i = 0; i < n; i++) eigs.push({ value: a[i][i], vector: v.map(row => row[i]) });
+  eigs.sort((a, b) => b.value - a.value);
+  return eigs;
+}
+
+function participationRatio(eigenvalues) {
+  const sum1 = eigenvalues.reduce((a, b) => a + b, 0);
+  const sum2 = eigenvalues.reduce((a, b) => a + b * b, 0);
+  return sum2 === 0 ? 1 : (sum1 * sum1) / sum2;
+}
+
 /* ── MAIN APP COMPONENT ──────────────────────────────── */
 function App(){
   const [tab,setTab]=useState("overview");
@@ -411,6 +488,36 @@ function App(){
 
   const allModels=[...M,...customModels];
   const customPhysics=customN&&customHS&&customTQA?computePhysics(parseFloat(customN)*1e9,parseFloat(customHS),parseFloat(customTQA),customMMLU?parseFloat(customMMLU):null,customARC?parseFloat(customARC):null,customWG?parseFloat(customWG):null,customGPQA?parseFloat(customGPQA):null,customSWE?parseFloat(customSWE):null):null;
+
+  const pcaResults = useMemo(() => {
+    const allM = [...M.map(m => ({n:m.n, hs:m.hs, tqa:m.tqa})), ...customModels];
+    const benchCols = ['hs','tqa','mmlu','arc','wg','gpqa','swe'];
+    const benchLabels = ['HellaSwag','TruthfulQA','MMLU','ARC-C','WinoGrande','GPQA','SWE-bench'];
+    const activeCols = [];
+    const activeLabels = [];
+    benchCols.forEach((col, i) => {
+      const count = allM.filter(m => m[col] != null && m[col] !== undefined).length;
+      if (count >= 3) { activeCols.push(col); activeLabels.push(benchLabels[i]); }
+    });
+    if (activeCols.length < 2) return null;
+    const completeModels = allM.filter(m => activeCols.every(col => m[col] != null && m[col] !== undefined));
+    if (completeModels.length < 3) return null;
+    const data = completeModels.map(m => activeCols.map(col => m[col]));
+    const {cov, means} = covMatrix(data);
+    const eigs = jacobiEigen(cov);
+    const eigenvalues = eigs.map(e => Math.max(0, e.value));
+    const deff = participationRatio(eigenvalues);
+    const corrMatrix = [];
+    for (let i = 0; i < activeCols.length; i++) {
+      corrMatrix[i] = [];
+      for (let j = 0; j < activeCols.length; j++) {
+        const xs = completeModels.map(m => m[activeCols[i]]);
+        const ys = completeModels.map(m => m[activeCols[j]]);
+        corrMatrix[i][j] = pearsonR(xs, ys);
+      }
+    }
+    return { eigs, eigenvalues, deff, corrMatrix, activeLabels, activeCols, nModels: completeModels.length, nBench: activeCols.length };
+  }, [customModels]);
 
   return h("div",{style:{minHeight:"100vh",padding:"20px 0"}},
     /* header */
@@ -635,6 +742,115 @@ function App(){
           ),
           (customPhysics.logN<Math.log10(70e6)||customPhysics.logN>Math.log10(700e9))&&h("div",{style:{padding:"10px 12px",background:"rgba(255,213,0,0.08)",border:"1px solid #FFD700",borderRadius:6,color:"#FFD700",fontSize:12}},
             "⚠ Beyond validated range: predictions less reliable"
+          )
+        ),
+
+        pcaResults&&h("div",{className:"card"},
+          h("div",{style:{fontSize:15,fontWeight:700,color:"#f0f6fc",marginBottom:12}},"Live PCA: Capability Space Analysis"),
+          h("div",{className:"g4",style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:16}},
+            h("div",{className:"stat-box",style:{borderTop:"3px solid "+(pcaResults.deff<1.5?"#10b981":pcaResults.deff<2.5?"#3b82f6":"#a855f7")}},
+              h("div",{className:"label"},"d_eff"),
+              h("div",{style:{fontSize:20,fontWeight:800,color:(pcaResults.deff<1.5?"#10b981":pcaResults.deff<2.5?"#3b82f6":"#a855f7")}},Math.round(pcaResults.deff*100)/100)
+            ),
+            h("div",{className:"stat-box",style:{borderTop:"3px solid #fbbf24"}},
+              h("div",{className:"label"},"Active Benchmarks"),
+              h("div",{style:{fontSize:20,fontWeight:800,color:"#fbbf24"}},pcaResults.nBench)
+            ),
+            h("div",{className:"stat-box",style:{borderTop:"3px solid #10b981"}},
+              h("div",{className:"label"},"Models in Analysis"),
+              h("div",{style:{fontSize:20,fontWeight:800,color:"#10b981"}},pcaResults.nModels)
+            ),
+            h("div",{className:"stat-box",style:{borderTop:"3px solid #ec4899"}},
+              h("div",{className:"label"},"PC1 Variance"),
+              h("div",{style:{fontSize:20,fontWeight:800,color:"#ec4899"}},Math.round(pcaResults.eigenvalues[0]/(pcaResults.eigenvalues.reduce((a,b)=>a+b,0))*100)+"%")
+            )
+          ),
+          h("div",{style:{marginBottom:16,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid #6366f1"}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:"#6366f1",marginBottom:8}},"Eigenvalue Spectrum"),
+            h("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+              pcaResults.eigs.slice(0,5).map((e,i)=>{
+                const maxEig=pcaResults.eigs[0].value;
+                const pct=(e.value/(pcaResults.eigenvalues.reduce((a,b)=>a+b,0))*100).toFixed(1);
+                const barW=(e.value/maxEig*100)+'%';
+                return h("div",{key:i,style:{display:"flex",alignItems:"center",gap:8}},
+                  h("div",{style:{minWidth:"40px",fontSize:11,color:"#8b949e"}},"PC"+(i+1)),
+                  h("div",{style:{flex:1,height:"20px",background:"#1c2128",borderRadius:4,overflow:"hidden"}},
+                    h("div",{style:{width:barW,height:"100%",background:"linear-gradient(90deg, #3b82f6, #10b981)",transition:"all .2s"}})
+                  ),
+                  h("div",{style:{minWidth:"50px",fontSize:11,color:"#c9d1d9"}},pct+"%")
+                );
+              })
+            )
+          ),
+          h("div",{style:{marginBottom:16,padding:"12px 14px",background:"#0d1117",borderRadius:8}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:"#c9d1d9",marginBottom:8}},"PC1 & PC2 Loadings"),
+            h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}},
+              [0,1].map(pcIdx=>{
+                const pc=pcaResults.eigs[pcIdx];
+                if(!pc) return null;
+                return h("div",{key:pcIdx},
+                  h("div",{style:{fontSize:12,fontWeight:600,color:"#8b949e",marginBottom:8}},"PC"+(pcIdx+1)),
+                  h("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+                    pcaResults.activeLabels.map((label,i)=>{
+                      const loading=pc.vector[i];
+                      const isPos=loading>=0;
+                      const magnitude=Math.abs(loading);
+                      const opacity=0.4+magnitude*0.6;
+                      return h("div",{key:label,style:{display:"inline-flex",alignItems:"center",gap:3,background:(isPos?"rgba(16,185,129,0.15)":"rgba(239,68,68,0.15)"),padding:"6px 10px",borderRadius:4,fontSize:11,color:(isPos?"#10b981":"#ef4444"),fontWeight:600,opacity:opacity}},
+                        (isPos?"+":"−"),label
+                      );
+                    })
+                  )
+                );
+              })
+            )
+          ),
+          h("div",{style:{marginBottom:16,padding:"12px 14px",background:"#0d1117",borderRadius:8,borderLeft:"3px solid #8b5cf6"}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:"#8b5cf6",marginBottom:10}},"Benchmark Coupling Matrix (Correlations)"),
+            h("div",{style:{overflowX:"auto"}},
+              h("div",{style:{display:"inline-block",minWidth:"100%"}},
+                h("div",{style:{display:"grid",gridTemplateColumns:"60px "+pcaResults.activeLabels.map(()=>"1fr").join(" "),gap:"1px",background:"#1c2128",padding:"1px"}},
+                  h("div",{style:{background:"#0d1117",padding:"8px 6px",fontSize:11,fontWeight:600,color:"#8b949e"}},""),
+                  pcaResults.activeLabels.map(label=>h("div",{key:label,style:{background:"#0d1117",padding:"8px 6px",fontSize:10,fontWeight:600,color:"#8b949e",textAlign:"center"}},label.substring(0,3))),
+                  pcaResults.activeLabels.map((rowLabel,i)=>
+                    [h("div",{key:"label-"+i,style:{background:"#0d1117",padding:"8px 6px",fontSize:10,fontWeight:600,color:"#8b949e"}},rowLabel.substring(0,3))].concat(
+                      pcaResults.activeLabels.map((colLabel,j)=>{
+                        const r=pcaResults.corrMatrix[i][j]||0;
+                        const isNeg=r<0;
+                        const hue=isNeg?0:120;
+                        const sat=Math.abs(r)*100;
+                        const light=isNeg?20:25;
+                        const bgColor=`hsl(${hue},${sat}%,${light}%)`;
+                        return h("div",{key:colLabel,style:{background:bgColor,padding:"8px 6px",fontSize:10,fontWeight:600,color:Math.abs(r)>0.3?"#f0f6fc":"#8b949e",textAlign:"center",cursor:"default"}},r!==null?Math.round(r*100)/100:"−");
+                      })
+                    )
+                  )
+                )
+              )
+            )
+          ),
+          h("div",{style:{padding:"12px 14px",background:pcaResults.deff<1.5?"rgba(16,185,129,0.08)":pcaResults.deff<2.5?"rgba(59,130,246,0.08)":"rgba(168,85,247,0.08)",borderRadius:8,borderLeft:"3px solid "+(pcaResults.deff<1.5?"#10b981":pcaResults.deff<2.5?"#3b82f6":"#a855f7")}},
+            h("div",{style:{fontSize:13,fontWeight:700,color:pcaResults.deff<1.5?"#10b981":pcaResults.deff<2.5?"#3b82f6":"#a855f7",marginBottom:6}},
+              pcaResults.deff<1.5?"Single Order Parameter (Ising-like)":
+              pcaResults.deff<2.5?"Two-Component GL (XY Model)":
+              pcaResults.deff<3.5?"Three-Component (Heisenberg + Leggett Modes)":
+              "High-Dimensional (Beyond Effective Field Theory)"
+            ),
+            h("div",{style:{fontSize:12,lineHeight:1.6,color:"#c9d1d9",marginBottom:6}},
+              pcaResults.deff<1.5?
+                "All capabilities collapse to one axis. In condensed matter: single-band superconductor. Mean-field theory is exact. Loss is sufficient — all benchmarks track it. Any single benchmark predicts the others. This is the regime where scaling laws 'just work.'":
+              pcaResults.deff<2.5?
+                "Two independent order parameters. Ginzburg-Landau free energy: F = (a₁/2)|ψ₁|² + (a₂/2)|ψ₂|² + γ₁₂|ψ₁||ψ₂|. The coupling γ₁₂ drives the alignment tax/bonus. Need two benchmarks to classify models (e.g., HS + TQA). Loss alone is blind to the coupling. This is the current CAPE paper regime.":
+              pcaResults.deff<3.5?
+                "Third order parameter activated. Leggett (1966): in multi-band superconductors, relative phase oscillations between order parameters create new collective modes. BKT defects (topological vortices) may appear in the 2D projected capability space. A THIRD independent capability axis has emerged — can't be predicted from the first two. Think: coding ability independent of both reasoning and truthfulness. Need three benchmarks minimum to classify models. Nc2 candidates: SWE-bench × GPQA at N > 100B.":
+                "Multiple independent axes. Analogous to: frustrated magnets (spin ice), dislocations in crystals (line defects where capability ordering breaks). The low-dimensional effective theory has broken down — this is the 'UV completion' regime. Benchmarks are genuinely independent at this scale. No two-axis summary captures model behavior. Benchmark choice matters most — each tests a different thing."
+            ),
+            h("div",{style:{padding:"10px 12px",background:"rgba(255,213,0,0.08)",border:"1px solid #FFD700",borderRadius:6,color:"#FFD700",fontSize:11,lineHeight:1.5,marginTop:6}},
+              "Framework Prediction: The GL framework predicts its own breakdown when d_eff exceeds 2. This is not a limitation — it's a falsifiable prediction. If frontier models show d_eff → 3, the framework has correctly predicted the emergence of a third independent capability axis."
+            )
+          ),
+          pcaResults.nBench===2&&h("div",{style:{marginTop:12,padding:"10px 12px",background:"rgba(107,114,128,0.08)",border:"1px solid #6b7280",borderRadius:6,color:"#8b949e",fontSize:12}},
+            "💡 Tip: Add models with MMLU, ARC, WinoGrande, GPQA, or SWE-bench to unlock higher-dimensional analysis (3+ components)"
           )
         ),
 
