@@ -121,12 +121,20 @@ def run_tests(url: str, headless: bool = True):
         else:
             fail("Page title", f"Got: {title[:50]}")
 
-        # ── Check no crash (React root rendered) ──────────────────────────
-        root_content = page.locator("#root").inner_text()
-        if len(root_content) > 100:
-            ok("React app rendered (#root has content)")
+        # ── Check no crash (app rendered) ────────────────────────────────
+        # Try React #root first, then vanilla .app container
+        root_el = page.locator("#root")
+        app_el = page.locator(".app")
+        if root_el.count() > 0:
+            root_content = root_el.inner_text(timeout=5000)
+        elif app_el.count() > 0:
+            root_content = app_el.inner_text(timeout=5000)
         else:
-            fail("React app rendered", f"#root only has {len(root_content)} chars")
+            root_content = page.locator("body").inner_text(timeout=5000)
+        if len(root_content) > 100:
+            ok("App rendered (has content)")
+        else:
+            fail("App rendered", f"Only {len(root_content)} chars")
 
         # ── Tab navigation ─────────────────────────────────────────────────
         print("\n[ TABS ]")
