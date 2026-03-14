@@ -40,7 +40,7 @@
     },
     {
       "n": "GPT-5.2 Pro",
-      "swe": 80,
+      "swe": 80.0,
       "gpqa": 93.2,
       "arc": null,
       "fam": "OpenAI",
@@ -59,7 +59,7 @@
     {
       "n": "Gemini 2.5 Pro",
       "swe": 63.8,
-      "gpqa": 84,
+      "gpqa": 84.0,
       "arc": null,
       "fam": "Google",
       "sz": "~500B",
@@ -67,7 +67,7 @@
     },
     {
       "n": "Gemini 3 Flash",
-      "swe": 78,
+      "swe": 78.0,
       "gpqa": 90.4,
       "arc": null,
       "fam": "Google",
