@@ -912,7 +912,7 @@ At frontier scale, HellaSwag and TruthfulQA saturate above 90\%; the relevant
 capability pair shifts to autonomous coding (SWE-bench Verified) versus
 scientific reasoning (GPQA Diamond).
 We measure $\gamma_{12}(\text{SWE}, \text{GPQA})$ across nineteen publicly evaluated frontier models
-(Table~\ref{tab:frontier}; scores as of February--March~2026; $h = \text{GPQA}_{\rm measured} - (0.80\cdot\text{SWE} + 24.5)$):
+(Table~\ref{tab:frontier}; scores as of February--March~2026; $h = \text{GPQA}_{\rm measured} - (0.79\cdot\text{SWE} + 24.7)$):
 cross-family $r = +0.85$ ($n = 19$, $p < 0.00001$; cooperative coupling strongly confirmed),
 consistent with cooperative coupling at frontier scale (Fig.~\ref{fig:frontier}).
 
@@ -953,9 +953,9 @@ The same external-field formalism that captures Phi (\S\ref{sec:phi}) applies he
 Define the frontier $h$ field as the deviation of GPQA from the universal cooperative SWE--GPQA curve:
 $h_{\rm frontier} = \text{GPQA}_{\rm measured} - \text{GPQA}_{\rm universal}(\text{SWE})$.
 Most models cluster near $|h| \lesssim 5$ points (Fig.~\ref{fig:frontier}c).
-Gemini~3.1~Pro has $h = +5.4$ (above the cooperative curve).
-The most striking $h$-field excursion is Gemini~2.5~Pro at $h = +11.5$: it substantially overshoots the cooperative regression because Google's training emphasised scientific reasoning before coding optimisation, exactly the frontier-scale analogue of the Phi data-quality effect in the HS-TQA phase.
-DeepSeek~V3.2 has $h = -4.1$ (below the cooperative curve, indicating a coding-specialist training recipe that partially trades reasoning performance for coding).
+Gemini~3.1~Pro has $h = +6.0$ (above the cooperative curve).
+The most striking $h$-field excursion is Gemini~2.5~Pro at $h = +8.9$: it substantially overshoots the cooperative regression because Google's training emphasised scientific reasoning before coding optimisation, exactly the frontier-scale analogue of the Phi data-quality effect in the HS-TQA phase.
+DeepSeek~V3.2 has $h = -3.5$ (below the cooperative curve, indicating a coding-specialist training recipe that partially trades reasoning performance for coding).
 These deviations are small---the frontier cooperative phase is robust---but they show that
 the same $h$-field mechanism that shifts $N_c$ at small scale is measurable at frontier scale.
 
@@ -967,15 +967,15 @@ The CAPE prediction for a training-recipe perturbation is a transient anticorrel
 excursion ($\gamma_{12} < 0$) followed by recovery at the next tier.
 The measurements confirm this:
 \begin{align*}
-  \gamma_{12}(\text{Son.4.5}\to\text{Son.4.6}) &= \frac{\Delta\text{GPQA}}{\Delta\text{SWE}} = \frac{74.1 - 83.4}{79.6 - 77.2} = -3.88 \quad (h = -13.9) \\
-  \gamma_{12}(\text{Son.4.6}\to\text{Opus~4.6}) &= \frac{91.3 - 74.1}{80.8 - 79.6} = +14.3 \quad\quad (h = +2.2)
+  \gamma_{12}(\text{Son.4.5}\to\text{Son.4.6}) &= \frac{\Delta\text{GPQA}}{\Delta\text{SWE}} = \frac{74.1 - 83.4}{79.6 - 77.2} = -3.88 \quad (h = -13.4) \\
+  \gamma_{12}(\text{Son.4.6}\to\text{Opus~4.6}) &= \frac{91.3 - 74.1}{80.8 - 79.6} = +14.3 \quad\quad (h = +2.8)
 \end{align*}
 Sonnet~4.6's training recipe boosts coding performance (SWE +2.4 pp) at the cost of reasoning (GPQA $-9.3$ pp),
-driving the $h$ field to $-13.9$---the frontier analogue of a web-trained model sitting below the cooperative
+driving the $h$ field to $-13.4$---the frontier analogue of a web-trained model sitting below the cooperative
 curve.\footnote{SWE-bench Verified and GPQA Diamond scores from official model cards and SWE-bench.com (accessed March 2026). 
 Kimi K2.5 scores from the Moonshot AI technical report (SWE=76.8\%, GPQA=87.6\%); note that SWE=80.2\% reported elsewhere refers to MiniMax~M2.5. 
 Grok-3 (xAI) is excluded: GPQA~84\% is available but SWE-bench is not published by xAI, making $\gamma_{12}$ uncomputable; its placement on the cooperative curve is consistent with the other models at this scale.}
-Opus~4.6 recovers to $h = +2.2$, above the cooperative baseline---the same
+Opus~4.6 recovers to $h = +2.8$, above the cooperative baseline---the same
 recovery structure seen in the original HS-TQA transition above $N_c$.
 The protocol is minimal: for any two consecutive releases, compute $\gamma_{12} = \Delta\text{GPQA}/\Delta\text{SWE}$.
 A single evaluation run on both benchmarks suffices to detect whether a new checkpoint has entered an anticorrelated excursion before deployment.
