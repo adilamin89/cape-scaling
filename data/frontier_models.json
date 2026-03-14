@@ -1,150 +1,25 @@
 {
-  "description": "Frontier-scale models (Feb-Mar 2026) with SWE-bench and GPQA Diamond scores",
-  "source": "Public benchmarks, collected March 2026",
+  "description": "Frontier-scale models with SWE-bench Verified and GPQA Diamond scores (Feb-Mar 2026)",
+  "source": "Published benchmarks, collected March 2026. h = GPQA_measured - GPQA_universal(SWE)",
   "models": [
-    {
-      "n": "Claude Haiku 4.5",
-      "swe": null,
-      "gpqa": null,
-      "arc": null,
-      "fam": "Anthropic",
-      "sz": "~4B",
-      "note": "No public evals"
-    },
-    {
-      "n": "Claude Sonnet 4.5",
-      "swe": 77.2,
-      "gpqa": 83.4,
-      "arc": null,
-      "fam": "Anthropic",
-      "sz": "~70B",
-      "note": ""
-    },
-    {
-      "n": "Claude Sonnet 4.6",
-      "swe": 79.6,
-      "gpqa": 89.9,
-      "arc": 58.3,
-      "fam": "Anthropic",
-      "sz": "~70B",
-      "note": "In paper"
-    },
-    {
-      "n": "Claude Opus 4.6",
-      "swe": 80.8,
-      "gpqa": 91.3,
-      "arc": 68.8,
-      "fam": "Anthropic",
-      "sz": "~500B",
-      "note": "In paper"
-    },
-    {
-      "n": "GPT-5.2 Pro",
-      "swe": 80.0,
-      "gpqa": 93.2,
-      "arc": null,
-      "fam": "OpenAI",
-      "sz": "~1T",
-      "note": ""
-    },
-    {
-      "n": "GPT-5.4",
-      "swe": null,
-      "gpqa": null,
-      "arc": null,
-      "fam": "OpenAI",
-      "sz": "~1T",
-      "note": "Mar 2026"
-    },
-    {
-      "n": "Gemini 2.5 Pro",
-      "swe": 63.8,
-      "gpqa": 84.0,
-      "arc": null,
-      "fam": "Google",
-      "sz": "~500B",
-      "note": "In paper"
-    },
-    {
-      "n": "Gemini 3 Flash",
-      "swe": 78.0,
-      "gpqa": 90.4,
-      "arc": null,
-      "fam": "Google",
-      "sz": "~500B",
-      "note": ""
-    },
-    {
-      "n": "Gemini 3 Pro",
-      "swe": 76.2,
-      "gpqa": 91.9,
-      "arc": null,
-      "fam": "Google",
-      "sz": "~1T",
-      "note": ""
-    },
-    {
-      "n": "Gemini 3.1 Pro",
-      "swe": 80.6,
-      "gpqa": 94.3,
-      "arc": null,
-      "fam": "Google",
-      "sz": "~1T",
-      "note": ""
-    },
-    {
-      "n": "DeepSeek V3.2",
-      "swe": 74.4,
-      "gpqa": 79.9,
-      "arc": null,
-      "fam": "DeepSeek",
-      "sz": "671B",
-      "note": ""
-    },
-    {
-      "n": "Kimi K2",
-      "swe": 65.8,
-      "gpqa": null,
-      "arc": null,
-      "fam": "Kimi",
-      "sz": "1T",
-      "note": "Open weights"
-    },
-    {
-      "n": "Kimi K2.5",
-      "swe": 80.2,
-      "gpqa": 85.2,
-      "arc": null,
-      "fam": "Kimi",
-      "sz": "1T",
-      "note": ""
-    },
-    {
-      "n": "MiniMax M2.5",
-      "swe": 80.2,
-      "gpqa": null,
-      "arc": null,
-      "fam": "MiniMax",
-      "sz": "~500B",
-      "note": "Open weights"
-    },
-    {
-      "n": "Qwen3.5-72B",
-      "swe": 73.4,
-      "gpqa": 83.7,
-      "arc": null,
-      "fam": "Alibaba",
-      "sz": "72B",
-      "note": "Open weights"
-    },
-    {
-      "n": "GLM-5",
-      "swe": null,
-      "gpqa": null,
-      "arc": null,
-      "fam": "Zhipu",
-      "sz": "~500B",
-      "note": "Arena top open"
-    }
+    {"n": "Claude 3.5 Sonnet", "swe": 49.0, "gpqa": 59.4, "h": -4.0, "lab": "Anthropic"},
+    {"n": "Claude 3.7 Sonnet", "swe": 62.3, "gpqa": 68.0, "h": -5.9, "lab": "Anthropic"},
+    {"n": "Claude Haiku 4.5", "swe": 73.3, "gpqa": 71.0, "h": -11.6, "lab": "Anthropic"},
+    {"n": "Claude Sonnet 4.5", "swe": 77.2, "gpqa": 83.4, "h": -2.2, "lab": "Anthropic"},
+    {"n": "Claude Opus 4.5", "swe": 80.9, "gpqa": 87.0, "h": -1.6, "lab": "Anthropic"},
+    {"n": "Claude Sonnet 4.6", "swe": 79.6, "gpqa": 74.1, "h": -13.4, "lab": "Anthropic"},
+    {"n": "Claude Opus 4.6", "swe": 80.8, "gpqa": 91.3, "h": 2.8, "lab": "Anthropic"},
+    {"n": "Gemini 2.5 Pro", "swe": 63.8, "gpqa": 84.0, "h": 8.9, "lab": "Google"},
+    {"n": "Gemini 3 Flash", "swe": 78.0, "gpqa": 90.4, "h": 4.1, "lab": "Google"},
+    {"n": "Gemini 3 Pro", "swe": 76.2, "gpqa": 91.9, "h": 7.0, "lab": "Google"},
+    {"n": "Gemini 3.1 Pro", "swe": 80.6, "gpqa": 94.3, "h": 6.0, "lab": "Google"},
+    {"n": "GPT-4o", "swe": 33.2, "gpqa": 53.6, "h": 2.7, "lab": "OpenAI"},
+    {"n": "GPT-5", "swe": 74.9, "gpqa": 85.7, "h": 1.9, "lab": "OpenAI"},
+    {"n": "GPT-5.1", "swe": 76.3, "gpqa": 88.1, "h": 3.2, "lab": "OpenAI"},
+    {"n": "GPT-5.2 Pro", "swe": 80.0, "gpqa": 93.2, "h": 5.3, "lab": "OpenAI"},
+    {"n": "DeepSeek V3.2", "swe": 74.4, "gpqa": 79.9, "h": -3.5, "lab": "DeepSeek"},
+    {"n": "Kimi K2.5", "swe": 76.8, "gpqa": 87.6, "h": 2.3, "lab": "Kimi"},
+    {"n": "Qwen3.5-72B", "swe": 73.4, "gpqa": 83.7, "h": 1.1, "lab": "Alibaba"},
+    {"n": "MiniMax M2.5", "swe": 80.2, "gpqa": 85.0, "h": -3.0, "lab": "MiniMax"}
   ]
 }
