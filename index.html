@@ -209,14 +209,24 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
       <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px">Chart Axes:</span>
       <select id="chart-pair" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--font-mono);font-size:11px;cursor:pointer" onchange="redrawResultCharts()">
         <option value="auto">Auto (phase-aware)</option>
+        <optgroup label="── Base pairs (pre-Nc2) ──">
         <option value="hs-tqa">HellaSwag × TruthfulQA</option>
-        <option value="swe-gpqa">SWE-bench × GPQA Diamond</option>
         <option value="hs-arc">HellaSwag × ARC-C</option>
         <option value="hs-wg">HellaSwag × WinoGrande</option>
         <option value="hs-mmlu">HellaSwag × MMLU</option>
         <option value="arc-tqa">ARC-C × TruthfulQA</option>
+        </optgroup>
+        <optgroup label="── Frontier pairs (post-Nc2) ──">
+        <option value="swe-gpqa">SWE-bench × GPQA Diamond</option>
         <option value="swe-ife">SWE-bench × IFEval</option>
         <option value="gpqa-ife">GPQA × IFEval</option>
+        </optgroup>
+        <optgroup label="── Single benchmark vs N ──">
+        <option value="solo-ife">IFEval vs N (beyond Nc3)</option>
+        <option value="solo-arc">ARC-C vs N</option>
+        <option value="solo-hs">HellaSwag vs N</option>
+        <option value="solo-tqa">TruthfulQA vs N</option>
+        </optgroup>
       </select>
       <span id="chart-pair-info" style="font-size:10px;color:var(--text3);font-family:var(--font-mono)"></span>
     </div>
@@ -684,8 +694,11 @@ const EXAMPLES={
 };
 
 // ── REGIME CLASSIFIER ────────────────────────────────────
+const NC3=114e9; // Nc3 ≈ 114B predicted from det(Γ)→0
 function classify(N){
   const g=g12(N);
+  if(N>NC3)return{l:"BEYOND Nc3",c:"#7b2fff",cls:"pill-frontier",action:"IFEval is the sole discriminating benchmark. Track γ(IFEval,HarmBench) for the next phase boundary."};
+  if(N>70e9)return{l:"PHASE 4 — AXIS ROTATION",c:"#4cc9f0",cls:"pill-frontier",action:"SWE×GPQA are discriminating. HS/TQA saturated. d_eff→2 with new axes."};
   if(g<-0.8)return{l:"DEEP TAX",c:"#ff4d6d",cls:"pill-tax",action:"Invest in data curation. Scaling alone worsens alignment."};
   if(g<0)return{l:"TAX",c:"#ff6b6b",cls:"pill-tax",action:"Curate data. You need ~h_c = "+Math.round(Math.pow(Math.max(0,(3.5e9-N)/1e9,0),1.5)*3)+" TQA pts of curation."};
   if(g<0.3)return{l:"TRANSITION",c:"#ffd166",cls:"pill-trans",action:"Maximum susceptibility. Small interventions have highest leverage here."};
@@ -1064,11 +1077,22 @@ function getPhysicsDiagnostic(g, N, logN, deff, chi, hField, benchScores){
 }
 
 function getPhaseAction(g, N, h){
-  if(g<-0.5) return `<strong style="color:#ff4d6d">Deep Tax Regime</strong><br>Scaling worsens alignment. Data curation is your primary lever — invest ${Math.round(Math.pow(Math.max(0,(3.5e9-N)/1e9),1.5)*3)} TQA points of quality uplift (Phi-level benchmark). RLHF here is temporary; pre-training coupling is structural.`;
-  if(g<0) return `<strong style="color:#ff6b6b">Shallow Tax</strong><br>Near the transition. A small data curation push (~5% Phi-level) could flip you into the bonus phase. Or scale to 3.5B.`;
-  if(g<0.3) return `<strong style="color:#ffd166">Critical Point</strong><br>Maximum susceptibility χ → ∞. This is the highest-leverage point for alignment interventions. Small RLHF changes have outsized effect.`;
-  if(N<100e9) return `<strong style="color:#06d6a0">Bonus Phase</strong><br>Scale and align together. Capability gains are redistributed (CV=27%) — individual task performance may not improve even as aggregate scores rise. This is structural, not a training failure.`;
-  return `<strong style="color:#4cc9f0">Frontier / Post-Saturation</strong><br>HellaSwag saturated. SWE-bench × GPQA Diamond are now discriminating. Track γ(SWE,IFEval) for Nc2. IFEval is the surviving key benchmark.`;
+  if(N>NC3) return `<strong style="color:#7b2fff">Beyond Nc3 — Theory Scope Boundary</strong><br>
+    The two-field GL description reaches its natural limit here. IFEval is the <em>sole</em> discriminating benchmark — SWE and GPQA have saturated just as HS/TQA did before them.
+    <br><span style="color:var(--accent)">Next benchmark axis:</span> γ(IFEval, HarmBench) — if it turns negative, you've found Nc4 and the three-field extension activates.
+    <br><span style="color:var(--text3)">The coexistence boundary (h=0 line) separates coding-specialist (h<0, e.g. Sonnet 4.6) from reasoning-specialist (h>0, e.g. Gemini) training recipes at this scale.</span>`;
+  if(N>70e9) return `<strong style="color:#4cc9f0">Phase 4 — Axis Rotation</strong><br>
+    HellaSwag/TQA saturated (>90%). SWE-bench × GPQA Diamond are now the discriminating pair, r=+0.85 (cooperative).
+    <br><span style="color:var(--accent)">Nc3 predicted ≈ 114–130B:</span> det(Γ)→0 extrapolation + Pythia 5-bench convergence. IFEval dominates λ₁ at frontier (loading = −0.64).
+    <br><span style="color:var(--text3)">Coexistence line (h=0): separates coding-first (Sonnet 4.6: h=−13.4) from reasoning-first (Opus 4.6: h=+2.8) recipes. Both are valid; h-field reveals the training priority.</span>`;
+  if(g<-0.5) return `<strong style="color:#ff4d6d">Deep Tax Regime</strong><br>Scaling worsens alignment. Data curation is your primary lever — invest ${Math.round(Math.pow(Math.max(0,(3.5e9-N)/1e9),1.5)*3)} TQA points of quality uplift (Phi-level benchmark). RLHF here is temporary; pre-training coupling is structural.
+    <br><span style="color:var(--text3)">Note: distilled models (Phi) achieve h≫0 below Nc via training history — a metastable cooperative state. This hysteresis signals a first-order component in the phase diagram.</span>`;
+  if(g<0) return `<strong style="color:#ff6b6b">Shallow Tax</strong><br>Near the transition. A small data curation push (~5% Phi-level) could flip you into the bonus phase. Or scale to 3.5B.
+    <br><span style="color:var(--text3)">The coexistence region [1.5B, 5.3B] means some models at this scale are already cooperative — it depends on training recipe (the h-field).</span>`;
+  if(g<0.3) return `<strong style="color:#ffd166">Critical Point (Nc ≈ 3.5B)</strong><br>Maximum susceptibility χ → ∞. This is the highest-leverage point for alignment interventions. Small RLHF changes have outsized effect. The ensemble Nc range is [1.5B, 5.3B].`;
+  if(N<70e9) return `<strong style="color:#06d6a0">Bonus Phase</strong><br>Scale and align together. Capability gains are redistributed (CV=27%) — individual task performance may not improve even as aggregate scores rise. This is structural, not a training failure.
+    <br><span style="color:var(--text3)">As you approach 70B, watch for HS/TQA saturation (both >90%). When that happens, you've entered the axis rotation zone — switch to SWE×GPQA as the discriminating pair.</span>`;
+  return `<strong style="color:#4cc9f0">Frontier / Post-Saturation</strong><br>HellaSwag saturated. SWE-bench × GPQA Diamond are now discriminating. Track γ(SWE,IFEval) for Nc3. IFEval is the surviving key benchmark at ~114B.`;
 }
 
 function getNearestModels(N){
@@ -1113,41 +1137,57 @@ function drawResultChart(userN, userHS, userTQA){
   const cv=document.getElementById('result-chart');
   const cv2=document.getElementById('result-chart-2');
   const dpr=window.devicePixelRatio||1;
+  const isBeyondNc3=userN&&userN>NC3;
   const isFrontierMode=userN&&userN>70e9;
-  const isNearTransition=userN&&userN>10e9&&userN<=70e9; // bonus phase nearing axis rotation
+  const isNearNc2=userN&&userN>10e9&&userN<=70e9; // bonus phase nearing axis rotation
+  const isNearNc3=userN&&userN>70e9&&userN<=NC3; // frontier phase nearing Nc3
   const pairSelect=document.getElementById('chart-pair').value;
   const pairInfo=document.getElementById('chart-pair-info');
 
   // Determine which charts to show
   let showBase=true, showFrontier=false;
   if(pairSelect==='auto'){
-    if(isFrontierMode){showBase=false;showFrontier=true;}
-    if(isNearTransition){showBase=true;showFrontier=true;} // Show BOTH near axis rotation
+    if(isBeyondNc3){showBase=false;showFrontier=true;} // IFEval solo or SWE×GPQA
+    else if(isFrontierMode){showBase=false;showFrontier=true;}
+    if(isNearNc2){showBase=true;showFrontier=true;} // Show BOTH near Nc2 axis rotation
   } else if(pairSelect==='swe-gpqa'||pairSelect==='swe-ife'||pairSelect==='gpqa-ife'){
     showBase=false;showFrontier=true;
+  } else if(pairSelect.startsWith('solo-')){
+    // Single-benchmark mode handled by drawGenericPairChart
+    showBase=false;showFrontier=false;
   } else {
     showBase=true;showFrontier=false;
   }
 
   // Info text
-  if(pairSelect==='auto'&&isNearTransition){
+  if(pairSelect==='auto'&&isBeyondNc3){
+    pairInfo.textContent='Beyond Nc3 ≈ 114B: SWE×GPQA shown + IFEval is sole discriminator. Theory scope boundary.';
+  } else if(pairSelect==='auto'&&isNearNc3){
+    pairInfo.textContent='Approaching Nc3: SWE×GPQA + IFEval emerging. det(Γ)→0 near 114–130B.';
+  } else if(pairSelect==='auto'&&isNearNc2){
     pairInfo.textContent='Showing both: HS×TQA (saturating) + SWE×GPQA (activating) — axis rotation zone';
   } else if(pairSelect==='auto'&&isFrontierMode){
     pairInfo.textContent='Frontier mode: SWE×GPQA axes (HS/TQA saturated above 90%)';
   } else if(pairSelect==='auto'){
     pairInfo.textContent='Base mode: HS×TQA axes';
+  } else if(pairSelect.startsWith('solo-')){
+    pairInfo.textContent='Single benchmark vs N — useful when d_eff→1 (beyond Nc3, only one axis discriminates)';
   } else {
     pairInfo.textContent='Manual pair: '+pairSelect.toUpperCase().replace('-',' × ');
   }
 
-  const W=cv.parentElement.clientWidth||700, H=showFrontier&&!showBase?280:240;
+  const W=cv.parentElement.clientWidth||700, H=(showFrontier&&!showBase)?280:240;
   cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
   const c=cv.getContext('2d'); c.scale(dpr,dpr);
   const p={l:52,r:16,t:16,b:44};
 
-  // Handle manual pair selections for non-standard pairs
+  // Handle single-benchmark and non-standard pair selections
   if(pairSelect!=='auto'&&pairSelect!=='hs-tqa'&&pairSelect!=='swe-gpqa'){
-    drawGenericPairChart(c,W,H,p,userN,pairSelect);
+    if(pairSelect.startsWith('solo-')){
+      drawSoloBenchChart(c,W,H,p,userN,pairSelect);
+    } else {
+      drawGenericPairChart(c,W,H,p,userN,pairSelect);
+    }
     cv2.style.display='none';
     return;
   }
@@ -1156,11 +1196,19 @@ function drawResultChart(userN, userHS, userTQA){
     drawFrontierMiniChart(c,W,H,p,userN,
       parseFloat(document.getElementById('in-swe').value)||null,
       parseFloat(document.getElementById('in-gpqa').value)||null);
-    cv2.style.display='none';
+    // For Nc3 and near-Nc3: show IFEval trajectory as second chart
+    if(pairSelect==='auto'&&(isBeyondNc3||isNearNc3)){
+      cv2.style.display='block';
+      cv2.width=W*dpr; cv2.height=240*dpr; cv2.style.width=W+'px'; cv2.style.height='240px';
+      const c2=cv2.getContext('2d'); c2.scale(dpr,dpr);
+      drawSoloBenchChart(c2,W,240,p,userN,'solo-ife');
+    } else {
+      cv2.style.display='none';
+    }
     return;
   }
 
-  // Show second chart if near transition
+  // Show second chart if near Nc2 transition
   if(showFrontier&&showBase){
     cv2.style.display='block';
     cv2.width=W*dpr; cv2.height=280*dpr; cv2.style.width=W+'px'; cv2.style.height='280px';
@@ -1228,6 +1276,119 @@ function drawResultChart(userN, userHS, userTQA){
   c.fillText('TAX',(p.l+ncX)/2,p.t+12);
   c.fillStyle='rgba(6,214,160,0.5)';
   c.fillText('BONUS',(ncX+W-p.r)/2,p.t+12);
+}
+
+function drawSoloBenchChart(c,W,H,p,userN,pairSelect){
+  // Single benchmark vs log₁₀(N) — useful beyond Nc3 where d_eff→1
+  const SOLO_CONFIG={
+    'solo-ife':{key:'ife',label:'IFEval (%)',src:'frontier',note:'Sole discriminator beyond Nc3 ≈ 114B'},
+    'solo-arc':{key:'arc',label:'ARC-C (%)',src:'base',note:'Loads >0.9 on HS eigenvector — co-saturates'},
+    'solo-hs':{key:'hs',label:'HellaSwag (%)',src:'base',note:'Primary base-phase benchmark, saturates >70B'},
+    'solo-tqa':{key:'tqa',label:'TruthfulQA (%)',src:'base',note:'Anti-correlated with HS below Nc, saturates >70B'},
+  };
+  const cfg=SOLO_CONFIG[pairSelect];
+  if(!cfg){c.fillStyle='#3d5a7a';c.font='12px DM Sans';c.textAlign='center';c.fillText('Unknown: '+pairSelect,W/2,H/2);return;}
+
+  // Collect data
+  const pts=[];
+  const dataArr=cfg.src==='frontier'?FRONTIER:MODELS;
+  if(cfg.src==='frontier'){
+    // Frontier doesn't have N, use SWE as proxy ordering or use known param counts
+    // Actually frontier models don't have param counts readily. Show score vs model index.
+    dataArr.forEach((m,i)=>{
+      const v=m[cfg.key]; if(v!=null&&!isNaN(v)) pts.push({x:i,y:v,name:m.n,color:m.fc,lab:m.lab});
+    });
+  } else {
+    dataArr.forEach(m=>{
+      const v=m[cfg.key]; if(v!=null&&!isNaN(v)) pts.push({x:Math.log10(m.N),y:v,name:m.n,color:m.fc,family:m.f});
+    });
+  }
+
+  c.clearRect(0,0,W,H);
+
+  if(pts.length<2){
+    c.fillStyle='#3d5a7a';c.font='12px DM Sans';c.textAlign='center';
+    c.fillText('Insufficient data for '+cfg.label,W/2,H/2-10);
+    if(cfg.src==='frontier') c.fillText('IFEval scores not yet in frontier dataset — add via inputs',W/2,H/2+10);
+    return;
+  }
+
+  // Auto-range
+  let xMin=Infinity,xMax=-Infinity,yMin=Infinity,yMax=-Infinity;
+  pts.forEach(d=>{if(d.x<xMin)xMin=d.x;if(d.x>xMax)xMax=d.x;if(d.y<yMin)yMin=d.y;if(d.y>yMax)yMax=d.y;});
+  const xPad=(xMax-xMin)*0.08||1, yPad=(yMax-yMin)*0.08||5;
+  xMin-=xPad;xMax+=xPad;yMin-=yPad;yMax+=yPad;
+
+  const X=v=>p.l+(v-xMin)/(xMax-xMin)*(W-p.l-p.r);
+  const Y=v=>p.t+(yMax-v)/(yMax-yMin)*(H-p.t-p.b);
+
+  // Background
+  c.fillStyle='rgba(123,47,255,0.03)';c.fillRect(p.l,p.t,W-p.l-p.r,H-p.t-p.b);
+  // Grid
+  c.strokeStyle='rgba(255,255,255,0.04)';c.lineWidth=1;
+  const xStep=Math.max(0.5,Math.round((xMax-xMin)/6*2)/2);
+  for(let v=Math.ceil(xMin*2)/2;v<=xMax;v+=xStep){c.beginPath();c.moveTo(X(v),p.t);c.lineTo(X(v),H-p.b);c.stroke();}
+  const yStep=Math.max(1,Math.round((yMax-yMin)/5));
+  for(let v=Math.ceil(yMin);v<=yMax;v+=yStep){c.beginPath();c.moveTo(p.l,Y(v));c.lineTo(W-p.r,Y(v));c.stroke();}
+
+  // Nc markers for base models
+  if(cfg.src==='base'){
+    const ncLogN=Math.log10(NC);
+    if(ncLogN>=xMin&&ncLogN<=xMax){
+      c.strokeStyle='rgba(255,209,102,0.5)';c.lineWidth=1.5;c.setLineDash([4,3]);
+      c.beginPath();c.moveTo(X(ncLogN),p.t);c.lineTo(X(ncLogN),H-p.b);c.stroke();c.setLineDash([]);
+      c.fillStyle='#ffd166';c.font='bold 9px Space Mono';c.textAlign='center';c.fillText('Nc=3.5B',X(ncLogN),p.t+12);
+    }
+    // Family trajectory lines
+    const fams={};
+    pts.forEach(d=>{if(!fams[d.family])fams[d.family]=[];fams[d.family].push(d);});
+    Object.values(fams).forEach(fm=>{
+      if(fm.length<2)return;
+      fm.sort((a,b)=>a.x-b.x);
+      c.strokeStyle=fm[0].color||'#7a9abf';c.globalAlpha=0.3;c.lineWidth=1.2;
+      c.beginPath();c.moveTo(X(fm[0].x),Y(fm[0].y));
+      fm.slice(1).forEach(d=>c.lineTo(X(d.x),Y(d.y)));
+      c.stroke();c.globalAlpha=1;
+    });
+  }
+
+  // Data points
+  pts.forEach(d=>{
+    const x=X(d.x),y=Y(d.y);
+    c.fillStyle=d.color||'#7a9abf';c.globalAlpha=0.7;
+    c.beginPath();c.arc(x,y,4,0,Math.PI*2);c.fill();
+    c.globalAlpha=1;c.fillStyle='#7a9abf';c.font='7px Space Mono';c.textAlign='left';
+    const shortName=d.name.replace(/^Pythia-/,'P-').replace(/^GPT-/,'G-').replace('Claude ','');
+    c.fillText(shortName,x+6,y+3);
+  });
+
+  // User point
+  const userBench=parseFloat(document.getElementById('in-'+cfg.key).value);
+  if(userN&&!isNaN(userBench)){
+    const ux=cfg.src==='base'?X(Math.log10(userN)):X(pts.length); // approx position
+    const uy=Y(userBench);
+    c.strokeStyle='#ffd166';c.lineWidth=2.5;
+    c.beginPath();c.arc(ux,uy,9,0,Math.PI*2);c.stroke();
+    c.fillStyle='#ffd166';c.beginPath();c.arc(ux,uy,3,0,Math.PI*2);c.fill();
+    c.fillStyle='#ffd166';c.font='bold 9px Space Mono';c.textAlign='center';
+    c.fillText('YOUR MODEL',ux,uy-14);
+  }
+
+  // Axis labels
+  c.fillStyle='#3d5a7a';c.font='10px DM Sans';c.textAlign='center';
+  if(cfg.src==='base'){
+    for(let v=Math.ceil(xMin);v<=xMax;v+=1)c.fillText(v.toFixed(0),X(v),H-p.b+16);
+    c.fillText('log₁₀(N)',W/2,H-4);
+  } else {
+    c.fillText('Model (frontier ordering)',W/2,H-4);
+  }
+  c.textAlign='right';
+  for(let v=Math.ceil(yMin);v<=yMax;v+=yStep){c.fillStyle='#3d5a7a';c.fillText(Math.round(v)+'%',p.l-6,Y(v)+4);}
+  c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='9px DM Sans';c.fillText(cfg.label,0,0);c.restore();
+
+  // Title
+  c.fillStyle='rgba(123,47,255,0.7)';c.font='bold 10px Space Mono';c.textAlign='right';
+  c.fillText(cfg.label+' vs N — '+cfg.note,W-p.r,p.t+12);
 }
 
 function drawGenericPairChart(c,W,H,p,userN,pairSelect){
