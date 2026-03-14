@@ -1,0 +1,33 @@
+{
+  "quadratic_fit": {
+    "Nc_median": 3493917612.597903,
+    "Nc_mean": 5876382731.684847,
+    "Nc_95CI": [
+      2916465746.289437,
+      13404201670.973732
+    ],
+    "Nc_68CI": [
+      3148170091.950898,
+      4326423283.800112
+    ],
+    "n_valid_samples": 9953,
+    "Nc_billions": "3.5B [2.9B, 13.4B]"
+  },
+  "gamma_zero_crossing": {
+    "Nc_full_fit": 4731360988.761093,
+    "Nc_jackknife_mean": 4933262334.388219,
+    "Nc_jackknife_SE": 3567679587.0972743,
+    "Nc_bootstrap_median": 4408340710.40188,
+    "Nc_bootstrap_95CI": [
+      1369543983.588252,
+      95559235826.61617
+    ],
+    "gamma_slope": 0.7426141461625871,
+    "gamma_intercept": -7.184781530416261
+  },
+  "combined_estimate": {
+    "note": "Weighted average of quadratic and gamma methods",
+    "Nc_quad_B": 3.493917612597903,
+    "Nc_gamma_B": 4.40834071040188
+  }
+}
