@@ -1,0 +1,150 @@
+{
+  "description": "Frontier-scale models (Feb-Mar 2026) with SWE-bench and GPQA Diamond scores",
+  "source": "Public benchmarks, collected March 2026",
+  "models": [
+    {
+      "n": "Claude Haiku 4.5",
+      "swe": null,
+      "gpqa": null,
+      "arc": null,
+      "fam": "Anthropic",
+      "sz": "~4B",
+      "note": "No public evals"
+    },
+    {
+      "n": "Claude Sonnet 4.5",
+      "swe": 77.2,
+      "gpqa": 83.4,
+      "arc": null,
+      "fam": "Anthropic",
+      "sz": "~70B",
+      "note": ""
+    },
+    {
+      "n": "Claude Sonnet 4.6",
+      "swe": 79.6,
+      "gpqa": 89.9,
+      "arc": 58.3,
+      "fam": "Anthropic",
+      "sz": "~70B",
+      "note": "In paper"
+    },
+    {
+      "n": "Claude Opus 4.6",
+      "swe": 80.8,
+      "gpqa": 91.3,
+      "arc": 68.8,
+      "fam": "Anthropic",
+      "sz": "~500B",
+      "note": "In paper"
+    },
+    {
+      "n": "GPT-5.2 Pro",
+      "swe": 80,
+      "gpqa": 93.2,
+      "arc": null,
+      "fam": "OpenAI",
+      "sz": "~1T",
+      "note": ""
+    },
+    {
+      "n": "GPT-5.4",
+      "swe": null,
+      "gpqa": null,
+      "arc": null,
+      "fam": "OpenAI",
+      "sz": "~1T",
+      "note": "Mar 2026"
+    },
+    {
+      "n": "Gemini 2.5 Pro",
+      "swe": 63.8,
+      "gpqa": 84,
+      "arc": null,
+      "fam": "Google",
+      "sz": "~500B",
+      "note": "In paper"
+    },
+    {
+      "n": "Gemini 3 Flash",
+      "swe": 78,
+      "gpqa": 90.4,
+      "arc": null,
+      "fam": "Google",
+      "sz": "~500B",
+      "note": ""
+    },
+    {
+      "n": "Gemini 3 Pro",
+      "swe": 76.2,
+      "gpqa": 91.9,
+      "arc": null,
+      "fam": "Google",
+      "sz": "~1T",
+      "note": ""
+    },
+    {
+      "n": "Gemini 3.1 Pro",
+      "swe": 80.6,
+      "gpqa": 94.3,
+      "arc": null,
+      "fam": "Google",
+      "sz": "~1T",
+      "note": ""
+    },
+    {
+      "n": "DeepSeek V3.2",
+      "swe": 74.4,
+      "gpqa": 79.9,
+      "arc": null,
+      "fam": "DeepSeek",
+      "sz": "671B",
+      "note": ""
+    },
+    {
+      "n": "Kimi K2",
+      "swe": 65.8,
+      "gpqa": null,
+      "arc": null,
+      "fam": "Kimi",
+      "sz": "1T",
+      "note": "Open weights"
+    },
+    {
+      "n": "Kimi K2.5",
+      "swe": 80.2,
+      "gpqa": 85.2,
+      "arc": null,
+      "fam": "Kimi",
+      "sz": "1T",
+      "note": ""
+    },
+    {
+      "n": "MiniMax M2.5",
+      "swe": 80.2,
+      "gpqa": null,
+      "arc": null,
+      "fam": "MiniMax",
+      "sz": "~500B",
+      "note": "Open weights"
+    },
+    {
+      "n": "Qwen3.5-72B",
+      "swe": 73.4,
+      "gpqa": 83.7,
+      "arc": null,
+      "fam": "Alibaba",
+      "sz": "72B",
+      "note": "Open weights"
+    },
+    {
+      "n": "GLM-5",
+      "swe": null,
+      "gpqa": null,
+      "arc": null,
+      "fam": "Zhipu",
+      "sz": "~500B",
+      "note": "Arena top open"
+    }
+  ]
+}
