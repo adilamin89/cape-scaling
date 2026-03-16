@@ -140,7 +140,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   <div class="header-stats">
     <div class="hstat"><span class="hstat-val">3.5B</span><span class="hstat-lbl">Critical Scale N<sub>c</sub></span></div>
     <div class="hstat"><span class="hstat-val">−0.989</span><span class="hstat-lbl">Pre-transition r</span></div>
-    <div class="hstat"><span class="hstat-val">44 + 19</span><span class="hstat-lbl">Base + Frontier Models</span></div>
+    <div class="hstat"><span class="hstat-val">44 + 20</span><span class="hstat-lbl">Base + Frontier Models</span></div>
     <div class="hstat"><span class="hstat-val">14</span><span class="hstat-lbl">Families</span></div>
   </div>
   <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap">
@@ -1861,7 +1861,7 @@ function drawFrontierChart(){
     if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.fillText('anomaly',x+8,y+12);}
   });
   c.fillStyle='rgba(6,214,160,0.5)'; c.font='bold 10px Space Mono'; c.textAlign='right';
-  c.fillText('r = +0.85 (n=19, p<0.00001)',W-p.r,p.t+14);
+  c.fillText('r = +0.85 (n=20, p<0.00001)',W-p.r,p.t+14);
   c.fillStyle='#3d5a7a'; c.font='10px DM Sans'; c.textAlign='center';
   for(let s=40;s<=80;s+=10) c.fillText(s+'%',X(s),H-p.b+16);
   c.fillText('SWE-bench Verified (%)',W/2,H-6);
