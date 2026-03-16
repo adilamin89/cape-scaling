@@ -1120,9 +1120,9 @@ Published IFEval scores are now available for four frontier models: Claude~Opus~
 Among the top five models by SWE-bench, the coding benchmark compresses to a $0.9$-point range ($80.0$--$80.9\%$, $\sigma = 0.35$)---\emph{tighter} than the HS/TQA compression at $N_{c,2}$ ($4.9$~pp).
 GPQA retains a $9.3$-point spread in this cluster, indicating partial but not complete saturation.
 Meanwhile IFEval spans $6.5$ points ($87.5$--$94.0\%$, $n=4$)---the widest relative spread among models where SWE has already saturated.
-This is the same pattern that announced $N_{c,1}$: old benchmarks compress, a new axis opens.
+This is the same pattern that announced $N_{c,1}$: old benchmarks compress, a new axis opens (Fig.~\ref{fig:nc3}b).
 
-The $3{\times}3$ correlation matrix restricted to these four models reveals the coupling rotation:
+The $3{\times}3$ correlation matrix restricted to these four models reveals the coupling rotation (Fig.~\ref{fig:nc3}a):
 $r(\text{SWE}, \text{GPQA}) = +0.13$ (decoupled---down from $+0.85$ overall),
 $r(\text{GPQA}, \text{IFEval}) = +0.81$ (strong cooperative),
 $r(\text{SWE}, \text{IFEval}) = -0.37$ (anti-correlated).
@@ -1156,7 +1156,7 @@ The next critical pair is predicted to be instruction-following (IFEval) versus 
 We recommend frontier labs begin tracking $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases---if it turns negative, $N_{c,3}$ has fully resolved and a new coupling regime has begun.
 
 \textbf{Symmetry structure at $N_{c,3}$: from XY to Heisenberg.}
-The physics at each critical scale maps onto a different symmetry class.
+The physics at each critical scale maps onto a different symmetry class (Fig.~\ref{fig:nc3}c).
 At $N_{c,1}$, the capability space is one-dimensional ($d_{\rm eff} \approx 1$): the system has Ising symmetry (one axis, two phases).
 Above $N_{c,1}$, two axes activate ($d_{\rm eff} \to 2$): the symmetry is $U(1)$ (XY-model), with the eigenvector angle $\theta$ as the order parameter and the Riccati ODE governing its dynamics.
 At $N_{c,3}$, the third axis activates ($d_{\rm eff} \to 3$): the symmetry expands to $O(3)$ (Heisenberg-model), with the capability state now a three-component vector $(\phi_{\rm SWE}, \phi_{\rm GPQA}, \phi_{\rm IFEval})$.
@@ -1390,6 +1390,25 @@ The practical lever at this scale is no longer data curation (the $N_{c,1}$ leve
 When a new benchmark pair begins showing negative cross-family coupling, a new alignment tax is opening at that scale---measure it before the field discovers it empirically.
 The $\sqrt{}$ isocline classifier generalises to every regime: compute the cooperative slope $a/b$ from the active benchmark pair, then test whether $\text{score}_2 > \sqrt{(a/b)\cdot\text{score}_1}$.
 This single formula---derived once from the Riccati ODE---works at $N_{c,1}$ (HS-TQA), $N_{c,2}$ (SWE-GPQA), and $N_{c,3}$ (GPQA-IFEval) without modification.
+
+\medskip
+\noindent\textbf{Worked example: diagnosing a frontier model release.}
+Suppose your lab has just trained a new frontier model. You run SWE-bench Verified ($81\%$), GPQA Diamond ($88\%$), and IFEval ($90\%$). CAPE returns:
+
+\smallskip
+\noindent\textit{Step 1: $N_{c,2}$ regime (SWE-GPQA).}
+$h_2 = \text{GPQA} - (0.79\cdot\text{SWE} + 24.7) = 88 - 88.7 = -0.7$. Near the cooperative baseline ($|h_2| < 5$): no SWE-GPQA tax excursion. If $h_2 < -10$ (like Sonnet~4.6 at $h=-13.4$), flag it as a coding-specialist vortex before deployment.
+
+\noindent\textit{Step 2: $N_{c,3}$ regime (GPQA-IFEval).}
+$h_3 = \text{IFEval} - (0.97\cdot\text{GPQA} + 6.8) = 90 - 92.2 = -2.2$. Slightly below the cooperative fit---your training recipe favours reasoning over instruction compliance. Check the isocline: $\sqrt{0.97 \times 88} = 92.4\% > 90\%$---your model is \emph{below} the $\sqrt{}$ boundary. This means you are in the mixed-phase regime at $N_{c,3}$: not a crisis, but the instruction-following axis is undertrained relative to reasoning. Recommendation: increase instruction-tuning weight in the next training run to bring $h_3$ above zero.
+
+\noindent\textit{Step 3: Trajectory check.}
+Compute $\gamma_{12} = \Delta\text{GPQA}/\Delta\text{SWE}$ between this release and the previous one. If $\gamma_{12} > 0$: cooperative, proceed. If $\gamma_{12} < 0$: tax excursion detected---recovery is expected at the next tier, but flag the model for review. Similarly, compute $\gamma_{13} = \Delta\text{IFEval}/\Delta\text{GPQA}$. If $\gamma_{13} < 0$: the $N_{c,3}$ tax is opening---reasoning gains are coming at the cost of instruction compliance.
+
+\smallskip
+\noindent This three-step protocol---$h$-field, isocline boundary, trajectory coupling---requires only three benchmark scores per model release.
+No model weights, no training logs, no internal access.
+The dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} automates all three steps.
 
 \medskip
 \noindent\textbf{Code, data, and dashboard.}
