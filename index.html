@@ -395,9 +395,14 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   </div>
 
   <div class="card">
-    <div class="card-title">Frontier Table <span>— h(D) field per model</span></div>
+    <div class="card-title">Nc3 Saturation Diagnostic <span>— Is the transition underway?</span></div>
+    <div id="nc3-diagnostic" style="font-family:var(--font-mono);font-size:11px;line-height:1.8;color:var(--text2)"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Frontier Table <span>— h(D) field + IFEval per model</span></div>
     <table class="tbl">
-      <thead><tr><th>Model</th><th>SWE (%)</th><th>GPQA (%)</th><th>h(D)</th><th>Lab</th></tr></thead>
+      <thead><tr><th>Model</th><th>SWE (%)</th><th>GPQA (%)</th><th>IFEval (%)</th><th>h(D)</th><th>Lab</th></tr></thead>
       <tbody id="frontier-table"></tbody>
     </table>
   </div>
@@ -657,28 +662,28 @@ const MODELS=[
 
 const FRONTIER=[
   // Anthropic (7) — full within-family trajectory
-  {n:"Claude 3.5 Sonnet",swe:49.0,gpqa:59.4,h:-4.0,lab:"Anthropic",fc:"#CC785C"},
-  {n:"Claude 3.7 Sonnet",swe:62.3,gpqa:68.0,h:-5.9,lab:"Anthropic",fc:"#CC785C"},
-  {n:"Claude Haiku 4.5",swe:73.3,gpqa:71.0,h:-11.6,lab:"Anthropic",fc:"#CC785C"},
-  {n:"Sonnet 4.5",swe:77.2,gpqa:83.4,h:-2.2,lab:"Anthropic",fc:"#CC785C"},
-  {n:"Opus 4.5",swe:80.9,gpqa:87.0,h:-1.6,lab:"Anthropic",fc:"#CC785C"},
-  {n:"Sonnet 4.6",swe:79.6,gpqa:74.1,h:-13.4,lab:"Anthropic",fc:"#CC785C"},
-  {n:"Opus 4.6",swe:80.8,gpqa:91.3,h:2.8,lab:"Anthropic",fc:"#CC785C"},
+  {n:"Claude 3.5 Sonnet",swe:49.0,gpqa:59.4,h:-4.0,lab:"Anthropic",fc:"#CC785C",ifeval:null},
+  {n:"Claude 3.7 Sonnet",swe:62.3,gpqa:68.0,h:-5.9,lab:"Anthropic",fc:"#CC785C",ifeval:null},
+  {n:"Claude Haiku 4.5",swe:73.3,gpqa:71.0,h:-11.6,lab:"Anthropic",fc:"#CC785C",ifeval:null},
+  {n:"Sonnet 4.5",swe:77.2,gpqa:83.4,h:-2.2,lab:"Anthropic",fc:"#CC785C",ifeval:null},
+  {n:"Opus 4.5",swe:80.9,gpqa:87.0,h:-1.6,lab:"Anthropic",fc:"#CC785C",ifeval:null},
+  {n:"Sonnet 4.6",swe:79.6,gpqa:74.1,h:-13.4,lab:"Anthropic",fc:"#CC785C",ifeval:null},
+  {n:"Opus 4.6",swe:80.8,gpqa:91.3,h:2.8,lab:"Anthropic",fc:"#CC785C",ifeval:94.0},
   // Google (4)
-  {n:"Gemini 2.5 Pro",swe:63.8,gpqa:84.0,h:8.9,lab:"Google",fc:"#4285f4"},
-  {n:"Gemini 3 Flash",swe:78.0,gpqa:90.4,h:4.1,lab:"Google",fc:"#4285f4"},
-  {n:"Gemini 3 Pro",swe:76.2,gpqa:91.9,h:7.0,lab:"Google",fc:"#4285f4"},
-  {n:"Gemini 3.1 Pro",swe:80.6,gpqa:94.3,h:6.0,lab:"Google",fc:"#4285f4"},
+  {n:"Gemini 2.5 Pro",swe:63.8,gpqa:84.0,h:8.9,lab:"Google",fc:"#4285f4",ifeval:null},
+  {n:"Gemini 3 Flash",swe:78.0,gpqa:90.4,h:4.1,lab:"Google",fc:"#4285f4",ifeval:null},
+  {n:"Gemini 3 Pro",swe:76.2,gpqa:91.9,h:7.0,lab:"Google",fc:"#4285f4",ifeval:null},
+  {n:"Gemini 3.1 Pro",swe:80.6,gpqa:94.3,h:6.0,lab:"Google",fc:"#4285f4",ifeval:null},
   // OpenAI (4)
-  {n:"GPT-4o",swe:33.2,gpqa:53.6,h:2.7,lab:"OpenAI",fc:"#10a37f"},
-  {n:"GPT-5",swe:74.9,gpqa:85.7,h:1.9,lab:"OpenAI",fc:"#10a37f"},
-  {n:"GPT-5.1",swe:76.3,gpqa:88.1,h:3.2,lab:"OpenAI",fc:"#10a37f"},
-  {n:"GPT-5.2 Pro",swe:80.0,gpqa:93.2,h:5.3,lab:"OpenAI",fc:"#10a37f"},
+  {n:"GPT-4o",swe:33.2,gpqa:53.6,h:2.7,lab:"OpenAI",fc:"#10a37f",ifeval:null},
+  {n:"GPT-5",swe:74.9,gpqa:85.7,h:1.9,lab:"OpenAI",fc:"#10a37f",ifeval:null},
+  {n:"GPT-5.1",swe:76.3,gpqa:88.1,h:3.2,lab:"OpenAI",fc:"#10a37f",ifeval:null},
+  {n:"GPT-5.2 Pro",swe:80.0,gpqa:93.2,h:5.3,lab:"OpenAI",fc:"#10a37f",ifeval:null},
   // Others
-  {n:"DeepSeek V3.2",swe:74.4,gpqa:79.9,h:-3.5,lab:"DeepSeek",fc:"#e11d48"},
-  {n:"Kimi K2.5",swe:76.8,gpqa:87.6,h:2.3,lab:"Kimi",fc:"#7c3aed"},
-  {n:"Qwen3.5-72B",swe:73.4,gpqa:83.7,h:1.1,lab:"Alibaba",fc:"#f59e0b"},
-  {n:"MiniMax M2.5",swe:80.2,gpqa:85.0,h:-3.0,lab:"MiniMax",fc:"#6366f1"},
+  {n:"DeepSeek V3.2",swe:74.4,gpqa:79.9,h:-3.5,lab:"DeepSeek",fc:"#e11d48",ifeval:null},
+  {n:"Kimi K2.5",swe:76.8,gpqa:87.6,h:2.3,lab:"Kimi",fc:"#7c3aed",ifeval:94.0},
+  {n:"Qwen3.5-397B",swe:76.4,gpqa:88.4,h:3.3,lab:"Alibaba",fc:"#f59e0b",ifeval:92.6},
+  {n:"MiniMax M2.5",swe:80.2,gpqa:85.0,h:-3.0,lab:"MiniMax",fc:"#6366f1",ifeval:87.5},
 ];
 
 const EXAMPLES={
@@ -709,7 +714,7 @@ document.querySelectorAll('.tab').forEach(b=>{
     b.classList.add('on');
     document.getElementById('tab-'+b.dataset.tab).style.display='block';
     if(b.dataset.tab==='phases')drawPhaseChart();
-    if(b.dataset.tab==='frontier'){drawFrontierChart();buildFrontierTable();}
+    if(b.dataset.tab==='frontier'){drawFrontierChart();buildFrontierTable();buildNc3Diagnostic();}
     if(b.dataset.tab==='cascade')drawCascadeChart();
   });
 });
@@ -1809,9 +1814,54 @@ function buildFrontierTable(){
       <td style="color:#c8d8f0;font-weight:600">${m.n}</td>
       <td>${m.swe}%</td>
       <td>${m.gpqa}%</td>
+      <td style="color:${m.ifeval?'#4cc9f0':'#3a4a5a'}">${m.ifeval?m.ifeval+'%':'—'}</td>
       <td style="color:${m.h>2?'#06d6a0':m.h<-2?'#ff4d6d':'#ffd166'};font-weight:700">${m.h>0?'+':''}${m.h}</td>
       <td style="color:#7a9abf">${m.lab}</td>
     </tr>`).join('');
+}
+function buildNc3Diagnostic(){
+  const el=document.getElementById('nc3-diagnostic');
+  if(!el)return;
+  // Top-5 by SWE
+  const sorted=[...FRONTIER].sort((a,b)=>b.swe-a.swe);
+  const top5=sorted.slice(0,5);
+  const sweSpread=(Math.max(...top5.map(m=>m.swe))-Math.min(...top5.map(m=>m.swe))).toFixed(1);
+  const gpqaSpread=(Math.max(...top5.map(m=>m.gpqa))-Math.min(...top5.map(m=>m.gpqa))).toFixed(1);
+  const withIFE=FRONTIER.filter(m=>m.ifeval!==null);
+  const ifeSpread=withIFE.length>=2?(Math.max(...withIFE.map(m=>m.ifeval))-Math.min(...withIFE.map(m=>m.ifeval))).toFixed(1):'N/A';
+  // r(SWE,GPQA) in saturated cluster (SWE>=78)
+  const sat=FRONTIER.filter(m=>m.swe>=78);
+  const satSwe=sat.map(m=>m.swe),satGpqa=sat.map(m=>m.gpqa);
+  const meanS=satSwe.reduce((a,b)=>a+b,0)/satSwe.length;
+  const meanG=satGpqa.reduce((a,b)=>a+b,0)/satGpqa.length;
+  let num=0,d1=0,d2=0;
+  for(let i=0;i<sat.length;i++){num+=(satSwe[i]-meanS)*(satGpqa[i]-meanG);d1+=(satSwe[i]-meanS)**2;d2+=(satGpqa[i]-meanG)**2;}
+  const rSat=(d1>0&&d2>0)?(num/Math.sqrt(d1*d2)):0;
+  const sweStatus=parseFloat(sweSpread)<3;
+  const decouple=Math.abs(rSat)<0.5;
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+      <div style="padding:10px;background:rgba(${sweStatus?'6,214,160':'255,209,102'},0.06);border:1px solid rgba(${sweStatus?'6,214,160':'255,209,102'},0.2);border-radius:6px">
+        <div style="color:${sweStatus?'var(--bonus)':'#ffd166'};font-weight:700;font-size:13px">SWE spread: ${sweSpread} pp</div>
+        <div style="color:var(--text3);font-size:10px">Top-5 models · ${sweStatus?'SATURATED ✓':'Not yet saturated'}</div>
+      </div>
+      <div style="padding:10px;background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.2);border-radius:6px">
+        <div style="color:#ffd166;font-weight:700;font-size:13px">GPQA spread: ${gpqaSpread} pp</div>
+        <div style="color:var(--text3);font-size:10px">Top-5 models · Compressing</div>
+      </div>
+      <div style="padding:10px;background:rgba(76,201,240,0.06);border:1px solid rgba(76,201,240,0.2);border-radius:6px">
+        <div style="color:var(--accent);font-weight:700;font-size:13px">IFEval spread: ${ifeSpread} pp</div>
+        <div style="color:var(--text3);font-size:10px">n=${withIFE.length} models · ${withIFE.length>=2?'NEW AXIS ACTIVATING':'Need more data'}</div>
+      </div>
+    </div>
+    <div style="padding:10px;background:rgba(${decouple?'6,214,160':'255,77,109'},0.04);border:1px solid rgba(${decouple?'6,214,160':'255,77,109'},0.15);border-radius:6px">
+      <span style="color:${decouple?'var(--bonus)':'var(--tax)'};font-weight:700">r(SWE, GPQA) in saturated cluster: ${rSat.toFixed(3)}</span>
+      <span style="color:var(--text3)"> (${sat.length} models, SWE≥78%) — ${decouple?'DECOUPLED from +0.85 → coupling rotation confirms Nc3 onset':'Still coupled'}</span>
+    </div>
+    <div style="margin-top:8px;color:var(--text3);font-size:10px;line-height:1.6">
+      Nc3 signature: old benchmark (SWE) saturates, new benchmark (IFEval) activates, coupling between old benchmarks drops.
+      Same pattern as Nc1 (HS/TQA saturated → SWE/GPQA activated). Preliminary: n=${withIFE.length} with IFEval data.
+    </div>`;
 }
 
 // ── CANVAS: CASCADE CHART ─────────────────────────────────

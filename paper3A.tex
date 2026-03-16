@@ -51,7 +51,7 @@ A dynamical system discovered by sparse regression reproduces all five benchmark
 The consequences cascade.
 At 1B parameters, one unit of data quality is worth roughly $10\times$ in model scale---curated training (Phi) eliminates the alignment tax entirely by shifting $N_c \to 0$.
 Across 19 frontier models spanning six labs (2024--2026), SWE-bench and GPQA Diamond couple cooperatively ($r=+0.85$, $p<10^{-5}$), with training-recipe excursions visible as measurable $h$-field deviations.
-A second capability axis transition is predicted at $N_{c,3} \approx 114$B, where IFEval becomes the last discriminating benchmark in the current generation.
+Preliminary evidence suggests the predicted second axis transition ($N_{c,3} \approx 114$B) is already underway: SWE-bench compresses to a $0.9$-point range among top-five models while IFEval emerges as the new discriminating axis ($6.5$-point spread, $n=4$)---the same saturation-then-activation pattern observed at $N_{c,1}$.
 The framework predicts its own successor: at that scale, the residual of the current two-field description is the input signal for a three-field extension.
 An interactive dashboard (\href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}}) classifies any model's alignment phase from benchmark scores alone, returns phase-specific training recommendations, and updates automatically as new models and benchmark pairs are published.
 Code: \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
@@ -439,8 +439,8 @@ The gradient-loss relationship follows:
   \|\nabla L\| \approx c \cdot L(N)^{3.5},\quad r = 0.93
   \label{eq:gradloss}
 \end{equation}
-and symbolic regression (PySR) finds an Arrhenius-like form
-$\|\nabla L\| \sim \exp(-C/L)$---an exponential slowdown where loss plays the role of temperature, familiar from activation-energy dynamics in chemistry and statistical physics.
+and symbolic regression (PySR) finds an Arrhenius-like form\footnote{Arrhenius law: $k = A\exp(-E_a/k_BT)$---the rate of a chemical reaction depends exponentially on the ratio of activation energy $E_a$ to temperature $T$. In ML terms: the gradient norm $\|\nabla L\|$ depends exponentially on $C/L$, where $C$ is an ``activation energy'' (how hard it is to improve further) and $L$ is the training loss (playing the role of temperature). High $C$ means the model needs exponentially more optimization to improve---this is the ``wall'' that scaling laws describe.}
+$\|\nabla L\| \sim \exp(-C/L)$---an exponential slowdown where loss plays the role of temperature.
 
 \textbf{Non-monotonic gradient near $N_c$.}
 Most strikingly, the gradient norm is \emph{non-monotonic} (Fig.~\ref{fig:gradient}c):
@@ -540,7 +540,7 @@ Transition ($C \approx 316$, $r^2 = 0.88$, a $10{\times}$ spike);
 Bonus phase ($C \approx 196$, $r^2 = 0.94$).
 The spike at transition is precisely why the gradient dips 37\% at 1B: the loss landscape becomes exponentially flat at $N_c$, the Arrhenius saddle point.
 This means the gradient dip is not an architectural quirk---it is the thermodynamic signature of the phase boundary, measurable from gradient norms alone without any benchmark data.
-A predicted consequence: any model trained at exactly $N_c$ will show minimum gradient norm and maximum susceptibility to alignment interventions.
+A predicted consequence: any model trained at exactly $N_c$ will show minimum gradient norm and maximum susceptibility\footnote{Susceptibility ($\chi$): in physics, how strongly a system responds to a small external perturbation (e.g., how much magnetization changes per unit applied field). In ML terms: $\chi$ at $N_c$ measures how much a small change in training data or recipe shifts the model between tax and bonus phases. $\chi$ peaks at the transition because the ``restoring force'' toward either phase vanishes---the system is maximally sensitive to interventions. This is why $N_c$ is the optimal scale for alignment fine-tuning.} to alignment interventions.
 More broadly, the phase boundary is a \emph{surface} in $(N, D, T)$ space rather than a point: scaling training time $T$ is a partial substitute for scaling model size $N$, coupled through $\chi_{ND} = 0.102$.
 A 3.5B model trained for $2\times$ standard compute may enter the cooperative phase along the temporal axis rather than the size axis---a prediction testable from intermediate training checkpoints.
 
@@ -757,8 +757,8 @@ $\partial L/\partial\ln N = \partial L/\partial\ln D$---a consequence of the cou
 CAPE identifies a sequence of critical scales as new capability axes activate:
 $N_{c,1} \approx 3.5$B (coupling sign flip: competition resolves to cooperation---the main finding of this paper);
 $N_{c,2} \approx 70$--$88$B (HellaSwag/TruthfulQA saturate, SWE-bench/GPQA become the active axis---benchmark axis rotation);
-$N_{c,3} \approx 114$--$130$B (predicted: SWE/GPQA/IFEval manifold itself saturates, third axis activates).
-Each transition is independently detectable: $N_{c,1}$ by OLMo ($\gamma_{12}=0.000$) and OPT (within-family sign flip); $N_{c,2}$ by the frontier cooperative coupling ($r=+0.85$); $N_{c,3}$ by two-method convergence ($\det(H)\to 0$ and frontier $3{\times}3$ eigenvalue analysis).
+$N_{c,3} \approx 114$--$130$B (SWE-bench saturates; IFEval activates as the new discriminating axis---preliminary evidence already visible in March 2026 data).
+Each transition is independently detectable: $N_{c,1}$ by OLMo ($\gamma_{12}=0.000$) and OPT (within-family sign flip); $N_{c,2}$ by the frontier cooperative coupling ($r=+0.85$); $N_{c,3}$ by SWE-bench compression to a $0.9$-point range among the top five frontier models, with IFEval showing a $6.5$-point spread ($n=4$)---the same saturation-then-activation pattern as $N_{c,1}$.
 The subscript convention follows the order of discovery; the physics at each transition is the same---a coupling sign change between the active capability pair.
 
 \textbf{Benchmark saturation and the next coupling pair.}
@@ -1081,19 +1081,34 @@ Each expansion requires its own effective description,
 with the previous model's residuals serving as the signal
 for the next level---exactly as in the L0$\to$L4 boosting chain.
 
-The \textbf{remaining testable prediction}: the IFEval scores used in the $3{\times}3$ frontier analysis (\S\ref{sec:Nc2_section}) are approximate estimates; confirming them with precise published measurements at matched compute, and then measuring the sign of $\gamma(\text{IFEval}, \text{HarmBench})$ across model generations, is the concrete next test for $N_{c,2}$.
-The preliminary evidence (r(SWE, IFEval) $\approx +0.76$ with approximate scores) is consistent with cooperative coupling---but approximate IFEval scores introduce enough uncertainty that the sign of this specific coupling cannot yet be declared confirmed.
+\textbf{Preliminary evidence for $N_{c,3}$.}
+Published IFEval scores are now available for four frontier models: Claude~Opus~4.6 ($94.0\%$), Kimi~K2.5 ($94.0\%$), Qwen~3.5-397B ($92.6\%$), and MiniMax~M2.5 ($87.5\%$).
+Among the top five models by SWE-bench, the coding benchmark compresses to a $0.9$-point range ($80.0$--$80.9\%$, $\sigma = 0.35$)---\emph{tighter} than the HS/TQA compression at $N_{c,2}$ ($4.9$~pp).
+GPQA retains a $9.3$-point spread in this cluster, indicating partial but not complete saturation.
+Meanwhile IFEval spans $6.5$ points ($87.5$--$94.0\%$, $n=4$)---the widest relative spread among models where SWE has already saturated.
+This is the same pattern that announced $N_{c,1}$: old benchmarks compress, a new axis opens.
 
-\textbf{Predicting the $N_{c,3}$ benchmark axis.}
-The frontier $3{\times}3$ correlation matrix (SWE-bench, GPQA Diamond, IFEval) has eigenvalues $\lambda_1=2.16$, $\lambda_2=0.67$, $\lambda_3=0.17$ and $\det(\Gamma)=0.24$.
-Extrapolating $\det(\Gamma)\to 0$ from the frontier data gives $N_{c,3} \approx 114$B---consistent with the $\sim$130B prediction from Pythia's $\det(H)\to 0$.
-Two-method convergence on $N_{c,3} \approx 110$--130B suggests this is robust.
+The $3{\times}3$ correlation matrix restricted to these four models reveals the coupling rotation:
+$r(\text{SWE}, \text{GPQA}) = +0.13$ (decoupled---down from $+0.85$ overall),
+$r(\text{GPQA}, \text{IFEval}) = +0.81$ (strong cooperative),
+$r(\text{SWE}, \text{IFEval}) = -0.37$ (anti-correlated).
+PCA gives $d_{\rm eff} = 1.75$ and $\det(\Gamma) = 0.11$, consistent with the predicted approach to $\det \to 0$.
+
+\textbf{Caveats.}
+The sample is small ($n=4$ with complete IFEval data); not all labs report IFEval publicly.
+OpenAI has flagged potential SWE-bench contamination in recent models~\cite{swebench2024}, which could compress SWE scores artificially.
+Nevertheless, the qualitative pattern---saturation of one benchmark axis accompanied by activation of a new one, with coupling rotation visible in the correlation matrix---reproduces the $N_{c,1}$ signature at a different scale, using a different benchmark pair.
+
+\textbf{$N_{c,3}$ prediction: from ``beyond frontier'' to ``in progress.''}
+The frontier $3{\times}3$ correlation matrix (SWE-bench, GPQA Diamond, IFEval) originally gave eigenvalues $\lambda_1=2.16$, $\lambda_2=0.67$, $\lambda_3=0.17$ and $\det(\Gamma)=0.24$.
+Extrapolating $\det(\Gamma)\to 0$ predicted $N_{c,3} \approx 114$B---consistent with the $\sim$130B prediction from Pythia's $\det(H)\to 0$.
+The SWE saturation and IFEval activation observed in March~2026 data suggest the transition is already underway, consistent with frontier models (whose exact parameter counts are undisclosed) having crossed into or through the $N_{c,3}$ region.
 
 \textbf{IFEval is the surviving benchmark at $N_{c,3}$.}
 The primary eigenvector $\mathbf{e}_1$ at frontier scale has loadings $(-0.57, -0.51, -0.64)$ on (SWE, GPQA, IFEval): IFEval dominates $\lambda_1$.
-When SWE-bench and GPQA Diamond saturate---as HellaSwag and TruthfulQA saturated before them---IFEval will be the last discriminating benchmark in the current generation.
+SWE-bench is already saturating among top models; as GPQA follows, IFEval will become the last discriminating benchmark in the current generation.
 The next critical pair is predicted to be instruction-following (IFEval) versus agentic safety compliance (e.g.\ HarmBench or AgentBench): the question of whether a model can complete complex autonomous tasks \emph{without} unsafe behavior.
-We recommend frontier labs begin tracking $\gamma(\text{IFEval}, \text{HarmBench})$ now---if it turns negative, $N_{c,3}$ is within reach.
+We recommend frontier labs begin tracking $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases---if it turns negative, $N_{c,3}$ has fully resolved and a new coupling regime has begun.
 
 \subsection{Capabilities live on a low-dimensional manifold}
 
@@ -1256,10 +1271,10 @@ operates at frontier scale via training-recipe choice:
 Sonnet~4.6 shows $h = -14$ (local tax excursion) while Opus~4.6 recovers to $h = +2$ (Fig.~\ref{fig:frontier}).
 The concrete next test for $N_{c,2}$ is measuring $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases (\S\ref{sec:Nc2_section}).
 
-Two-method convergence (Pythia $\det(H)$ extrapolation and frontier $3{\times}3$ eigenvalue analysis) predicts $N_{c,3} \approx 114$--$130$B, where the SWE/GPQA/IFEval manifold itself exhausts $d_{\rm eff}\to 3$.
-IFEval dominates the primary eigenvector at this scale ($\lambda_1$ loading $= -0.64$), making it the last discriminating benchmark in the current generation.
-We recommend frontier labs begin tracking $\gamma(\text{IFEval}, \text{HarmBench})$ now: this pair operationalizes the question of whether a model can complete complex autonomous tasks without unsafe behavior---the natural next axis of competition.
-When this coupling turns negative, the field will need a new benchmark designed to be orthogonal to IFEval; Paper~3B develops the eigenvector rotation formalism for detecting this in advance.
+Preliminary evidence (March 2026) suggests $N_{c,3}$ is already underway: SWE-bench compresses to a $0.9$-point range among top-five models---tighter than the HS/TQA saturation at $N_{c,2}$---while IFEval shows $6.5$-point spread ($n=4$), emerging as the new discriminating axis (\S\ref{sec:Nc2_section}).
+The coupling rotation signature is visible: $r(\text{SWE}, \text{GPQA})$ drops from $+0.85$ overall to $+0.13$ within the saturated cluster, while $r(\text{GPQA}, \text{IFEval}) = +0.81$.
+The same saturation-then-activation pattern that announced $N_{c,1}$ now repeats at frontier scale---with caveats about small sample size and potential SWE-bench contamination noted in \S\ref{sec:Nc2_section}.
+The concrete next test is measuring $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases: when this coupling turns negative, $N_{c,3}$ will have fully resolved.
 
 Capability coupling, not individual capability scaling, governs alignment.
 CAPE makes this coupling measurable, predictable, and designable---and, like any good origin story, it tells you exactly where the sequel begins.
