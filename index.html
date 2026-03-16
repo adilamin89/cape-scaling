@@ -400,6 +400,66 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   </div>
 
   <div class="card">
+    <div class="card-title">Symmetry Evolution <span>— Ising → U(1) → O(3) → O(4)</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-family:var(--font-mono);font-size:10px;line-height:1.6">
+      <div style="padding:10px;background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.15);border-radius:6px">
+        <div style="color:#ffd166;font-weight:700;font-size:12px">Nc1 ≈ 3.5B</div>
+        <div style="color:var(--text2);margin-top:4px"><b style="color:#ffd166">Ising</b> symmetry</div>
+        <div style="color:var(--text3)">d_eff ≈ 1 • 1 axis</div>
+        <div style="color:var(--text3)">HS ↔ TQA coupling flip</div>
+        <div style="color:var(--text3)">Tax → Bonus</div>
+      </div>
+      <div style="padding:10px;background:rgba(76,201,240,0.06);border:1px solid rgba(76,201,240,0.15);border-radius:6px">
+        <div style="color:var(--accent);font-weight:700;font-size:12px">Nc2 ≈ 70–88B</div>
+        <div style="color:var(--text2);margin-top:4px"><b style="color:var(--accent)">U(1)</b> / XY model</div>
+        <div style="color:var(--text3)">d_eff → 2 • 2 axes</div>
+        <div style="color:var(--text3)">SWE ↔ GPQA activate</div>
+        <div style="color:var(--text3)">h = GPQA − 0.79·SWE − 24.7</div>
+      </div>
+      <div style="padding:10px;background:rgba(123,47,255,0.06);border:1px solid rgba(123,47,255,0.15);border-radius:6px">
+        <div style="color:#7b2fff;font-weight:700;font-size:12px">Nc3 ≈ 114–130B</div>
+        <div style="color:var(--text2);margin-top:4px"><b style="color:#7b2fff">O(3)</b> / Heisenberg</div>
+        <div style="color:var(--text3)">d_eff → 3 • 3 axes</div>
+        <div style="color:var(--text3)">IFEval activates</div>
+        <div style="color:var(--text3)">h₃ = IFE − 0.97·GPQA − 6.8</div>
+      </div>
+      <div style="padding:10px;background:rgba(200,200,200,0.04);border:1px dashed rgba(200,200,200,0.15);border-radius:6px">
+        <div style="color:#8aa8c8;font-weight:700;font-size:12px">Nc4 ~ 200–400B</div>
+        <div style="color:var(--text2);margin-top:4px"><b style="color:#8aa8c8">O(4)</b> predicted</div>
+        <div style="color:var(--text3)">d_eff → 4 • 4 axes</div>
+        <div style="color:var(--text3)">HLE / AgentBench?</div>
+        <div style="color:var(--text3)">Topological protection</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;color:var(--text3);font-size:10px;line-height:1.5;font-family:var(--font-mono)">
+      Each transition expands the symmetry group and rotates the h-field. At O(3), topological protection of the cooperative phase becomes possible (hedgehog defects replace vortex lines).
+      Coding-specialist models (Sonnet 4.6, Codex) are vortex excursions in capability space — localised disruptions that the bulk cooperative condensate tolerates.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Nc3 Coupling Relation <span>— h-field rotation from SWE-GPQA to GPQA-IFEval</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-family:var(--font-mono);font-size:11px">
+      <div style="padding:10px;background:rgba(76,201,240,0.04);border:1px solid rgba(76,201,240,0.12);border-radius:6px">
+        <div style="color:var(--accent);font-weight:700;margin-bottom:4px">Nc2 regime (SWE-GPQA)</div>
+        <div style="color:var(--text2)">GPQA = 0.79·SWE + 24.7</div>
+        <div style="color:var(--text3)">r = +0.85 (n=19) • h₂ = GPQA − fit</div>
+        <div style="color:var(--text3);margin-top:4px">Active pair: coding vs reasoning</div>
+      </div>
+      <div style="padding:10px;background:rgba(123,47,255,0.04);border:1px solid rgba(123,47,255,0.12);border-radius:6px">
+        <div style="color:#7b2fff;font-weight:700;margin-bottom:4px">Nc3 regime (GPQA-IFEval)</div>
+        <div style="color:var(--text2)">IFEval = 0.97·GPQA + 6.8</div>
+        <div style="color:var(--text3)">r = +0.81 (n=4) • h₃ = IFEval − fit</div>
+        <div style="color:var(--text3);margin-top:4px">Active pair: reasoning vs instruction-following</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;color:var(--text3);font-size:10px;line-height:1.5;font-family:var(--font-mono)">
+      The h-field rotates at each Nc: the discriminating benchmark pair changes, and the coupling relation shifts to the new active axis.
+      At Nc3, SWE saturates and drops out; the coupling that matters becomes GPQA ↔ IFEval.
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title">Frontier Table <span>— h(D) field + IFEval per model</span></div>
     <table class="tbl">
       <thead><tr><th>Model</th><th>SWE (%)</th><th>GPQA (%)</th><th>IFEval (%)</th><th>h(D)</th><th>Lab</th></tr></thead>

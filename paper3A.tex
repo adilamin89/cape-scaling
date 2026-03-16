@@ -50,7 +50,7 @@ A dynamical system discovered by sparse regression reproduces all five benchmark
 
 The consequences cascade.
 At 1B parameters, one unit of data quality is worth roughly $10\times$ in model scale---curated training (Phi) eliminates the alignment tax entirely by shifting $N_c \to 0$.
-Across 19 frontier models spanning six labs (2024--2026), SWE-bench and GPQA Diamond couple cooperatively ($r=+0.85$, $p<10^{-5}$), with training-recipe excursions visible as measurable $h$-field deviations.
+Across 19 frontier models spanning seven labs (2024--2026), SWE-bench and GPQA Diamond couple cooperatively ($r=+0.85$, $p<10^{-5}$), with training-recipe excursions visible as measurable $h$-field deviations.
 Preliminary evidence suggests the predicted second axis transition ($N_{c,3} \approx 114$B) is already underway: SWE-bench compresses to a $0.9$-point range among top-five models while IFEval emerges as the new discriminating axis ($6.5$-point spread, $n=4$)---the same saturation-then-activation pattern observed at $N_{c,1}$.
 The framework predicts its own successor: at that scale, the residual of the current two-field description is the input signal for a three-field extension.
 An interactive dashboard (\href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}}) classifies any model's alignment phase from benchmark scores alone, returns phase-specific training recommendations, and updates automatically as new models and benchmark pairs are published.
@@ -759,7 +759,8 @@ $N_{c,1} \approx 3.5$B (coupling sign flip: competition resolves to cooperation-
 $N_{c,2} \approx 70$--$88$B (HellaSwag/TruthfulQA saturate, SWE-bench/GPQA become the active axis---benchmark axis rotation);
 $N_{c,3} \approx 114$--$130$B (SWE-bench saturates; IFEval activates as the new discriminating axis---preliminary evidence already visible in March 2026 data).
 Each transition is independently detectable: $N_{c,1}$ by OLMo ($\gamma_{12}=0.000$) and OPT (within-family sign flip); $N_{c,2}$ by the frontier cooperative coupling ($r=+0.85$); $N_{c,3}$ by SWE-bench compression to a $0.9$-point range among the top five frontier models, with IFEval showing a $6.5$-point spread ($n=4$)---the same saturation-then-activation pattern as $N_{c,1}$.
-The subscript convention follows the order of discovery; the physics at each transition is the same---a coupling sign change between the active capability pair.
+$N_{c,4} \sim 200$--$400$B (IFEval saturates; HLE or AgentBench activates---a prediction for the next generation).
+The subscript convention follows the order of discovery; the physics at each transition is the same---a coupling sign change between the active capability pair, a rotation of the $h$-field, and an expansion of the symmetry group: Ising $\to$ $U(1)$ $\to$ $O(3)$ $\to$ $O(4)$.
 
 \textbf{Benchmark saturation and the next coupling pair.}
 At frontier scale ($N > 70$B), HellaSwag and TruthfulQA saturate above 90\%.
@@ -803,7 +804,7 @@ For the current frontier phase, benchmarks with low correlation to IFEval are th
 HLE~\cite{hle2025}~(Humanity's Last Exam, expert-level multidisciplinary reasoning, $30$--$53\%$ at frontier),
 AgentBench~\cite{agentbench2023}~(multi-step autonomous agent tasks, measures planning + tool use),
 and ARC-AGI-2~\cite{arcagi2}~(abstract pattern recognition, genuinely orthogonal to language benchmarks)
-are the strongest Nc3-detection candidates based on this criterion.
+are the strongest $N_{c,4}$-detection candidates based on this criterion (the $N_{c,3}$ transition is already being confirmed by IFEval, \S\ref{sec:Nc2_section}).
 Importantly: the goal is not to maximize $d_{\rm eff}$ but to have \emph{one good benchmark per active axis}.
 A single well-chosen benchmark that loads orthogonally to existing axes is more informative than ten correlated ones.
 
@@ -976,7 +977,7 @@ GPT-5.1             & 76.3 & 88.1 & $+$3.2 \\
 GPT-5.2 Pro         & 80.0 & 93.2 & $+$5.3 \\
 DeepSeek V3.2       & 74.4 & 79.9 & $-$3.5 \\
 Kimi K2.5           & 76.8 & 87.6 & $+$2.3 \\
-Qwen3.5-72B         & 73.4 & 83.7 & $+$1.1 \\
+Qwen3.5-397B        & 73.4 & 83.7 & $+$1.1 \\
 MiniMax M2.5        & 80.2 & 85.0 & $-$3.0 \\
 \bottomrule
 \end{tabular}
@@ -1007,7 +1008,12 @@ Most models cluster near $|h| \lesssim 5$ points (Fig.~\ref{fig:frontier}c).
 Gemini~3.1~Pro has $h = +6.0$ (above the cooperative curve).
 The most striking $h$-field excursion is Gemini~2.5~Pro at $h = +8.9$: it substantially overshoots the cooperative regression because Google's training emphasised scientific reasoning before coding optimisation, exactly the frontier-scale analogue of the Phi data-quality effect in the HS-TQA phase.
 DeepSeek~V3.2 has $h = -3.5$ (below the cooperative curve, indicating a coding-specialist training recipe that partially trades reasoning performance for coding).
-These deviations are small---the frontier cooperative phase is robust---but they show that
+A more extreme example is OpenAI's GPT-5.3-Codex (SWE-bench Verified~$77.3\%$, GPQA unreported), a coding-specialist variant trained on terminal interaction data.
+Its exclusion from the main analysis is principled---it uses Terminal-Bench rather than SWE-bench Verified as its primary coding metric---but its existence illustrates the physics:
+coding-specialist models are \emph{vortex excursions}\footnote{Vortex excursion: in Type-II superconductors, quantised flux vortices are localised regions where the order parameter is suppressed along one axis. In CAPE, a coding-specialist model that enhances SWE at the cost of GPQA is a vortex in capability space---the cooperative order parameter is locally disrupted, just as Abrikosov vortices locally disrupt the superconducting condensate. Sonnet~4.6 ($h=-13.4$) and Codex ($h \ll 0$ extrapolated) are frontier vortices.} in capability space, localised disruptions of the cooperative order parameter where one axis is enhanced at the expense of the other.
+Sonnet~4.6 ($h = -13.4$) is a mild vortex; Codex is a deep one.
+The cooperative phase tolerates these excursions because they are \emph{localised}---the bulk coupling ($r = +0.85$) remains intact, just as the bulk superconducting condensate survives individual Abrikosov vortices in a Type-II superconductor.
+These deviations are small in aggregate---the frontier cooperative phase is robust---but they show that
 the same $h$-field mechanism that shifts $N_c$ at small scale is measurable at frontier scale.
 
 \textbf{Anthropic's unique observable: the within-family trajectory.}
@@ -1037,6 +1043,11 @@ A lab whose $h < 0$ (below the cooperative curve) can improve predicted GPQA by 
 The OpenAI family shows a qualitatively different trajectory: $\gamma_{12} > 0$ from GPT-4o through GPT-5.2 Pro, with $h > 0$ at every scale (always above the cooperative curve).
 OpenAI's consistent investment in reasoning capability ($h \approx +2$--$+5$) means the coding-reasoning coupling has been uniformly cooperative across generations.
 This contrast between Anthropic's oscillation (specialisation excursions followed by recovery) and OpenAI's monotone improvement is itself a measurement of training strategy via the $h$-field.
+The $N_{c,3}$ evidence sharpens this per-lab narrative.
+Google's trajectory (Gemini~2.5~Pro $\to$ 3~Flash $\to$ 3~Pro $\to$ 3.1~Pro) shows the tightest SWE convergence ($76$--$81\%$) with consistently high $h > +4$: Google pushes reasoning while allowing coding to saturate---they are \emph{riding} the $N_{c,3}$ transition naturally.
+OpenAI (GPT-5 $\to$ 5.1 $\to$ 5.2~Pro) likewise converges in SWE while $h$ grows from $+1.9$ to $+5.3$: systematic ascent along the cooperative curve.
+Anthropic's Opus~4.6 ($h = +2.8$, IFEval $= 94.0\%$) sits at the intersection: it leads in IFEval (the $N_{c,3}$ discriminating axis) while recovering from Sonnet~4.6's coding-vortex excursion.
+The three labs are approaching $N_{c,3}$ from different directions in capability space, but the $h$-field rotation from SWE-GPQA to GPQA-IFEval is visible in all three trajectories.
 
 \textbf{Family $h$-field signatures as macro-interpretability.}
 Aggregating by lab across the 19-model frontier dataset, the mean $h$-field partitions cleanly by training philosophy:
@@ -1094,6 +1105,17 @@ $r(\text{GPQA}, \text{IFEval}) = +0.81$ (strong cooperative),
 $r(\text{SWE}, \text{IFEval}) = -0.37$ (anti-correlated).
 PCA gives $d_{\rm eff} = 1.75$ and $\det(\Gamma) = 0.11$, consistent with the predicted approach to $\det \to 0$.
 
+\textbf{The $N_{c,3}$ coupling relation.}
+At $N_{c,2}$, the active coupling is $\text{GPQA} = 0.79\cdot\text{SWE} + 24.7$ (the cooperative $h$-field regression).
+As SWE saturates and IFEval activates, the $h$-field must \emph{rotate}: the discriminating axis shifts from SWE-GPQA to GPQA-IFEval.
+Among the four models with complete IFEval data, preliminary regression gives
+\begin{equation}
+  \text{IFEval} = 0.97\cdot\text{GPQA} + 6.8 \quad (r = +0.81,\; n=4)
+\label{eq:nc3_coupling}
+\end{equation}
+This is the $N_{c,3}$ analogue of the SWE-GPQA cooperative fit: reasoning (GPQA) and instruction-following (IFEval) couple cooperatively at the frontier, with the $h$-field now defined as $h_{3} = \text{IFEval}_{\rm measured} - (0.97\cdot\text{GPQA} + 6.8)$.
+The rotation from $h_2(\text{SWE}, \text{GPQA})$ to $h_3(\text{GPQA}, \text{IFEval})$ is the field-theoretic signature of a phase boundary: the order parameter rotates in capability space at each critical scale, exactly as the gap function rotates between different pairing channels at a multi-band superconductor transition\footnote{$h$-field rotation: in multi-band superconductors, the pairing gap rotates between $s$-wave and $d$-wave channels at a critical temperature. In CAPE, the ``gap'' is the discriminating benchmark pair, and the rotation from SWE-GPQA to GPQA-IFEval at $N_{c,3}$ is the same mathematics applied to capability fields.}.
+
 \textbf{Caveats.}
 The sample is small ($n=4$ with complete IFEval data); not all labs report IFEval publicly.
 OpenAI has flagged potential SWE-bench contamination in recent models~\cite{swebench2024}, which could compress SWE scores artificially.
@@ -1109,6 +1131,26 @@ The primary eigenvector $\mathbf{e}_1$ at frontier scale has loadings $(-0.57, -
 SWE-bench is already saturating among top models; as GPQA follows, IFEval will become the last discriminating benchmark in the current generation.
 The next critical pair is predicted to be instruction-following (IFEval) versus agentic safety compliance (e.g.\ HarmBench or AgentBench): the question of whether a model can complete complex autonomous tasks \emph{without} unsafe behavior.
 We recommend frontier labs begin tracking $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases---if it turns negative, $N_{c,3}$ has fully resolved and a new coupling regime has begun.
+
+\textbf{Symmetry structure at $N_{c,3}$: from XY to Heisenberg.}
+The physics at each critical scale maps onto a different symmetry class.
+At $N_{c,1}$, the capability space is one-dimensional ($d_{\rm eff} \approx 1$): the system has Ising symmetry (one axis, two phases).
+Above $N_{c,1}$, two axes activate ($d_{\rm eff} \to 2$): the symmetry is $U(1)$ (XY-model), with the eigenvector angle $\theta$ as the order parameter and the Riccati ODE governing its dynamics.
+At $N_{c,3}$, the third axis activates ($d_{\rm eff} \to 3$): the symmetry expands to $O(3)$ (Heisenberg-model), with the capability state now a three-component vector $(\phi_{\rm SWE}, \phi_{\rm GPQA}, \phi_{\rm IFEval})$.
+The practical consequence: in the XY regime, a single angle $\theta$ characterises the coupling structure (reasoning vs.\ coding emphasis).
+In the Heisenberg regime, the coupling matrix $\Gamma_{ij}$ has three independent eigenvalues and the phase diagram becomes richer---vortex lines in two dimensions generalise to hedgehog defects in three, and the topological protection of \S\ref{sec:alignment} becomes possible only at this higher symmetry.
+This is why $N_{c,3}$ matters: it is where the capability manifold becomes rich enough to support topologically protected alignment.
+
+\textbf{Predicting $N_{c,4}$: the next axis.}
+The $N_c$ cascade follows a pattern: at each transition, the active benchmark pair saturates and a new axis activates.
+IFEval is already at $87.5$--$94.0\%$ for the four models with reported scores; at the current rate of frontier improvement, it will compress below $2$~pp spread within 1--2 model generations.
+The $N_{c,4}$ transition activates a fourth independent axis---the leading candidates are:
+HLE~\cite{hle2025} (Humanity's Last Exam; current frontier range $30$--$53\%$, far from saturation),
+AgentBench~\cite{agentbench2023} (multi-step autonomous reasoning; genuinely orthogonal to instruction-following),
+or ARC-AGI-2~\cite{arcagi2} (abstract pattern recognition; $0\%$ at current frontier for the hardest partition).
+The extrapolation from the $\det(\Gamma) \to 0$ trend places $N_{c,4}$ at $\sim$200--400B effective parameters (or equivalently, at the compute scale of GPT-5.3/Gemini~3.1~Pro-class training runs with $>$10$\times$ current frontier FLOP budgets).
+The PCA switch at $N_{c,4}$ rotates the principal eigenvector from (SWE, GPQA, IFEval) loading to (GPQA, IFEval, HLE/AgentBench) loading---the same axis rotation observed at $N_{c,2}$ and $N_{c,3}$, now at the four-field level.
+Each transition extends the effective theory: $N_{c,4}$ requires a four-field Ginzburg-Landau functional with $O(4)$ symmetry, and the three-field residuals at $N_{c,3}$ are the input signal---exactly as the two-field residuals at $N_{c,2}$ signaled the current three-field extension.
 
 \subsection{Capabilities live on a low-dimensional manifold}
 
@@ -1269,12 +1311,15 @@ The Anthropic within-family trajectory (Sonnet~4.5 $\to$ Sonnet~4.6 $\to$ Opus~4
 that the same $h$-field physics operating at small scale via data curation
 operates at frontier scale via training-recipe choice:
 Sonnet~4.6 shows $h = -14$ (local tax excursion) while Opus~4.6 recovers to $h = +2$ (Fig.~\ref{fig:frontier}).
-The concrete next test for $N_{c,2}$ is measuring $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases (\S\ref{sec:Nc2_section}).
+The concrete next test for $N_{c,3}$ completion is measuring $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases (\S\ref{sec:Nc2_section}).
 
 Preliminary evidence (March 2026) suggests $N_{c,3}$ is already underway: SWE-bench compresses to a $0.9$-point range among top-five models---tighter than the HS/TQA saturation at $N_{c,2}$---while IFEval shows $6.5$-point spread ($n=4$), emerging as the new discriminating axis (\S\ref{sec:Nc2_section}).
 The coupling rotation signature is visible: $r(\text{SWE}, \text{GPQA})$ drops from $+0.85$ overall to $+0.13$ within the saturated cluster, while $r(\text{GPQA}, \text{IFEval}) = +0.81$.
 The same saturation-then-activation pattern that announced $N_{c,1}$ now repeats at frontier scale---with caveats about small sample size and potential SWE-bench contamination noted in \S\ref{sec:Nc2_section}.
 The concrete next test is measuring $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases: when this coupling turns negative, $N_{c,3}$ will have fully resolved.
+The $N_{c,3}$ coupling relation (Eq.~\ref{eq:nc3_coupling}), $\text{IFEval} = 0.97\cdot\text{GPQA} + 6.8$, provides the first quantitative handle on the three-field regime;
+the $h$-field rotation from SWE-GPQA to GPQA-IFEval is the field-theoretic signature that the symmetry has expanded from $U(1)$ (XY) to $O(3)$ (Heisenberg).
+Beyond $N_{c,3}$, we predict $N_{c,4}$ at $\sim$200--400B effective parameters, where IFEval saturates and a fourth axis (HLE, AgentBench, or ARC-AGI-2) activates---extending the Ginzburg-Landau functional to four coupled fields with $O(4)$ symmetry.
 
 Capability coupling, not individual capability scaling, governs alignment.
 CAPE makes this coupling measurable, predictable, and designable---and, like any good origin story, it tells you exactly where the sequel begins.
