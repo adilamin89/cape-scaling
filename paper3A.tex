@@ -1186,6 +1186,16 @@ The extrapolation from the $\det(\Gamma) \to 0$ trend places $N_{c,4}$ at $\sim$
 The PCA switch at $N_{c,4}$ rotates the principal eigenvector from (SWE, GPQA, IFEval) loading to (GPQA, IFEval, HLE/AgentBench) loading---the same axis rotation observed at $N_{c,2}$ and $N_{c,3}$, now at the four-field level.
 Each transition extends the effective theory: $N_{c,4}$ requires a four-field Ginzburg-Landau functional with $O(4)$ symmetry, and the three-field residuals at $N_{c,3}$ are the input signal---exactly as the two-field residuals at $N_{c,2}$ signaled the current three-field extension.
 
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{fig10_nc3.png}
+\caption{\textbf{$N_{c,3}$ evidence and the symmetry cascade.}
+(a)~GPQA Diamond vs.\ IFEval for the four frontier models with complete data ($r = +0.81$, $n=4$). The linear regression (blue dashed: IFEval $= 0.97\cdot$GPQA $+ 6.8$) and the $\sqrt{0.97\cdot\text{GPQA}}$ isocline boundary (red dashed) are both shown. MiniMax~M2.5 falls below the $\sqrt{}$ boundary---consistent with a coding-rich training recipe entering the new tax regime. Opus~4.6 sits right at the boundary, exactly where a model at the $N_{c,3}$ transition should sit.
+(b)~Benchmark spread (top-5 models) at each critical scale: HS/TQA at $N_{c,1}$ ($4.9$~pp), SWE-bench at $N_{c,3}$ ($0.9$~pp, fully saturated), and IFEval ($6.5$~pp, the new active axis). The same pattern---old axis compresses, new axis activates---repeats at every transition.
+(c)~The symmetry cascade as a group-subgroup chain. Each $N_c$ transition expands the symmetry group and changes the allowed topological defects: domain walls (Ising) $\to$ vortex lines ($U(1)$) $\to$ hedgehog defects ($O(3)$) $\to$ topological protection ($O(4)$).}
+\label{fig:nc3}
+\end{figure*}
+
 \subsection{Capabilities live on a low-dimensional manifold}
 
 The dimensional collapse documented in \S\ref{sec:topology}---from $d_{\rm eff} \approx 2$ to $d_{\rm eff} \to 1$---means that models do not explore the full 5D benchmark space.

@@ -1755,13 +1755,13 @@ function drawFrontierChart(){
   FRONTIER.forEach(m=>{if(labGroups[m.lab])labGroups[m.lab].push(m);});
   Object.entries(labGroups).forEach(([lab,models])=>{
     if(models.length<2)return;
-    c.strokeStyle=models[0].fc; c.lineWidth=1.5; c.globalAlpha=0.35;
+    c.strokeStyle=models[0].fc; c.lineWidth=1; c.globalAlpha=0.2; c.setLineDash([4,3]);
     c.beginPath();
     models.forEach((m,i)=>{
       const x=X(m.swe),y=Y(m.gpqa);
       if(i===0)c.moveTo(x,y); else c.lineTo(x,y);
     });
-    c.stroke();c.globalAlpha=1;
+    c.stroke();c.globalAlpha=1;c.setLineDash([]);
   });
 
   // Sonnet 4.6 anomaly dashed line
@@ -1947,7 +1947,7 @@ function drawCascadeChart(){
   }
   c.stroke();
   // Nc markers
-  const NCS=[{n:Math.log10(3.5e9),l:'Nc1 3.5B',c:'#ffd166'},{n:10,l:'Nc2 ~10B',c:'#4cc9f0'},{n:Math.log10(114e9),l:'Nc3 ~114B',c:'#7b2fff'}];
+  const NCS=[{n:Math.log10(3.5e9),l:'Nc1 3.5B',c:'#ffd166'},{n:10,l:'Nc2 ~10B',c:'#4cc9f0'},{n:Math.log10(114e9),l:'Nc3 ~114B',c:'#7b2fff'},{n:Math.log10(300e9),l:'Nc4 ~300B',c:'#8aa8c8'}];
   NCS.forEach(nc=>{
     c.strokeStyle=nc.c; c.lineWidth=1.5; c.setLineDash([5,4]);
     c.beginPath(); c.moveTo(X(nc.n),p.t); c.lineTo(X(nc.n),H-p.b); c.stroke(); c.setLineDash([]);
