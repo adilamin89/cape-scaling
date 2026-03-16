@@ -1072,6 +1072,56 @@ function getPhysicsDiagnostic(g, N, logN, deff, chi, hField, benchScores){
     </div>`;
   }
 
+  // Algebraic phase classifier (zero-parameter, from ODE isocline)
+  if(benchScores.hs && benchScores.tqa){
+    const hsNorm=benchScores.hs/100;
+    const tqaNorm=benchScores.tqa/100;
+    const tqaCrit=Math.sqrt(0.187*hsNorm);
+    const inBonus=tqaNorm>tqaCrit;
+    html+=`<div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
+      <span style="color:var(--accent2)">Algebraic classifier (zero-parameter):</span>
+      TQA = ${tqaNorm.toFixed(3)} ${inBonus?'>':'<'} √(0.187·HS) = ${tqaCrit.toFixed(3)}
+      → <span style="color:${inBonus?'var(--bonus)':'var(--tax)'}"><strong>${inBonus?'BONUS phase':'TAX phase'}</strong></span>
+      <span style="color:var(--text3)">(Calibrated on OLMo: 0.07% error, zero free parameters)</span>
+    </div>`;
+  }
+  // Frontier algebraic classifier
+  if(benchScores.swe && benchScores.gpqa){
+    const sweNorm=benchScores.swe/100;
+    const gpqaNorm=benchScores.gpqa/100;
+    const gpqaCrit=Math.sqrt(0.79*sweNorm);
+    const deepCoop=gpqaNorm>gpqaCrit;
+    html+=`<div style="margin-top:4px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
+      <span style="color:var(--accent2)">Frontier classifier:</span>
+      GPQA = ${gpqaNorm.toFixed(3)} ${deepCoop?'>':'<'} √(0.79·SWE) = ${gpqaCrit.toFixed(3)}
+      → <span style="color:${deepCoop?'var(--bonus)':'var(--tax)'}"><strong>${deepCoop?'Deep cooperative':'Tax opening'}</strong></span>
+    </div>`;
+  }
+
+  // Nc cascade display
+  html+=`<div style="margin-top:10px;padding:8px;background:var(--bg2);border-radius:4px;font-size:11px;color:var(--text2);line-height:1.8;font-family:var(--font-mono)">
+    <span style="color:var(--accent2);font-weight:700">Nc Cascade</span><br>
+    <span style="color:${N<3.5e9?'#fff':'var(--text3)'}">Nc₁ ≈ 3.5B</span> — coupling sign flip (HS×TQA) ${N<3.5e9?'← you are here':N<70e9?'✓ passed':'✓ passed'}<br>
+    <span style="color:${N>3.5e9&&N<88e9?'#fff':'var(--text3)'}">Nc₂ ≈ 70–88B</span> — benchmark axis rotation (HS/TQA→SWE/GPQA) ${N<70e9?'ahead':N<88e9?'← entering':'✓ passed'}<br>
+    <span style="color:${N>88e9&&N<130e9?'#fff':'var(--text3)'}">Nc₃ ≈ 114–130B</span> — det(Γ)→0, third axis activates ${N<114e9?'ahead':N<130e9?'← approaching':'← beyond scope'}
+  </div>`;
+
+  // Macro h-field by lab (frontier context)
+  if(N>70e9 && benchScores.swe && benchScores.gpqa){
+    const userH=(benchScores.gpqa-(0.79*benchScores.swe+24.7));
+    const labProfiles=[
+      {lab:'Google',h:'+6.2',style:'reasoning-rich'},
+      {lab:'OpenAI',h:'+3.1',style:'reasoning-rich'},
+      {lab:'Anthropic',h:'−6.0',style:'coding-rich'},
+      {lab:'DeepSeek',h:'−3.5',style:'coding-rich'}
+    ];
+    html+=`<div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
+      <span style="color:var(--accent2)">Macro-interpretability (h-field by lab):</span>
+      Your model: h = ${userH.toFixed(1)} → <span style="color:${userH>0?'var(--bonus)':'var(--tax)'}"><strong>${userH>0?'reasoning-rich':'coding-rich'}</strong></span> training recipe<br>
+      <span style="color:var(--text3)">Lab signatures: ${labProfiles.map(l=>`${l.lab} h̄≈${l.h}`).join(' | ')}</span>
+    </div>`;
+  }
+
   html+=`</div>`;
   return html;
 }

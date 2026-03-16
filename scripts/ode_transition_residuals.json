@@ -1,0 +1,157 @@
+{
+  "dA": [
+    [
+      0.0,
+      0.61,
+      0.0,
+      0.16999999999999993,
+      0.0
+    ],
+    [
+      0.13,
+      -0.039999999999999994,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.11000000000000001,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.1,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "db": [
+    -0.33999999999999997,
+    0.15,
+    -0.06,
+    -0.07,
+    -0.040000000000000036
+  ],
+  "model_residuals": {
+    "Pythia-70M  (tax)": [
+      0.3812,
+      0.01590000000000001,
+      0.05280000000000001,
+      0.048,
+      0.0
+    ],
+    "Pythia-1B   (tax)": [
+      0.33209999999999995,
+      0.0589,
+      0.041800000000000004,
+      0.038000000000000006,
+      0.0
+    ],
+    "Pythia-2.8B (cross)": [
+      0.32159999999999994,
+      0.06880000000000001,
+      0.0396,
+      0.036,
+      0.0
+    ],
+    "Pythia-6.9B (bonus)": [
+      0.31279999999999997,
+      0.0709,
+      0.03740000000000001,
+      0.034,
+      0.0
+    ],
+    "Pythia-12B  (bonus)": [
+      0.30229999999999996,
+      0.0743,
+      0.0352,
+      0.032,
+      0.0
+    ],
+    "Llama-2-7B  (bonus)": [
+      0.35519999999999996,
+      0.0858,
+      0.04290000000000001,
+      0.03900000000000001,
+      0.0
+    ],
+    "Llama-2-70B (bonus)": [
+      0.4054,
+      0.0951,
+      0.04950000000000001,
+      0.045000000000000005,
+      0.0
+    ]
+  },
+  "model_vectors": {
+    "Pythia-70M  (tax)": [
+      0.27,
+      0.48,
+      0.28,
+      0.52,
+      0.25
+    ],
+    "Pythia-1B   (tax)": [
+      0.57,
+      0.38,
+      0.43,
+      0.59,
+      0.25
+    ],
+    "Pythia-2.8B (cross)": [
+      0.64,
+      0.36,
+      0.46,
+      0.6,
+      0.27
+    ],
+    "Pythia-6.9B (bonus)": [
+      0.65,
+      0.34,
+      0.47,
+      0.62,
+      0.27
+    ],
+    "Pythia-12B  (bonus)": [
+      0.67,
+      0.32,
+      0.46,
+      0.63,
+      0.28
+    ],
+    "Llama-2-7B  (bonus)": [
+      0.78,
+      0.39,
+      0.53,
+      0.69,
+      0.45
+    ],
+    "Llama-2-70B (bonus)": [
+      0.87,
+      0.45,
+      0.67,
+      0.77,
+      0.7
+    ]
+  },
+  "note": "Run PySR on residuals vs benchmark features to find symbolic transition operator",
+  "transition_operator": {
+    "dA_dominant_entry": "dA[HS,TQA] = +0.61",
+    "rank": "approximately rank-1 (one dominant eigenvector)",
+    "interpretation": "TQA coupling liberation \u2014 TQA stops suppressing other benchmarks",
+    "gl_connection": "rank-1 \u0394A confirms single order parameter \u03b3\u2081\u2082",
+    "pysr_next_step": "residual = \u0394A\u00b7y vs benchmark features \u2192 symbolic form of transition",
+    "prediction": "if \u0394A \u221d \u03b3\u2081\u2082\u00b7e_TQA\u00b7e_TQA^T, order parameter IS the coupling"
+  }
+}
