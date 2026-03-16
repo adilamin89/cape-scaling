@@ -1,7 +1,7 @@
 """
 cape_frontier_full.py
-Full 19-model frontier coupling analysis
-r = +0.854, p = 0.000003
+Full 20-model frontier coupling analysis
+r = +0.848, p = 0.000002
 Includes family trajectory analysis and h-field computation
 """
 import numpy as np
@@ -23,9 +23,10 @@ MODELS = [
     ("GPT-5",              74.9, 85.7, "OpenAI"),
     ("GPT-5.1",            76.3, 88.1, "OpenAI"),
     ("GPT-5.2 Pro",        80.0, 93.2, "OpenAI"),
+    ("GPT-5.4",            77.2, 84.2, "OpenAI"),
     ("DeepSeek V3.2",      74.4, 79.9, "DeepSeek"),
     ("Kimi K2.5",          76.8, 87.6, "Moonshot"),
-    ("Qwen3.5-72B",        73.4, 83.7, "Alibaba"),
+    ("Qwen3.5-397B",       73.4, 88.4, "Alibaba"),
     ("MiniMax M2.5",       80.2, 85.0, "MiniMax"),
 ]
 

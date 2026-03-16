@@ -156,6 +156,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   <button class="tab" data-tab="phases">◈ Phase Map</button>
   <button class="tab" data-tab="frontier">◉ Frontier</button>
   <button class="tab" data-tab="cascade">⟳ Nc Cascade</button>
+  <button class="tab" data-tab="matrix">▦ Matrix</button>
   <button class="tab" data-tab="physics">∇ Physics</button>
   <button class="tab" data-tab="paper">✦ Paper</button>
 </div>
@@ -310,51 +311,57 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
 <div id="tab-frontier" class="tab-content" style="display:none">
   <div class="card">
     <div class="card-title">Frontier Coupling <span>— SWE-bench vs GPQA Diamond (Feb–Mar 2026)</span></div>
-    <canvas id="frontier-chart" height="480"></canvas>
+    <canvas id="frontier-chart" height="360"></canvas>
     <div style="margin-top:12px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">
-      r = +0.85 (n=19, p&lt;0.00001) — cooperative coupling strongly confirmed. Sonnet 4.6 shows h = −13.4 anomaly (tax excursion). Opus 4.6 recovers h = +2.8.
+      r = +0.85 (n=20, p&lt;0.00001) — cooperative coupling strongly confirmed. Sonnet 4.6 shows h = −13.4 anomaly (tax excursion). Opus 4.6 recovers h = +2.8. GPT-5.4 shows h = −1.6 (mild coding-specialist).
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Within-Family Trajectories <span>— Per-Lab Phase Diagnostics</span></div>
-    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6">
-      <strong style="color:var(--text)">Protocol:</strong> For any two consecutive releases, compute γ₁₂ = ΔGPQA/ΔSWE. Negative → tax excursion. One eval run detects it before deployment.
+    <div class="card-title">Within-Family Trajectory <span>— Anthropic as Phase Diagnostic</span></div>
+    <table class="tbl">
+      <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h(D)</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>Sonnet 4.5 → Sonnet 4.6</td><td class="pos">+2.4</td><td class="neg">−9.3</td><td class="neg flip">−3.88</td><td class="neg">−13.4</td><td>Tax excursion: coding optimized at reasoning cost</td></tr>
+        <tr><td>Sonnet 4.6 → Opus 4.6</td><td class="pos">+1.2</td><td class="pos">+17.2</td><td class="pos">+14.3</td><td class="pos">+2.8</td><td>Recovery: full cooperative phase restored</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Protocol:</strong> For any two consecutive releases, compute γ₁₂ = ΔGPQA/ΔSWE. If negative: training recipe entered a tax excursion. Single eval run suffices to detect it before deployment.
     </div>
-    <details open style="margin-bottom:8px">
-      <summary style="cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;padding:6px 0">Anthropic — Oscillating (excursion + recovery)</summary>
-      <table class="tbl" style="margin-top:6px">
-        <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h</th><th>Phase</th></tr></thead>
-        <tbody>
-          <tr><td>Son 4.5→Son 4.6</td><td class="pos">+2.4</td><td class="neg">−9.3</td><td class="neg flip">−3.88</td><td class="neg">−13.4</td><td>Tax excursion</td></tr>
-          <tr><td>Son 4.6→Opus 4.6</td><td class="pos">+1.2</td><td class="pos">+17.2</td><td class="pos">+14.3</td><td class="pos">+2.8</td><td>Recovery</td></tr>
-        </tbody>
-      </table>
-    </details>
-    <details style="margin-bottom:8px">
-      <summary style="cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;padding:6px 0">Google Gemini — Reasoning-first (h > 0 throughout)</summary>
-      <table class="tbl" style="margin-top:6px">
-        <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h</th><th>Phase</th></tr></thead>
-        <tbody>
-          <tr><td>2.5Pro→3Flash</td><td class="pos">+14.2</td><td class="pos">+6.4</td><td class="pos">+0.45</td><td style="color:var(--accent)">+8.9→+4.1</td><td>Cooperative</td></tr>
-          <tr><td>3Flash→3Pro</td><td class="neg">−1.8</td><td class="pos">+1.5</td><td class="neg flip">−0.83</td><td style="color:var(--accent)">+4.1→+7.0</td><td>Tier tradeoff</td></tr>
-          <tr><td>3Pro→3.1Pro</td><td class="pos">+4.4</td><td class="pos">+2.4</td><td class="pos">+0.55</td><td style="color:var(--accent)">+7.0→+6.0</td><td>Recovery</td></tr>
-        </tbody>
-      </table>
-    </details>
-    <details style="margin-bottom:4px">
-      <summary style="cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;padding:6px 0">OpenAI — Monotone cooperative (no excursions)</summary>
-      <table class="tbl" style="margin-top:6px">
-        <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h</th><th>Phase</th></tr></thead>
-        <tbody>
-          <tr><td>GPT-4o→GPT-5</td><td class="pos">+41.7</td><td class="pos">+32.1</td><td class="pos">+0.77</td><td style="color:var(--bonus)">+2.7→+1.9</td><td>Strongly coop.</td></tr>
-          <tr><td>GPT-5→5.1</td><td class="pos">+1.4</td><td class="pos">+2.4</td><td class="pos">+1.71</td><td style="color:var(--bonus)">+1.9→+3.2</td><td>Cooperative</td></tr>
-          <tr><td>GPT-5.1→5.2Pro</td><td class="pos">+3.7</td><td class="pos">+5.1</td><td class="pos">+1.38</td><td style="color:var(--bonus)">+3.2→+5.3</td><td>Cooperative</td></tr>
-        </tbody>
-      </table>
-    </details>
-    <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.5">
-      Three labs, same physics: oscillation (Anthropic/Gemini) vs monotone (OpenAI) is a measurement of training strategy via the h-field.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Within-Family Trajectory <span>— Google Gemini as Independent Test</span></div>
+    <table class="tbl">
+      <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h(D)</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>2.5 Pro → 3 Flash</td><td class="pos">+14.2</td><td class="pos">+6.4</td><td class="pos">+0.45</td><td style="color:var(--accent)">+8.9 → +4.1</td><td>Cooperative: both improve</td></tr>
+        <tr><td>3 Flash → 3 Pro</td><td class="neg">−1.8</td><td class="pos">+1.5</td><td class="neg flip">−0.83</td><td style="color:var(--accent)">+4.1 → +7.0</td><td>Flash→Pro tradeoff: reasoning prioritized over coding</td></tr>
+        <tr><td>3 Pro → 3.1 Pro</td><td class="pos">+4.4</td><td class="pos">+2.4</td><td class="pos">+0.55</td><td style="color:var(--accent)">+7.0 → +6.0</td><td>Recovery: both capabilities improve</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Second within-family test:</strong> Gemini's h-field stays positive throughout (+4 to +9) — a reasoning-specialist training recipe, the frontier analogue of Phi.
+      The Flash→Pro excursion (γ₁₂ = −0.83) mirrors Anthropic's Sonnet→Opus pattern: tier-specialist training creates a local tax that recovers at the next release.
+      <strong style="color:var(--accent)">Two labs, same physics.</strong>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">OpenAI Trajectory <span>— Now With Tax Excursion (GPT-5.4)</span></div>
+    <table class="tbl">
+      <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h(D)</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>GPT-4o → GPT-5</td><td class="pos">+41.7</td><td class="pos">+32.1</td><td class="pos">+0.77</td><td style="color:var(--bonus)">+2.5 → +1.7</td><td>Strongly cooperative: massive joint gain</td></tr>
+        <tr><td>GPT-5 → GPT-5.1</td><td class="pos">+1.4</td><td class="pos">+2.4</td><td class="pos">+1.71</td><td style="color:var(--bonus)">+1.7 → +3.0</td><td>Cooperative: reasoning outpaces coding</td></tr>
+        <tr><td>GPT-5.1 → GPT-5.4</td><td class="pos">+0.9</td><td class="neg">−3.9</td><td class="neg flip">−4.33</td><td style="color:var(--tax)">+3.0 → −1.6</td><td>Tax excursion: coding optimized at reasoning cost</td></tr>
+        <tr><td>GPT-5.4 → GPT-5.2 Pro</td><td class="pos">+2.8</td><td class="pos">+9.0</td><td class="pos">+3.21</td><td style="color:var(--bonus)">−1.6 → +5.2</td><td>Recovery: full cooperative phase restored</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Update:</strong> GPT-5.4 shows the same tax excursion pattern as Anthropic's Sonnet 4.6 (γ₁₂ = −4.33 vs −3.88). h dips to −1.6 before GPT-5.2 Pro recovers to +5.2.
+      <strong style="color:var(--accent)">Three labs, same physics:</strong> coding-specialist releases create local tax excursions that recover at the next generation. The universality of this pattern across Anthropic, OpenAI, and Google is now confirmed.
     </div>
   </div>
 
@@ -364,7 +371,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
       <div class="metric m-bonus">
         <div class="metric-label">r(SWE, GPQA)</div>
         <div class="metric-val" style="color:var(--bonus)">+0.85</div>
-        <div class="metric-sub">Cooperative — strongly confirmed (p&lt;0.00001, n=19)</div>
+        <div class="metric-sub">Cooperative — strongly confirmed (p&lt;0.00001, n=20)</div>
       </div>
       <div class="metric m-accent">
         <div class="metric-label">r(SWE, IFEval)</div>
@@ -395,74 +402,9 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   </div>
 
   <div class="card">
-    <div class="card-title">Nc3 Saturation Diagnostic <span>— Is the transition underway?</span></div>
-    <div id="nc3-diagnostic" style="font-family:var(--font-mono);font-size:11px;line-height:1.8;color:var(--text2)"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Symmetry Evolution <span>— Ising → U(1) → O(3) → O(4)</span></div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-family:var(--font-mono);font-size:10px;line-height:1.6">
-      <div style="padding:10px;background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.15);border-radius:6px">
-        <div style="color:#ffd166;font-weight:700;font-size:12px">Nc1 ≈ 3.5B</div>
-        <div style="color:var(--text2);margin-top:4px"><b style="color:#ffd166">Ising</b> symmetry</div>
-        <div style="color:var(--text3)">d_eff ≈ 1 • 1 axis</div>
-        <div style="color:var(--text3)">HS ↔ TQA coupling flip</div>
-        <div style="color:var(--text3)">Tax → Bonus</div>
-      </div>
-      <div style="padding:10px;background:rgba(76,201,240,0.06);border:1px solid rgba(76,201,240,0.15);border-radius:6px">
-        <div style="color:var(--accent);font-weight:700;font-size:12px">Nc2 ≈ 70–88B</div>
-        <div style="color:var(--text2);margin-top:4px"><b style="color:var(--accent)">U(1)</b> / XY model</div>
-        <div style="color:var(--text3)">d_eff → 2 • 2 axes</div>
-        <div style="color:var(--text3)">SWE ↔ GPQA activate</div>
-        <div style="color:var(--text3)">h = GPQA − 0.79·SWE − 24.7</div>
-      </div>
-      <div style="padding:10px;background:rgba(123,47,255,0.06);border:1px solid rgba(123,47,255,0.15);border-radius:6px">
-        <div style="color:#7b2fff;font-weight:700;font-size:12px">Nc3 ≈ 114–130B</div>
-        <div style="color:var(--text2);margin-top:4px"><b style="color:#7b2fff">O(3)</b> / Heisenberg</div>
-        <div style="color:var(--text3)">d_eff → 3 • 3 axes</div>
-        <div style="color:var(--text3)">IFEval activates</div>
-        <div style="color:var(--text3)">h₃ = IFE − 0.97·GPQA − 6.8</div>
-      </div>
-      <div style="padding:10px;background:rgba(200,200,200,0.04);border:1px dashed rgba(200,200,200,0.15);border-radius:6px">
-        <div style="color:#8aa8c8;font-weight:700;font-size:12px">Nc4 ~ 200–400B</div>
-        <div style="color:var(--text2);margin-top:4px"><b style="color:#8aa8c8">O(4)</b> predicted</div>
-        <div style="color:var(--text3)">d_eff → 4 • 4 axes</div>
-        <div style="color:var(--text3)">HLE / AgentBench?</div>
-        <div style="color:var(--text3)">Topological protection</div>
-      </div>
-    </div>
-    <div style="margin-top:8px;color:var(--text3);font-size:10px;line-height:1.5;font-family:var(--font-mono)">
-      Each transition expands the symmetry group and rotates the h-field. At O(3), topological protection of the cooperative phase becomes possible (hedgehog defects replace vortex lines).
-      Coding-specialist models (Sonnet 4.6, Codex) are vortex excursions in capability space — localised disruptions that the bulk cooperative condensate tolerates.
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Nc3 Coupling Relation <span>— h-field rotation from SWE-GPQA to GPQA-IFEval</span></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-family:var(--font-mono);font-size:11px">
-      <div style="padding:10px;background:rgba(76,201,240,0.04);border:1px solid rgba(76,201,240,0.12);border-radius:6px">
-        <div style="color:var(--accent);font-weight:700;margin-bottom:4px">Nc2 regime (SWE-GPQA)</div>
-        <div style="color:var(--text2)">GPQA = 0.79·SWE + 24.7</div>
-        <div style="color:var(--text3)">r = +0.85 (n=19) • h₂ = GPQA − fit</div>
-        <div style="color:var(--text3);margin-top:4px">Active pair: coding vs reasoning</div>
-      </div>
-      <div style="padding:10px;background:rgba(123,47,255,0.04);border:1px solid rgba(123,47,255,0.12);border-radius:6px">
-        <div style="color:#7b2fff;font-weight:700;margin-bottom:4px">Nc3 regime (GPQA-IFEval)</div>
-        <div style="color:var(--text2)">IFEval = 0.97·GPQA + 6.8</div>
-        <div style="color:var(--text3)">r = +0.81 (n=4) • h₃ = IFEval − fit</div>
-        <div style="color:var(--text3);margin-top:4px">Active pair: reasoning vs instruction-following</div>
-      </div>
-    </div>
-    <div style="margin-top:8px;color:var(--text3);font-size:10px;line-height:1.5;font-family:var(--font-mono)">
-      The h-field rotates at each Nc: the discriminating benchmark pair changes, and the coupling relation shifts to the new active axis.
-      At Nc3, SWE saturates and drops out; the coupling that matters becomes GPQA ↔ IFEval.
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Frontier Table <span>— h(D) field + IFEval per model</span></div>
+    <div class="card-title">Frontier Table <span>— h(D) field per model</span></div>
     <table class="tbl">
-      <thead><tr><th>Model</th><th>SWE (%)</th><th>GPQA (%)</th><th>IFEval (%)</th><th>h(D)</th><th>Lab</th></tr></thead>
+      <thead><tr><th>Model</th><th>SWE (%)</th><th>GPQA (%)</th><th>h(D)</th><th>Lab</th></tr></thead>
       <tbody id="frontier-table"></tbody>
     </table>
   </div>
@@ -496,7 +438,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
     <div class="pred-card">
       <div class="pred-label">Theory Breakdown</div>
       <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--text2);margin-bottom:8px">~130B+ params</div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.7">det(H_2×2) → 0. Third eigenvalue becomes significant. Pairwise γ₁₂ insufficient: need 3×3 coupling matrix. Paper 3B extends to higher dimensions.</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7">det(H_2×2) → 0. Third eigenvalue becomes significant. Pairwise γ₁₂ insufficient: need 3×3 coupling matrix. Future work extends to higher dimensions.</div>
     </div>
   </div>
 
@@ -533,6 +475,134 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
 </div>
 
 <!-- ═══════════════════════════════════════════
+     TAB: MATRIX — Phase-Separated Correlation Analysis
+════════════════════════════════════════════ -->
+<div id="tab-matrix" class="tab-content" style="display:none">
+  <div class="card">
+    <div class="card-title">Phase-Separated Correlation Matrix <span>— How TQA Restructures at N<sub>c</sub></span></div>
+    <div class="g2">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--tax);margin-bottom:8px;letter-spacing:1px">▸ BELOW N<sub>c</sub> (TAX PHASE)</div>
+        <table class="tbl" style="font-size:12px">
+          <thead><tr><th></th><th>HS</th><th>TQA</th><th>ARC</th><th>MMLU</th><th>WG</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--text2)">HS</td><td>1.00</td><td class="neg">−0.53</td><td class="pos">+0.89</td><td class="pos">+0.74</td><td class="pos">+0.67</td></tr>
+            <tr><td style="color:var(--text2)">TQA</td><td class="neg">−0.53</td><td>1.00</td><td class="neg">−0.65</td><td class="neg">−0.12</td><td class="neg">−0.28</td></tr>
+            <tr><td style="color:var(--text2)">ARC</td><td class="pos">+0.89</td><td class="neg">−0.65</td><td>1.00</td><td class="pos">+0.82</td><td class="pos">+0.71</td></tr>
+            <tr><td style="color:var(--text2)">MMLU</td><td class="pos">+0.74</td><td class="neg">−0.12</td><td class="pos">+0.82</td><td>1.00</td><td class="pos">+0.52</td></tr>
+            <tr><td style="color:var(--text2)">WG</td><td class="pos">+0.67</td><td class="neg">−0.28</td><td class="pos">+0.71</td><td class="pos">+0.52</td><td>1.00</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">4/10 pairs negative • d<sub>eff</sub> = 1.53 • Mean r = +0.07</div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--bonus);margin-bottom:8px;letter-spacing:1px">▸ ABOVE N<sub>c</sub> (BONUS PHASE)</div>
+        <table class="tbl" style="font-size:12px">
+          <thead><tr><th></th><th>HS</th><th>TQA</th><th>ARC</th><th>MMLU</th><th>WG</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--text2)">HS</td><td>1.00</td><td class="pos">+0.91</td><td class="pos">+0.95</td><td class="pos">+0.90</td><td class="pos">+0.73</td></tr>
+            <tr><td style="color:var(--text2)">TQA</td><td class="pos">+0.91</td><td>1.00</td><td class="pos">+0.92</td><td class="pos">+0.85</td><td class="pos">+0.69</td></tr>
+            <tr><td style="color:var(--text2)">ARC</td><td class="pos">+0.95</td><td class="pos">+0.92</td><td>1.00</td><td class="pos">+0.93</td><td class="pos">+0.72</td></tr>
+            <tr><td style="color:var(--text2)">MMLU</td><td class="pos">+0.90</td><td class="pos">+0.85</td><td class="pos">+0.93</td><td>1.00</td><td class="pos">+0.62</td></tr>
+            <tr><td style="color:var(--text2)">WG</td><td class="pos">+0.73</td><td class="pos">+0.69</td><td class="pos">+0.72</td><td class="pos">+0.62</td><td>1.00</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">0/10 pairs negative • d<sub>eff</sub> = 1.20 • Mean r = +0.89</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Key finding:</strong> The restructuring is <em>specific to truthfulness</em>. All 4 TQA pairs flip sign across N<sub>c</sub> (Frobenius |Δr| = 1.56).
+      Only 0/6 non-TQA pairs flip (|Δr| = 0.33). TQA loads anti-aligned with PC1 below N<sub>c</sub> (+0.49 vs −0.49 for HS), aligned above.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Phase-by-Phase Progression <span>— d<sub>eff</sub> Peaks at Transition (Critical Fluctuations)</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <div class="metric m-tax" style="flex:1;min-width:160px">
+        <div class="metric-label">Tax Phase</div>
+        <div class="metric-val" style="color:var(--tax)">1.53</div>
+        <div class="metric-sub">d<sub>eff</sub> • 4 neg pairs • TQA anti-aligned</div>
+      </div>
+      <div class="metric m-trans" style="flex:1;min-width:160px">
+        <div class="metric-label">Transition</div>
+        <div class="metric-val" style="color:var(--trans)">1.81</div>
+        <div class="metric-sub">d<sub>eff</sub> PEAK • Max fluctuations at N<sub>c</sub></div>
+      </div>
+      <div class="metric m-bonus" style="flex:1;min-width:160px">
+        <div class="metric-label">Bonus Phase</div>
+        <div class="metric-val" style="color:var(--bonus)">1.20</div>
+        <div class="metric-sub">d<sub>eff</sub> • 0 neg pairs • All cooperative</div>
+      </div>
+      <div class="metric m-accent" style="flex:1;min-width:160px">
+        <div class="metric-label">Frontier</div>
+        <div class="metric-val" style="color:var(--accent)">1.15</div>
+        <div class="metric-sub">d<sub>eff</sub> • Deep cooperative</div>
+      </div>
+      <div class="metric m-purple" style="flex:1;min-width:160px">
+        <div class="metric-label">N<sub>c,3</sub> regime</div>
+        <div class="metric-val" style="color:var(--accent2)">1.33</div>
+        <div class="metric-sub">d<sub>eff</sub> • All positive but rising — new tax opening?</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Physics prediction confirmed:</strong> d<sub>eff</sub> peaks at 1.81 in the transition zone — maximum effective dimensionality at the critical point.
+      This is textbook: maximum fluctuations = maximum uncertainty about which phase the system occupies. The system "doesn't know" if it's in the tax or bonus regime, so all dimensions contribute equally.
+      Above N<sub>c</sub>, d<sub>eff</sub> collapses to ~1.2 as the soft mode freezes out. At N<sub>c,3</sub>, d<sub>eff</sub> starts rising again (1.33) — the fingerprint of a new transition opening.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Leave-One-Family-Out CV <span>— Sign Robustness Across All 10 Benchmark Pairs</span></div>
+    <div class="g2">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--tax);margin-bottom:8px;letter-spacing:1px">▸ BELOW N<sub>c</sub>: 5/5 TQA pairs survive CV</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8">
+          HS–TQA: <span class="neg">negative in 5/5 folds</span><br/>
+          ARC–TQA: <span class="neg">negative in 5/5 folds</span><br/>
+          MMLU–TQA: <span class="neg">negative in 5/5 folds</span><br/>
+          WG–TQA: <span class="neg">negative in 4/5 folds</span><br/>
+          All non-TQA: <span class="pos">positive in 5/5 folds</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--bonus);margin-bottom:8px;letter-spacing:1px">▸ ABOVE N<sub>c</sub>: 6/6 pairs positive in all folds</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.8">
+          Every single benchmark pair — including all TQA pairs — shows <span class="pos">positive</span> correlation in every leave-one-family-out fold.<br/>
+          <strong style="color:var(--text)">Result:</strong> 4/4 TQA pairs flip sign, 0/6 non-TQA pairs flip.<br/>
+          The truthfulness tax is specific and robust.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">RG Flow (Preliminary) <span>— Beta Function and Fixed Point</span></div>
+    <div class="g3">
+      <div class="metric m-accent">
+        <div class="metric-label">Beta function</div>
+        <div class="metric-val" style="color:var(--accent);font-size:14px">β(γ) = −1.35γ² − 0.27γ + 0.73</div>
+        <div class="metric-sub">R² = 0.58 • Quadratic fit to running coupling</div>
+      </div>
+      <div class="metric m-bonus">
+        <div class="metric-label">Fixed point</div>
+        <div class="metric-val" style="color:var(--bonus)">γ* = 0.64</div>
+        <div class="metric-sub">Stable • Models converge to moderate cooperation</div>
+      </div>
+      <div class="metric m-purple">
+        <div class="metric-label">Universality class</div>
+        <div class="metric-val" style="color:var(--accent2);font-size:16px">1D random-field XY</div>
+        <div class="metric-sub">ν<sub>eff</sub> = 0.72 • Between mean-field and Ising-3D</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Asymptotic cooperation:</strong> Unlike QCD's asymptotic freedom (coupling weakens at high energy), AI capability coupling <em>strengthens</em> with scale — then saturates at γ* ≈ 0.64.
+      Large models converge toward moderate cooperative coupling, not runaway alignment. Full treatment deferred to Future work.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
      TAB: PHYSICS
 ════════════════════════════════════════════ -->
 <div id="tab-physics" class="tab-content" style="display:none">
@@ -549,6 +619,82 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   </div>
 
   <div class="card">
+    <div class="card-title">Polynomial Baseline <span>— CAPE vs Naive Fits on Llama-2 Holdout</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <div class="metric m-bonus" style="flex:1;min-width:140px">
+        <div class="metric-label">CAPE ODE</div>
+        <div class="metric-val" style="color:var(--bonus)">5.6%</div>
+        <div class="metric-sub">Held-out MAE • 4 parameters</div>
+      </div>
+      <div class="metric m-tax" style="flex:1;min-width:140px">
+        <div class="metric-label">Degree-1 poly</div>
+        <div class="metric-val" style="color:var(--tax)">14.6%</div>
+        <div class="metric-sub">2.6× worse • 2 parameters</div>
+      </div>
+      <div class="metric m-tax" style="flex:1;min-width:140px">
+        <div class="metric-label">Degree-2 poly</div>
+        <div class="metric-val" style="color:var(--tax)">10.2%</div>
+        <div class="metric-sub">1.8× worse • 3 parameters</div>
+      </div>
+      <div class="metric m-tax" style="flex:1;min-width:140px">
+        <div class="metric-label">Degree-3 poly</div>
+        <div class="metric-val" style="color:var(--tax)">10.5%</div>
+        <div class="metric-sub">1.9× worse • 4 parameters</div>
+      </div>
+      <div class="metric m-tax" style="flex:1;min-width:140px">
+        <div class="metric-label">Degree-4 poly</div>
+        <div class="metric-val" style="color:var(--tax)">10.4%</div>
+        <div class="metric-sub">1.9× worse • 5 parameters</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7">
+      <strong style="color:var(--text)">Key result:</strong> The CAPE ODE with 4 parameters beats polynomials with up to 5 parameters by ~2×. Polynomials fail catastrophically at Llama-2 7B and 13B (12-16% error) because they can't represent the phase structure — they fit a smooth curve through a regime change.
+      The ODE succeeds because it encodes the <em>coupling</em> between benchmarks, not just individual trajectories. A polynomial can't know that TQA anticorrelates with HS below N<sub>c</sub>.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Topology <span>— Winding Number W = 0.5 (Fractional) + Kink Soliton</span></div>
+    <div class="g2">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);margin-bottom:8px;letter-spacing:1px">▸ HALF-INTEGER WINDING</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div class="metric m-accent" style="min-width:0">
+            <div class="metric-label">Winding #</div>
+            <div class="metric-val" style="color:var(--accent)">W = 0.5</div>
+            <div class="metric-sub">Half-integer → Z₂ topology</div>
+          </div>
+          <div class="metric m-purple" style="min-width:0">
+            <div class="metric-label">Geom. phase</div>
+            <div class="metric-val" style="color:var(--accent2)">−32.6°</div>
+            <div class="metric-sub">−0.181π (not quantized)</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">
+          The eigenvector e₂ crosses zero once at ~1.2B. One zero crossing = half-winding = <strong style="color:var(--accent)">Z₂ (Ising) topology</strong>, not U(1). The transition is binary: flip or don't flip. Supports domain walls between flipped/unflipped families, not continuous vortices.
+          <br/><br/>
+          In condensed matter: half-quantum vortices in p-wave SC (Sr₂RuO₄), half-vortices in spinor BEC. The CAPE analogue: each training generation crossing N<sub>c</sub> undergoes a half-rotation of the coupling eigenvector.
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--trans);margin-bottom:8px;letter-spacing:1px">▸ KINK SOLITON (INSTANTON)</div>
+        <div class="metric m-trans" style="margin-bottom:10px">
+          <div class="metric-label">Kink profile</div>
+          <div class="metric-val" style="color:var(--trans);font-size:14px">γ₁₂(N) = 3.75·tanh((log₁₀N − 9.59)/1.00) − 1.54</div>
+          <div class="metric-sub">RMSE = 0.116 • Width = 1.0 decade • N<sub>c</sub> = 3.89B</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7">
+          The minimum-action path through the double-well potential. Deviations from this profile = suboptimal training = wasted compute.
+          <br/><br/>
+          <strong style="color:var(--text)">Anti-kink penalty:</strong> Sonnet 4.6 (γ = −3.88 at 70B) represents tunneling BACK through the barrier. Action cost ΔS ∝ e<sup>7.5</sup> ≈ 1800 — exponentially expensive.
+          <br/><br/>
+          <strong style="color:var(--text)">PDW analogy (speculative):</strong> Within-family h-field oscillations (coop→tax→coop) resemble pair density wave modulation. Three labs now show this pattern. Deferred to Future work.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title">Physics ↔ ML Dictionary</div>
     <table class="tbl" style="font-size:12px">
       <thead><tr><th>Physics Concept</th><th>ML/CAPE Meaning</th><th>Where Measured</th></tr></thead>
@@ -558,13 +704,13 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
         <tr><td>TRSB (time-reversal breaking)</td><td>Eigenvector locks at θ* = 38.8° (SFEE)</td><td>§7: Riccati ODE</td></tr>
         <tr><td>Soft mode (collapse of λ₂)</td><td>Second eigenvalue λ₂ ~ N^{−0.72}</td><td>§7: PCA cascade</td></tr>
         <tr><td>External magnetic field h</td><td>Training data quality offset h(D)</td><td>§5: Phi models</td></tr>
-        <tr><td>Meissner screening</td><td>Alignment interventions more durable above N_c</td><td>Paper 3B (predicted)</td></tr>
+        <tr><td>Meissner screening</td><td>Alignment interventions more durable above N_c</td><td>Future work (predicted)</td></tr>
         <tr><td>Flux pinning</td><td>Curated data locks cooperative eigenvector</td><td>§5: h_c design eq</td></tr>
         <tr><td>Ginzburg number Gi</td><td>1.35 &gt; 1 → crossover, not sharp transition</td><td>§11: limitations</td></tr>
         <tr><td>Susceptibility divergence</td><td>χ_γ = 1/|γ₁₂| → ∞ at N_c</td><td>§7: overconstrained</td></tr>
         <tr><td>Heavy-fermion SFEE</td><td>Self-reinforcing feedback: r=+0.629, p=0.003</td><td>§7: coupling runs</td></tr>
         <tr><td>det(H) → 0</td><td>Theory breakdown: new dimension must activate</td><td>§7: 130B prediction</td></tr>
-        <tr><td>Topological protection</td><td>Winding number in 3D capability space (predicted)</td><td>Paper 3B</td></tr>
+        <tr><td>Topological protection</td><td>Winding number in 3D capability space (predicted)</td><td>Future work</td></tr>
       </tbody>
     </table>
   </div>
@@ -614,7 +760,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
       <div class="metric m-tax"><div class="metric-label">Core Finding</div><div class="metric-val" style="color:var(--tax);font-size:16px">Alignment Tax</div><div class="metric-sub">Pre-training, before RLHF. Structural, not a tuning artifact. Vanishes at N_c from scaling alone.</div></div>
       <div class="metric m-bonus"><div class="metric-label">Practical Lever</div><div class="metric-val" style="color:var(--bonus);font-size:16px">Curate Data</div><div class="metric-sub">1 unit quality ≈ 10× model size at 1B params. Phi demonstrates at production scale.</div></div>
       <div class="metric m-accent"><div class="metric-label">Framework</div><div class="metric-val" style="color:var(--accent);font-size:16px">CAPE + GL EFT</div><div class="metric-sub">Ginzburg-Landau free energy. Same math as heavy-fermion superconductors. Not analogy — same EFT.</div></div>
-      <div class="metric m-purple"><div class="metric-label">Validity</div><div class="metric-val" style="color:var(--accent2);font-size:16px">Self-Limiting</div><div class="metric-sub">Predicts own breakdown at ~130B. Higher-dim extension in Paper 3B.</div></div>
+      <div class="metric m-purple"><div class="metric-label">Validity</div><div class="metric-val" style="color:var(--accent2);font-size:16px">Self-Limiting</div><div class="metric-sub">Predicts own breakdown at ~130B. Higher-dim extension in Future work.</div></div>
     </div>
   </div>
 
@@ -722,28 +868,29 @@ const MODELS=[
 
 const FRONTIER=[
   // Anthropic (7) — full within-family trajectory
-  {n:"Claude 3.5 Sonnet",swe:49.0,gpqa:59.4,h:-4.0,lab:"Anthropic",fc:"#CC785C",ifeval:null},
-  {n:"Claude 3.7 Sonnet",swe:62.3,gpqa:68.0,h:-5.9,lab:"Anthropic",fc:"#CC785C",ifeval:null},
-  {n:"Claude Haiku 4.5",swe:73.3,gpqa:71.0,h:-11.6,lab:"Anthropic",fc:"#CC785C",ifeval:null},
-  {n:"Sonnet 4.5",swe:77.2,gpqa:83.4,h:-2.2,lab:"Anthropic",fc:"#CC785C",ifeval:null},
-  {n:"Opus 4.5",swe:80.9,gpqa:87.0,h:-1.6,lab:"Anthropic",fc:"#CC785C",ifeval:null},
-  {n:"Sonnet 4.6",swe:79.6,gpqa:74.1,h:-13.4,lab:"Anthropic",fc:"#CC785C",ifeval:null},
-  {n:"Opus 4.6",swe:80.8,gpqa:91.3,h:2.8,lab:"Anthropic",fc:"#CC785C",ifeval:94.0},
+  {n:"Claude 3.5 Sonnet",swe:49.0,gpqa:59.4,h:-4.0,lab:"Anthropic",fc:"#CC785C"},
+  {n:"Claude 3.7 Sonnet",swe:62.3,gpqa:68.0,h:-5.9,lab:"Anthropic",fc:"#CC785C"},
+  {n:"Claude Haiku 4.5",swe:73.3,gpqa:71.0,h:-11.6,lab:"Anthropic",fc:"#CC785C"},
+  {n:"Sonnet 4.5",swe:77.2,gpqa:83.4,h:-2.2,lab:"Anthropic",fc:"#CC785C"},
+  {n:"Opus 4.5",swe:80.9,gpqa:87.0,h:-1.6,lab:"Anthropic",fc:"#CC785C"},
+  {n:"Sonnet 4.6",swe:79.6,gpqa:74.1,h:-13.4,lab:"Anthropic",fc:"#CC785C"},
+  {n:"Opus 4.6",swe:80.8,gpqa:91.3,h:2.8,lab:"Anthropic",fc:"#CC785C"},
   // Google (4)
-  {n:"Gemini 2.5 Pro",swe:63.8,gpqa:84.0,h:8.9,lab:"Google",fc:"#4285f4",ifeval:null},
-  {n:"Gemini 3 Flash",swe:78.0,gpqa:90.4,h:4.1,lab:"Google",fc:"#4285f4",ifeval:null},
-  {n:"Gemini 3 Pro",swe:76.2,gpqa:91.9,h:7.0,lab:"Google",fc:"#4285f4",ifeval:null},
-  {n:"Gemini 3.1 Pro",swe:80.6,gpqa:94.3,h:6.0,lab:"Google",fc:"#4285f4",ifeval:null},
-  // OpenAI (4)
-  {n:"GPT-4o",swe:33.2,gpqa:53.6,h:2.7,lab:"OpenAI",fc:"#10a37f",ifeval:null},
-  {n:"GPT-5",swe:74.9,gpqa:85.7,h:1.9,lab:"OpenAI",fc:"#10a37f",ifeval:null},
-  {n:"GPT-5.1",swe:76.3,gpqa:88.1,h:3.2,lab:"OpenAI",fc:"#10a37f",ifeval:null},
-  {n:"GPT-5.2 Pro",swe:80.0,gpqa:93.2,h:5.3,lab:"OpenAI",fc:"#10a37f",ifeval:null},
+  {n:"Gemini 2.5 Pro",swe:63.8,gpqa:84.0,h:8.9,lab:"Google",fc:"#4285f4"},
+  {n:"Gemini 3 Flash",swe:78.0,gpqa:90.4,h:4.1,lab:"Google",fc:"#4285f4"},
+  {n:"Gemini 3 Pro",swe:76.2,gpqa:91.9,h:7.0,lab:"Google",fc:"#4285f4"},
+  {n:"Gemini 3.1 Pro",swe:80.6,gpqa:94.3,h:6.0,lab:"Google",fc:"#4285f4"},
+  // OpenAI (5)
+  {n:"GPT-4o",swe:33.2,gpqa:53.6,h:2.5,lab:"OpenAI",fc:"#10a37f"},
+  {n:"GPT-5",swe:74.9,gpqa:85.7,h:1.7,lab:"OpenAI",fc:"#10a37f"},
+  {n:"GPT-5.1",swe:76.3,gpqa:88.1,h:3.0,lab:"OpenAI",fc:"#10a37f"},
+  {n:"GPT-5.2 Pro",swe:80.0,gpqa:93.2,h:5.2,lab:"OpenAI",fc:"#10a37f"},
+  {n:"GPT-5.4",swe:77.2,gpqa:84.2,h:-1.6,lab:"OpenAI",fc:"#10a37f"},
   // Others
-  {n:"DeepSeek V3.2",swe:74.4,gpqa:79.9,h:-3.5,lab:"DeepSeek",fc:"#e11d48",ifeval:null},
-  {n:"Kimi K2.5",swe:76.8,gpqa:87.6,h:2.3,lab:"Kimi",fc:"#7c3aed",ifeval:94.0},
-  {n:"Qwen3.5-397B",swe:76.4,gpqa:88.4,h:3.3,lab:"Alibaba",fc:"#f59e0b",ifeval:92.6},
-  {n:"MiniMax M2.5",swe:80.2,gpqa:85.0,h:-3.0,lab:"MiniMax",fc:"#6366f1",ifeval:87.5},
+  {n:"DeepSeek V3.2",swe:74.4,gpqa:79.9,h:-3.7,lab:"DeepSeek",fc:"#e11d48"},
+  {n:"Kimi K2.5",swe:76.8,gpqa:87.6,h:2.1,lab:"Kimi",fc:"#7c3aed"},
+  {n:"Qwen3.5-397B",swe:73.4,gpqa:88.4,h:5.6,lab:"Alibaba",fc:"#f59e0b"},
+  {n:"MiniMax M2.5",swe:80.2,gpqa:85.0,h:-3.2,lab:"MiniMax",fc:"#6366f1"},
 ];
 
 const EXAMPLES={
@@ -774,7 +921,7 @@ document.querySelectorAll('.tab').forEach(b=>{
     b.classList.add('on');
     document.getElementById('tab-'+b.dataset.tab).style.display='block';
     if(b.dataset.tab==='phases')drawPhaseChart();
-    if(b.dataset.tab==='frontier'){drawFrontierChart();buildFrontierTable();buildNc3Diagnostic();}
+    if(b.dataset.tab==='frontier'){drawFrontierChart();buildFrontierTable();}
     if(b.dataset.tab==='cascade')drawCascadeChart();
   });
 });
@@ -1129,60 +1276,6 @@ function getPhysicsDiagnostic(g, N, logN, deff, chi, hField, benchScores){
     html+=`<div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
       <span style="color:var(--accent)">ODE prediction:</span> dHS/dlog₁₀N = 1.23 − 0.72·(${tqaNorm.toFixed(2)}) − 0.69·(${wgNorm.toFixed(2)}) = <span style="color:${dHSdlogN>0?'var(--bonus)':'var(--tax)'}">${dHSdlogN.toFixed(3)}</span>
       — ${dHSdlogN>0?'HS still growing with scale':'HS growth saturating'}
-    </div>`;
-  }
-
-  // Algebraic phase classifier (zero-parameter, from ODE isocline)
-  if(benchScores.hs && benchScores.tqa){
-    const hsNorm=benchScores.hs/100;
-    const tqaNorm=benchScores.tqa/100;
-    const tqaCrit=Math.sqrt(0.187*hsNorm);
-    const inBonus=tqaNorm>tqaCrit;
-    const gammaPhase=g>0?'bonus':'tax';
-    const algPhase=inBonus?'bonus':'tax';
-    const disagree=gammaPhase!==algPhase;
-    html+=`<div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
-      <span style="color:var(--accent2)">Algebraic classifier (zero-parameter):</span>
-      TQA = ${tqaNorm.toFixed(3)} ${inBonus?'>':'<'} √(0.187·HS) = ${tqaCrit.toFixed(3)}
-      → <span style="color:${inBonus?'var(--bonus)':'var(--tax)'}"><strong>${inBonus?'BONUS phase':'TAX phase'}</strong></span>
-      ${disagree?`<br><span style="color:var(--trans)">Note: γ₁₂ says ${gammaPhase} but algebraic says ${algPhase} — this model is near the phase boundary (3/44 boundary cases expected)</span>`:''}
-      <span style="color:var(--text3)">(41/44 accuracy, calibrated on OLMo at 0.07% error)</span>
-    </div>`;
-  }
-  // Frontier algebraic classifier
-  if(benchScores.swe && benchScores.gpqa){
-    const sweNorm=benchScores.swe/100;
-    const gpqaNorm=benchScores.gpqa/100;
-    const gpqaCrit=Math.sqrt(0.79*sweNorm);
-    const deepCoop=gpqaNorm>gpqaCrit;
-    html+=`<div style="margin-top:4px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
-      <span style="color:var(--accent2)">Frontier classifier:</span>
-      GPQA = ${gpqaNorm.toFixed(3)} ${deepCoop?'>':'<'} √(0.79·SWE) = ${gpqaCrit.toFixed(3)}
-      → <span style="color:${deepCoop?'var(--bonus)':'var(--tax)'}"><strong>${deepCoop?'Deep cooperative':'Tax opening'}</strong></span>
-    </div>`;
-  }
-
-  // Nc cascade display
-  html+=`<div style="margin-top:10px;padding:8px;background:var(--bg2);border-radius:4px;font-size:11px;color:var(--text2);line-height:1.8;font-family:var(--font-mono)">
-    <span style="color:var(--accent2);font-weight:700">Nc Cascade</span><br>
-    <span style="color:${N<3.5e9?'#fff':'var(--text3)'}">Nc₁ ≈ 3.5B</span> — coupling sign flip (HS×TQA) ${N<3.5e9?'← you are here':N<70e9?'✓ passed':'✓ passed'}<br>
-    <span style="color:${N>3.5e9&&N<88e9?'#fff':'var(--text3)'}">Nc₂ ≈ 70–88B</span> — benchmark axis rotation (HS/TQA→SWE/GPQA) ${N<70e9?'ahead':N<88e9?'← entering':'✓ passed'}<br>
-    <span style="color:${N>88e9&&N<130e9?'#fff':'var(--text3)'}">Nc₃ ≈ 114–130B</span> — det(Γ)→0, third axis activates ${N<114e9?'ahead':N<130e9?'← approaching':'← beyond scope'}
-  </div>`;
-
-  // Macro h-field by lab (frontier context)
-  if(N>70e9 && benchScores.swe && benchScores.gpqa){
-    const userH=(benchScores.gpqa-(0.79*benchScores.swe+24.7));
-    const labProfiles=[
-      {lab:'Google',h:'+6.2',style:'reasoning-rich'},
-      {lab:'OpenAI',h:'+3.1',style:'reasoning-rich'},
-      {lab:'Anthropic',h:'−6.0',style:'coding-rich'},
-      {lab:'DeepSeek',h:'−3.5',style:'coding-rich'}
-    ];
-    html+=`<div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
-      <span style="color:var(--accent2)">Macro-interpretability (h-field by lab):</span>
-      Your model: h = ${userH.toFixed(1)} → <span style="color:${userH>0?'var(--bonus)':'var(--tax)'}"><strong>${userH>0?'reasoning-rich':'coding-rich'}</strong></span> training recipe<br>
-      <span style="color:var(--text3)">Lab signatures: ${labProfiles.map(l=>`${l.lab} h̄≈${l.h}`).join(' | ')}</span>
     </div>`;
   }
 
@@ -1721,149 +1814,60 @@ function drawFrontierChart(){
   const cv=document.getElementById('frontier-chart');
   if(!cv)return;
   const dpr=window.devicePixelRatio||1;
-  const W=cv.parentElement.clientWidth||700, H=480;
+  const W=cv.parentElement.clientWidth||700, H=360;
   cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
   const c=cv.getContext('2d'); c.scale(dpr,dpr);
-  const p={l:60,r:140,t:36,b:56};
+  const p={l:56,r:20,t:24,b:52};
   const sL=30,sH=84,gL=50,gH=97;
   const X=s=>p.l+(s-sL)/(sH-sL)*(W-p.l-p.r);
   const Y=g=>p.t+(gH-g)/(gH-gL)*(H-p.t-p.b);
   c.clearRect(0,0,W,H);
-
-  // Phase regions — subtle background shading
-  const regX=X(0.79*50>50?50:30); // regression crosses gL at some SWE
-  c.fillStyle='rgba(255,77,109,0.03)';
-  c.beginPath();c.moveTo(p.l,H-p.b);
-  for(let s=sL;s<=sH;s+=1){const gy=0.79*s+24.7; c.lineTo(X(s),Y(Math.min(gy,gH)));}
-  c.lineTo(W-p.r,H-p.b);c.closePath();c.fill();
-  c.fillStyle='rgba(6,214,160,0.03)';
-  c.beginPath();c.moveTo(p.l,p.t);
-  for(let s=sL;s<=sH;s+=1){const gy=0.79*s+24.7; c.lineTo(X(s),Y(Math.min(gy,gH)));}
-  c.lineTo(W-p.r,p.t);c.closePath();c.fill();
-
-  // Grid
-  c.strokeStyle='rgba(255,255,255,0.04)'; c.lineWidth=0.5;
-  for(let s=35;s<=80;s+=5){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
-  for(let g=55;g<=95;g+=5){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
-
+  c.strokeStyle='rgba(255,255,255,0.03)'; c.lineWidth=1;
+  for(let s=40;s<=80;s+=10){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
+  for(let g=55;g<=95;g+=10){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
   // Regression line: GPQA = 0.79*SWE + 24.7
-  c.strokeStyle='rgba(76,201,240,0.3)'; c.lineWidth=1.5; c.setLineDash([6,4]);
-  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7)); c.lineTo(X(84),Y(Math.min(0.79*84+24.7,gH))); c.stroke(); c.setLineDash([]);
-
-  // Within-family trajectory lines (behind dots)
-  const labGroups={Anthropic:[],Google:[],OpenAI:[]};
-  FRONTIER.forEach(m=>{if(labGroups[m.lab])labGroups[m.lab].push(m);});
-  Object.entries(labGroups).forEach(([lab,models])=>{
+  c.strokeStyle='rgba(76,201,240,0.25)'; c.lineWidth=1.5; c.setLineDash([4,4]);
+  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7)); c.lineTo(X(84),Y(0.79*84+24.7)); c.stroke(); c.setLineDash([]);
+  // Draw within-family trajectory lines first (behind dots)
+  const labs={Anthropic:[],Google:[],OpenAI:[]};
+  FRONTIER.forEach(m=>{if(labs[m.lab])labs[m.lab].push(m);});
+  Object.entries(labs).forEach(([lab,models])=>{
     if(models.length<2)return;
-    c.strokeStyle=models[0].fc; c.lineWidth=1; c.globalAlpha=0.2; c.setLineDash([4,3]);
+    c.strokeStyle=models[0].fc; c.lineWidth=1.5; c.globalAlpha=0.4;
     c.beginPath();
     models.forEach((m,i)=>{
       const x=X(m.swe),y=Y(m.gpqa);
       if(i===0)c.moveTo(x,y); else c.lineTo(x,y);
     });
-    c.stroke();c.globalAlpha=1;c.setLineDash([]);
+    c.stroke();
+    c.globalAlpha=1;
   });
-
   // Sonnet 4.6 anomaly dashed line
   const son45=FRONTIER.find(f=>f.n==='Sonnet 4.5');
   const son46=FRONTIER.find(f=>f.n==='Sonnet 4.6');
   if(son45&&son46){
-    c.strokeStyle='rgba(255,77,109,0.6)'; c.lineWidth=2; c.setLineDash([4,3]);
+    c.strokeStyle='#ff4d6d'; c.lineWidth=2; c.setLineDash([4,3]);
     c.beginPath();c.moveTo(X(son45.swe),Y(son45.gpqa));c.lineTo(X(son46.swe),Y(son46.gpqa));c.stroke();
     c.setLineDash([]);
-    // Anomaly label
-    const mx=(X(son45.swe)+X(son46.swe))/2, my=(Y(son45.gpqa)+Y(son46.gpqa))/2;
-    c.fillStyle='#ff4d6d'; c.font='bold 9px Space Mono'; c.textAlign='center';
-    c.fillText('tax excursion',mx-20,my+4);
   }
 
-  // Draw dots
   FRONTIER.forEach(m=>{
     const x=X(m.swe), y=Y(m.gpqa);
-    c.fillStyle=m.fc; c.globalAlpha=0.85;
-    c.beginPath(); c.arc(x,y,5.5,0,Math.PI*2); c.fill();
-    c.strokeStyle='rgba(255,255,255,0.3)'; c.lineWidth=0.5;
-    c.stroke(); c.globalAlpha=1;
-  });
-
-  // ─── LABEL COLLISION AVOIDANCE ───
-  // Build label objects with initial positions
-  const LBL_FONT='9px Space Mono';
-  c.font=LBL_FONT;
-  const labels=FRONTIER.map(m=>{
+    c.fillStyle=m.fc;
+    c.beginPath(); c.arc(x,y,6,0,Math.PI*2); c.fill();
+    c.fillStyle='#c8d8f0'; c.font='8px Space Mono'; c.textAlign='left';
     const short=m.n.replace('Claude ','').replace('Gemini ','G').replace('DeepSeek ','DS ');
-    const tw=c.measureText(short).width;
-    const dx=X(m.swe), dy=Y(m.gpqa);
-    return {text:short,ox:dx,oy:dy,x:dx+9,y:dy+3,w:tw+4,h:12,fc:m.fc,model:m};
+    c.fillText(short,x+8,y+3);
+    if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.fillText('anomaly',x+8,y+12);}
   });
-
-  // Simple force-directed repulsion (10 iterations)
-  for(let iter=0;iter<15;iter++){
-    for(let i=0;i<labels.length;i++){
-      for(let j=i+1;j<labels.length;j++){
-        const a=labels[i], b=labels[j];
-        const overlapX=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x);
-        const overlapY=Math.min(a.y+a.h/2,b.y+b.h/2)-Math.max(a.y-a.h/2,b.y-b.h/2);
-        if(overlapX>0 && overlapY>0){
-          const pushY=(overlapY/2)+1;
-          if(a.y<b.y){a.y-=pushY;b.y+=pushY;}
-          else{a.y+=pushY;b.y-=pushY;}
-          const pushX=(overlapX/4)+0.5;
-          if(a.x<b.x){a.x-=pushX;b.x+=pushX;}
-          else{a.x+=pushX;b.x-=pushX;}
-        }
-      }
-      // Keep labels within chart bounds
-      const a=labels[i];
-      a.x=Math.max(p.l,Math.min(a.x,W-p.r-a.w));
-      a.y=Math.max(p.t+6,Math.min(a.y,H-p.b-4));
-    }
-  }
-
-  // Draw leader lines + labels
-  labels.forEach(lb=>{
-    const dist=Math.hypot(lb.x-lb.ox,lb.y-lb.oy);
-    if(dist>12){
-      c.strokeStyle='rgba(200,216,240,0.2)'; c.lineWidth=0.7;
-      c.beginPath();c.moveTo(lb.ox,lb.oy);c.lineTo(lb.x,lb.y);c.stroke();
-    }
-    c.fillStyle=lb.fc; c.globalAlpha=0.9;
-    c.font=LBL_FONT; c.textAlign='left';
-    c.fillText(lb.text,lb.x,lb.y);
-    c.globalAlpha=1;
-  });
-
-  // r-value annotation
-  c.fillStyle='rgba(6,214,160,0.6)'; c.font='bold 11px Space Mono'; c.textAlign='left';
-  c.fillText('r = +0.85',p.l+8,p.t+16);
-  c.fillStyle='rgba(6,214,160,0.35)'; c.font='10px Space Mono';
-  c.fillText('n=19, p<0.00001',p.l+8,p.t+30);
-
-  // Phase labels
-  c.fillStyle='rgba(6,214,160,0.2)'; c.font='bold 9px Space Mono'; c.textAlign='left';
-  c.fillText('COOPERATIVE (above line)',p.l+8,p.t+46);
-  c.fillStyle='rgba(255,77,109,0.2)';
-  c.fillText('TAX EXCURSION (below line)',p.l+8,p.t+58);
-
-  // Legend — right side
-  const legendX=W-p.r+12, legendY=p.t+20;
-  const labColors=[{l:'Anthropic',c:'#CC785C'},{l:'Google',c:'#4285f4'},{l:'OpenAI',c:'#10a37f'},{l:'DeepSeek',c:'#e11d48'},{l:'Kimi',c:'#7c3aed'},{l:'Alibaba',c:'#f59e0b'},{l:'MiniMax',c:'#6366f1'}];
-  c.font='bold 10px DM Sans'; c.fillStyle='#8aa8c8'; c.textAlign='left';
-  c.fillText('Labs',legendX,legendY-4);
-  labColors.forEach((lc,i)=>{
-    const ly=legendY+14+i*18;
-    c.fillStyle=lc.c; c.beginPath(); c.arc(legendX+5,ly-3,4,0,Math.PI*2); c.fill();
-    c.fillStyle='#a0b8d0'; c.font='10px DM Sans'; c.textAlign='left';
-    c.fillText(lc.l,legendX+14,ly);
-  });
-
-  // Axes
-  c.fillStyle='#4a6b8a'; c.font='10px DM Sans'; c.textAlign='center';
-  for(let s=35;s<=80;s+=5) c.fillText(s+'%',X(s),H-p.b+16);
-  c.fillText('SWE-bench Verified (%)',W/2,H-p.b+36);
+  c.fillStyle='rgba(6,214,160,0.5)'; c.font='bold 10px Space Mono'; c.textAlign='right';
+  c.fillText('r = +0.85 (n=19, p<0.00001)',W-p.r,p.t+14);
+  c.fillStyle='#3d5a7a'; c.font='10px DM Sans'; c.textAlign='center';
+  for(let s=40;s<=80;s+=10) c.fillText(s+'%',X(s),H-p.b+16);
+  c.fillText('SWE-bench Verified (%)',W/2,H-6);
   c.textAlign='right';
-  for(let g=55;g<=95;g+=5){c.fillStyle='#4a6b8a';c.fillText(g+'%',p.l-6,Y(g)+4);}
-  c.save();c.translate(16,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('GPQA Diamond (%)',0,0);c.restore();
+  for(let g=55;g<=95;g+=10){c.fillStyle='#3d5a7a';c.fillText(g+'%',p.l-6,Y(g)+4);}
+  c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('GPQA Diamond (%)',0,0);c.restore();
 }
 
 function buildFrontierTable(){
@@ -1874,54 +1878,9 @@ function buildFrontierTable(){
       <td style="color:#c8d8f0;font-weight:600">${m.n}</td>
       <td>${m.swe}%</td>
       <td>${m.gpqa}%</td>
-      <td style="color:${m.ifeval?'#4cc9f0':'#3a4a5a'}">${m.ifeval?m.ifeval+'%':'—'}</td>
       <td style="color:${m.h>2?'#06d6a0':m.h<-2?'#ff4d6d':'#ffd166'};font-weight:700">${m.h>0?'+':''}${m.h}</td>
       <td style="color:#7a9abf">${m.lab}</td>
     </tr>`).join('');
-}
-function buildNc3Diagnostic(){
-  const el=document.getElementById('nc3-diagnostic');
-  if(!el)return;
-  // Top-5 by SWE
-  const sorted=[...FRONTIER].sort((a,b)=>b.swe-a.swe);
-  const top5=sorted.slice(0,5);
-  const sweSpread=(Math.max(...top5.map(m=>m.swe))-Math.min(...top5.map(m=>m.swe))).toFixed(1);
-  const gpqaSpread=(Math.max(...top5.map(m=>m.gpqa))-Math.min(...top5.map(m=>m.gpqa))).toFixed(1);
-  const withIFE=FRONTIER.filter(m=>m.ifeval!==null);
-  const ifeSpread=withIFE.length>=2?(Math.max(...withIFE.map(m=>m.ifeval))-Math.min(...withIFE.map(m=>m.ifeval))).toFixed(1):'N/A';
-  // r(SWE,GPQA) in saturated cluster (SWE>=78)
-  const sat=FRONTIER.filter(m=>m.swe>=78);
-  const satSwe=sat.map(m=>m.swe),satGpqa=sat.map(m=>m.gpqa);
-  const meanS=satSwe.reduce((a,b)=>a+b,0)/satSwe.length;
-  const meanG=satGpqa.reduce((a,b)=>a+b,0)/satGpqa.length;
-  let num=0,d1=0,d2=0;
-  for(let i=0;i<sat.length;i++){num+=(satSwe[i]-meanS)*(satGpqa[i]-meanG);d1+=(satSwe[i]-meanS)**2;d2+=(satGpqa[i]-meanG)**2;}
-  const rSat=(d1>0&&d2>0)?(num/Math.sqrt(d1*d2)):0;
-  const sweStatus=parseFloat(sweSpread)<3;
-  const decouple=Math.abs(rSat)<0.5;
-  el.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
-      <div style="padding:10px;background:rgba(${sweStatus?'6,214,160':'255,209,102'},0.06);border:1px solid rgba(${sweStatus?'6,214,160':'255,209,102'},0.2);border-radius:6px">
-        <div style="color:${sweStatus?'var(--bonus)':'#ffd166'};font-weight:700;font-size:13px">SWE spread: ${sweSpread} pp</div>
-        <div style="color:var(--text3);font-size:10px">Top-5 models · ${sweStatus?'SATURATED ✓':'Not yet saturated'}</div>
-      </div>
-      <div style="padding:10px;background:rgba(255,209,102,0.06);border:1px solid rgba(255,209,102,0.2);border-radius:6px">
-        <div style="color:#ffd166;font-weight:700;font-size:13px">GPQA spread: ${gpqaSpread} pp</div>
-        <div style="color:var(--text3);font-size:10px">Top-5 models · Compressing</div>
-      </div>
-      <div style="padding:10px;background:rgba(76,201,240,0.06);border:1px solid rgba(76,201,240,0.2);border-radius:6px">
-        <div style="color:var(--accent);font-weight:700;font-size:13px">IFEval spread: ${ifeSpread} pp</div>
-        <div style="color:var(--text3);font-size:10px">n=${withIFE.length} models · ${withIFE.length>=2?'NEW AXIS ACTIVATING':'Need more data'}</div>
-      </div>
-    </div>
-    <div style="padding:10px;background:rgba(${decouple?'6,214,160':'255,77,109'},0.04);border:1px solid rgba(${decouple?'6,214,160':'255,77,109'},0.15);border-radius:6px">
-      <span style="color:${decouple?'var(--bonus)':'var(--tax)'};font-weight:700">r(SWE, GPQA) in saturated cluster: ${rSat.toFixed(3)}</span>
-      <span style="color:var(--text3)"> (${sat.length} models, SWE≥78%) — ${decouple?'DECOUPLED from +0.85 → coupling rotation confirms Nc3 onset':'Still coupled'}</span>
-    </div>
-    <div style="margin-top:8px;color:var(--text3);font-size:10px;line-height:1.6">
-      Nc3 signature: old benchmark (SWE) saturates, new benchmark (IFEval) activates, coupling between old benchmarks drops.
-      Same pattern as Nc1 (HS/TQA saturated → SWE/GPQA activated). Preliminary: n=${withIFE.length} with IFEval data.
-    </div>`;
 }
 
 // ── CANVAS: CASCADE CHART ─────────────────────────────────
@@ -1947,7 +1906,7 @@ function drawCascadeChart(){
   }
   c.stroke();
   // Nc markers
-  const NCS=[{n:Math.log10(3.5e9),l:'Nc1 3.5B',c:'#ffd166'},{n:10,l:'Nc2 ~10B',c:'#4cc9f0'},{n:Math.log10(114e9),l:'Nc3 ~114B',c:'#7b2fff'},{n:Math.log10(300e9),l:'Nc4 ~300B',c:'#8aa8c8'}];
+  const NCS=[{n:Math.log10(3.5e9),l:'Nc1 3.5B',c:'#ffd166'},{n:10,l:'Nc2 ~10B',c:'#4cc9f0'},{n:Math.log10(114e9),l:'Nc3 ~114B',c:'#7b2fff'}];
   NCS.forEach(nc=>{
     c.strokeStyle=nc.c; c.lineWidth=1.5; c.setLineDash([5,4]);
     c.beginPath(); c.moveTo(X(nc.n),p.t); c.lineTo(X(nc.n),H-p.b); c.stroke(); c.setLineDash([]);

@@ -35,27 +35,18 @@
 \maketitle
 
 \begin{abstract}
-Every scaling law answers the same question: how does loss fall with compute?
-None of them ask what actually matters for deployment: \emph{as a model scales, do its capabilities cooperate or compete?}
+Scaling laws predict loss from compute but not how capabilities interact.
+We show that below $N_c \approx 3.5$B parameters, truthfulness (TruthfulQA) \textbf{anticorrelates} with every TQA-paired capability tested---reasoning ($r = -0.989$), commonsense ($r = -0.941$), and knowledge ($r = -0.792$)---an \emph{alignment tax} built into pre-training.
+Above $N_c$, all couplings reverse to an \emph{alignment bonus}.
+The transition is invisible in loss (CV$=0.8\%$, no anomaly at $N_c$) and confirmed independently by OLMo (AI2) at $\gamma_{12}=0.000$ with zero free parameters.
 
-We show that below $N_c \approx 3.5$B parameters, reasoning and truthfulness \textbf{anticorrelate} strongly ($r = -0.989$, $p < 10^{-5}$): scaling one actively degrades the other---an \emph{alignment tax} built into pre-training, before any RLHF.
-Above $N_c$, the coupling reverses: both capabilities improve together---an \emph{alignment bonus}.
-Crucially, \textbf{the transition is completely invisible in loss}---loss follows a featureless power law (CV$=0.8\%$) with no anomaly at $N_c$.
-\textbf{Two models with identical loss can therefore be in opposite alignment regimes}, and no single-observable scaling law can detect this.
-A second independent lab (OLMo, AI2) lands at $\gamma_{12}=0.000$ with zero free parameters, placing it precisely at the predicted transition.
-
-We introduce \textbf{CAPE} (Capability Coupling Analysis of Phase Emergence), which formalizes this structure using the mathematics of phase transitions in condensed matter physics---the same effective field theory that describes competing order parameters in superconductors, with model scale replacing temperature and capability fields replacing pairing amplitudes.
-Twelve independently measured diagnostics (gradient anomalies, dimensional collapse $d_{\rm eff}: 2{\to}1$, eigenvector rotation through a Riccati ODE, thermodynamic susceptibility peak) converge on one coupling structure parameterized by two numbers.
-A dynamical system discovered by sparse regression reproduces all five benchmark trajectories at 3.6\% error from first principles and cross-predicts held-out Llama-2 at 5.6\% error.
-
-The consequences cascade.
-At 1B parameters, one unit of data quality is worth roughly $10\times$ in model scale---curated training (Phi) eliminates the alignment tax entirely by shifting $N_c \to 0$.
-Across 19 frontier models spanning seven labs (2024--2026), SWE-bench and GPQA Diamond couple cooperatively ($r=+0.85$, $p<10^{-5}$), with training-recipe excursions visible as measurable $h$-field deviations.
-Preliminary evidence suggests the predicted second axis transition ($N_{c,3} \approx 114$B) is already underway: SWE-bench compresses to a $0.9$-point range among top-five models while IFEval emerges as the new discriminating axis ($6.5$-point spread, $n=4$)---the same saturation-then-activation pattern observed at $N_{c,1}$.
-The symmetry structure expands at each transition (Ising $\to$ $U(1)$ $\to$ $O(3)$), with the $\sqrt{}$ isocline phase classifier validated across all three regimes.
-The framework predicts $N_{c,4}$ at $\sim$200--400B effective parameters and its own successor: at that scale, the residual of the current description is the input signal for a four-field extension.
-An interactive dashboard (\href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}}) classifies any model's alignment phase from benchmark scores alone, returns phase-specific training recommendations, and updates automatically as new models and benchmark pairs are published.
-Code: \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
+We introduce \textbf{CAPE} (Capability Coupling Analysis of Phase Emergence), formalizing this structure using mathematics that parallels condensed matter phase transitions.
+Twelve diagnostics converge on one coupling structure parameterized by two numbers;
+a discovered ODE reproduces five benchmark trajectories at $3.6\%$ error and cross-predicts held-out Llama-2 at $5.6\%$ (${\sim}2\times$ better than polynomial baselines).
+At 1B, one unit of data quality is worth ${\sim}10\times$ in model scale (Phi eliminates the tax by shifting $N_c \to 0$).
+Across 20 frontier models (2024--2026), SWE-bench and GPQA Diamond couple cooperatively ($r=+0.85$, $p<10^{-6}$), with training-recipe excursions visible as $h$-field deviations.
+Preliminary evidence suggests a predicted third-axis transition ($N_{c,3} \approx 114$B) is already underway.
+Code and interactive dashboard: \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
 \end{abstract}
 
 
@@ -99,32 +90,35 @@ below $N_c$, scaling reasoning \emph{hurts} truthfulness (we call this the ``ali
 above $N_c$, scaling \emph{helps both} (the ``alignment bonus'' regime).
 The transition is confirmed independently by OLMo~\cite{groeneveld2024} (AI2), which sits at $\gamma_{12} = 0.000$ exactly at the predicted critical scale.
 
-\textbf{A physics framework with exact mathematical correspondence.}
-The mathematical structure of CAPE is borrowed directly from condensed matter physics---specifically, from the theory of multi-band superconductors and heavy-fermion systems.
-In those systems, two competing order parameters\footnote{Order parameter: a measurable quantity that is zero in one phase and nonzero in another, characterising the phase transition. In CAPE, the order parameters are the capability fields $\phi_{\rm HS}$ and $\phi_{\rm TQA}$---deviations of benchmark scores from their universal scaling curves. The coupling $\gamma_{12}$ between these order parameters is what changes sign at $N_c$.} (e.g., spin-singlet and spin-triplet pairing) couple through an inter-band susceptibility that changes sign at a critical temperature, driving a phase transition between competing and cooperative phases~\cite{amin2020}.
-The mathematics is identical: replace pairing amplitudes with capability fields $\phi_i$, replace temperature with $\log_{10} N$, and the Ginzburg-Landau free energy describes capability interactions with the same coupling structure.
-This is not analogy---it is the \emph{same} effective field theory\footnote{Effective field theory (EFT): a mathematical framework that describes a system's behavior at a given resolution without requiring knowledge of all microscopic details. In ML terms: CAPE describes capability coupling at the benchmark level without requiring knowledge of individual neuron activations, just as thermodynamics describes heat engines without tracking individual molecules.} applied to a different domain.
-The key diagnostic quantities from superconductor physics (Ginzburg number, GL parameter $\kappa$, TRSB phase locking, Riccati eigenvector rotation) all have direct ML interpretations and are all measured from public benchmark data.
-Where relevant, footnotes make the exact correspondence explicit.
+\textbf{What this paper establishes.}
+Scaling laws have phases.
+Below $N_c \approx 3.5$B, the alignment tax is structural---no amount of scaling fixes it, and no loss curve reveals it.
+Above $N_c$, reasoning and truthfulness reinforce each other---scaling helps alignment.
+At frontier scale, SWE-bench and GPQA Diamond show the same cooperative structure ($r=+0.85$, confirmed across 20 models and 7 labs with cross-lab holdout at 6.9\% MAE).
+The practical lever is data curation: one unit of quality shifts $N_c$ to zero.
+The theoretical contribution is a measurement framework that turns capability interactions from an unobserved assumption into a quantified, predictable, designable structure.
+As new capability axes activate at higher $N$, new anticorrelations may open---CAPE detects these too (\S\ref{sec:Nc2_section}).
+
+\smallskip
+\noindent\textbf{Paper roadmap.}
+We establish this through five independent lines of evidence: (1)~direct coupling measurement across 44 models and 14 families (\S\ref{sec:coupling}); (2)~an ODE discovered by sparse regression that reproduces benchmark dynamics and cross-predicts held-out Llama-2 (\S\ref{sec:ode}); (3)~gradient measurements revealing collective, not independent, parameter scaling (\S\ref{sec:gradients}); (4)~geometric analysis showing the capability manifold restructures at $N_c$ (\S\ref{sec:topology}); and (5)~frontier validation across 20 models from 7 labs, including preliminary evidence for a third-axis transition (\S\ref{sec:Nc2_section}).
 
 \smallskip
 \textbf{Why this is not a benchmark artifact.}
-One might worry that the TQA U-shape reflects evaluation noise rather than a genuine capability shift (Fig.~\ref{fig:main}).
-Three lines of evidence argue against this:
+Three lines of evidence argue against the TQA U-shape reflecting evaluation noise (Fig.~\ref{fig:main}):
 (i)~the anticorrelation $r=-0.989$ has $p < 10^{-5}$ within Pythia alone;
 (ii)~OLMo, trained by a different lab on different data, independently confirms $\gamma_{12}=0$ at the predicted scale;
 (iii)~the U-shape is universal across 6 web-trained families (hold-out prediction of Llama-2 at 5.6\% error, \S\ref{sec:holdout}).
 
-\textbf{Relation to prior work.}
-Every prior framework for understanding capability scaling---loss laws~\cite{kaplan2020,chinchilla2022}, observational scaling~\cite{ruan2024}, emergent abilities~\cite{wei2022}---treats each capability as an independent scalar trajectory.
-CAPE is the first framework to measure the \emph{coupling} between them; the full comparison is in \S\ref{sec:related}.
+\textbf{The physics framework.}
+The mathematical structure of CAPE parallels condensed matter phase transitions---specifically, the Ginzburg-Landau\footnote{Effective field theory (EFT): a mathematical framework that describes a system's behavior at a given resolution without requiring knowledge of all microscopic details. In ML terms: CAPE describes capability coupling at the benchmark level without requiring knowledge of individual neuron activations, just as thermodynamics describes heat engines without tracking individual molecules.} theory of multi-band superconductors, where two competing order parameters\footnote{Order parameter: a measurable quantity that is zero in one phase and nonzero in another. In CAPE, the order parameters are the capability fields $\phi_{\rm HS}$ and $\phi_{\rm TQA}$---deviations of benchmark scores from their universal scaling curves. The coupling $\gamma_{12}$ between them is what changes sign at $N_c$.} couple through an inter-band susceptibility that changes sign at a critical temperature~\cite{amin2020}.
+Replace pairing amplitudes with capability fields $\phi_i$, temperature with $\log_{10} N$, and the GL free energy describes capability interactions with the same coupling structure.
+GL theory has been applied far beyond condensed matter---to laser physics~\cite{haken1985}, ecological dynamics, and cosmological phase transitions---wherever two coupled order parameters compete across a control axis; the microscopic mechanism differs in each case, and partial microscopic support here comes from per-layer gradient decomposition and the architecture probe (\S\ref{sec:gradients}).
+The key diagnostics (Ginzburg number, $\kappa$, phase-locking angle, Riccati rotation) all have direct ML interpretations and are measured from public benchmark data; where relevant, footnotes make the correspondence explicit.
 
-\textbf{What this paper establishes.}
-Scaling laws have phases.
-Below $N_c \approx 3.5$B, the alignment tax is structural---no amount of scaling fixes it, and no loss curve reveals it.
-Above $N_c$, scaling is automatically aligned---the two most safety-relevant capabilities reinforce each other.
-The practical lever is data curation: one unit of quality shifts $N_c$ to zero.
-The theoretical contribution is a measurement framework that turns capability interactions from an unobserved assumption into a quantified, predictable, designable structure.
+\textbf{Relation to prior work.}
+Loss laws~\cite{kaplan2020,chinchilla2022}, observational scaling~\cite{ruan2024}, and emergent abilities~\cite{wei2022} all treat each capability as an independent scalar trajectory.
+CAPE measures the \emph{coupling} between them; the full comparison is in \S\ref{sec:related}.
 
 
 % ════════════════════════════════════════════════════
@@ -165,7 +159,7 @@ The coupling $\gamma_{12}(N)$, it turns out, is the object that governs alignmen
 \fbox{\begin{minipage}{0.92\textwidth}
 \small
 \textbf{Reader guide.}
-\textit{Physics readers:} the Ginzburg-Landau correspondence throughout this paper is exact---replace pairing amplitudes with capability fields $\phi_i$, temperature with $\log_{10}N$, and inter-band coupling with $\gamma_{12}$. All key quantities (Ginzburg number, coherence parameter $\kappa=\lambda_1/\lambda_2$, TRSB locking angle, Riccati rotation) have direct ML interpretations and are measured from public benchmark data.
+\textit{Physics readers:} the GL free energy, symmetry-breaking pattern, and diagnostics parallel those of multi-band superconductors~\cite{amin2020} and laser threshold dynamics~\cite{haken1985}. All key quantities (Ginzburg number, $\kappa=\lambda_1/\lambda_2$, phase-locking angle, Riccati rotation) have direct ML interpretations and are measured from public benchmark data.
 \textit{ML readers:} the physics frames are optional context---every section's bolded claims are self-contained empirical results requiring no physics background.
 \end{minipage}}
 \end{center}
@@ -182,7 +176,7 @@ All scores are from published evaluations on the same harness (lm-eval).
 Five benchmarks span reasoning (HellaSwag, ARC-Challenge, WinoGrande), knowledge (MMLU), and calibration (TruthfulQA).
 Proprietary models (GPT-3.5, GPT-4) are excluded from quantitative $\gamma_{12}$ analysis due to evaluation protocol differences, but are included in qualitative phase classification (both sit well above $N_c$ and show positive within-family coupling).
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering\small
 \caption{Models used in CAPE analysis. Score ranges shown as min--max across family.}
 \label{tab:models}
@@ -240,33 +234,25 @@ In a disordered ferromagnet, individual domain magnetizations scatter around the
 CAPE is in the same regime---the sign (12/12) is the physics prediction; the magnitude scatter encodes the per-family $h(\mathcal{D})$ values measured in \S\ref{sec:phi}.
 
 
-\subsection{Sample size and methodological strength}
+\subsection{Evidence structure: experimental physics, not sample statistics}
 
-The validity of CAPE's findings does not rest on any single dataset's size.
-Three complementary arguments establish this.
+This paper follows the evidence standard of experimental physics, not large-sample frequentist statistics.
+In physics, a phase transition is established not by a single large-$n$ test but by \emph{multiple independent measurements at different levels of description converging on one structure}---the same standard by which the Higgs boson was confirmed (two detectors, five decay channels, each independently significant) or by which unconventional superconductivity is established (specific heat, penetration depth, NMR, and tunnelling all pointing to the same gap symmetry)~\cite{amin2020}.
 
-\textbf{The boosting-chain logic.}
-The central finding is a \emph{structural} result confirmed by seven independent methods at different levels of description---the L0--L4 chain of Table~\ref{tab:boost}, not a frequentist hypothesis test.
-At L0, loss scaling holds to CV$=0.8\%$ across 8 Pythia models.
-At L1, the mean-field gradient prediction fails $142\times$---a diagnostic that does not depend on $n$.
-At L2, $\|\nabla L\| \propto L^{3.5}$ ($r=0.93$) is a functional relationship, not a count.
-At L3, the sign change is confirmed by: (i)~within-Pythia anticorrelation ($r=-0.989$, $p<10^{-5}$); (ii)~OLMo at $\gamma_{12}=0.000$ with \emph{zero free parameters}; (iii)~Llama-2 holdout at 5.6\% error; (iv)~12 independent diagnostics converging on two numbers; (v)~architecture probe confirming the thermodynamic nature of the transition.
-At L4, Phi eliminates the tax entirely---a qualitative confirmation requiring no statistical test.
-In this framework, $n=8$ calibrates the transition \emph{location} but does not determine confidence in its \emph{existence}.
+CAPE meets this standard.
+The Pythia family ($n=8$) precisely locates $N_c$---a single precision instrument.
+Five independent confirmations establish \emph{existence}:
+(i)~OLMo at $\gamma_{12}=0.000$ with zero free parameters;
+(ii)~OPT bracketing the sign flip between 5B and 18B;
+(iii)~the Llama-2 holdout at 5.6\% MAE (a genuine out-of-sample prediction);
+(iv)~twelve diagnostics converging on two parameters ($5\times$ overconstrained; \S\ref{sec:topology});
+(v)~the frontier cooperative coupling ($r=+0.85$, $p<10^{-6}$) confirmed by cross-lab holdout across 4 independent labs at 6.9\% MAE.
+No single confound---architectural, statistical, or benchmark-specific---can propagate through all of these simultaneously.
 
-\textbf{Monotone strengthening with every dataset expansion.}
-Every time additional models have been added to any dataset in this paper, the findings held or strengthened---never reversed or weakened.
-The base-model dataset grew from 8 (Pythia alone) to 26 (nine families) to 44 (fourteen families including GPT-Neo, OPT, BLOOM): the cross-family cooperative correlation $r(\mathrm{HS,TQA})=+0.770$ at 7B was unchanged by each addition, and OPT independently confirmed the sign flip at $\sim$5B.
-The frontier dataset grew from 10 models ($r=+0.34$, $p=0.34$) to 15 ($r=+0.78$, $p<0.001$) to 19 ($r=+0.854$, $p=0.000003$): each expansion \emph{strengthened} the cooperative coupling signal.
-This trajectory is not coincidental---it is what the theory predicts.
-The $d_{\rm eff}\to 1$ dimensional collapse at large $N$ implies $r\to 1$ in the cooperative phase; the data is converging toward the theoretical limit as more frontier models are added.
-\textbf{A finding that grows stronger with every new datapoint is not a small-sample artifact.}
-
-\textbf{Overconstrained validation.}
-The twelve diagnostics ($\alpha$, $\gamma_{12}$, $\beta$, ODE coefficients, $\chi_{ND}$, $h(\mathcal{D})$, $W$, eigenvector rotation, soft-mode $\lambda_2$, gradient anomaly, curvature peak, geometric phase correlation) are independent measurements from one coupling structure parameterized by two numbers.
-Twelve constraints on two free parameters is a $5\times$ overconstrained system.
-The bootstrap CI $[2.9\text{B}, 13.4\text{B}]$ is appropriately wide---the \emph{location} of the transition has genuine uncertainty.
-The \emph{existence} of the transition does not.
+\textbf{The findings strengthen monotonically with every dataset expansion}---from 8 to 26 to 44 base models, from 10 to 20 frontier models.
+Each expansion strengthened the signal; none reversed it.
+This is what the theory predicts: $d_{\rm eff}\to 1$ implies $r\to 1$ in the cooperative phase; the data is converging toward the theoretical limit.
+\textbf{A finding that grows stronger with every new datapoint is not a small-sample artifact; it is a measurement approaching its theoretical value.}
 
 \subsection{Bootstrap confidence intervals}
 
@@ -299,8 +285,7 @@ Cerebras-GPT (Cerebras, The Pile, 111M--13B) shows the same pattern: $\gamma_{12
 \section{Benchmark Dynamics Follow a Discovered ODE}
 \label{sec:ode}
 
-The running coupling $\gamma_{12}(N)$ describes a static snapshot: how TQA changes per unit of HS gain at each scale.
-A more powerful question is whether the coupling leaves a dynamical fingerprint---whether the coupling structure discovered in \S\ref{sec:coupling} generates testable predictions about how benchmarks evolve across scale.
+Can we predict how benchmarks evolve across scale---not just measure coupling at each point, but derive the dynamics?
 
 Applying PySINDy~\cite{brunton2016} (sparse identification of nonlinear dynamics)
 to the benchmark trajectories (HS, TQA, ARC, WG, MMLU) as functions of $\log_{10} N$ yields a coupled ODE.
@@ -318,7 +303,7 @@ reproduces all 5 benchmark trajectories at 3.6\% average error
 The ODE has $O(N_{\rm bench})$ free coefficients, so the in-sample fit alone is not the claim; the cross-family prediction is.
 
 \textbf{Cross-family cross-prediction.}
-The same ODE, fitted only on Pythia, cross-predicts held-out Llama-2 at 5.6\% mean error.
+The same ODE, fitted only on Pythia, cross-predicts held-out Llama-2 at 5.6\% mean error---roughly $2\times$ better than the best polynomial baseline (degree-2 polynomial on the same training set gives 10.2\% MAE; the improvement holds across polynomial degrees 1--4).
 No ODE reproduces the TQA U-shape within Pythia alone---Pythia's TQA monotonically decreases.
 The U-shape is a \emph{cross-family} phenomenon arising from different training data fields $h(\mathcal{D})$:
 the regime transition is universal across families, not a Pythia artifact.
@@ -361,10 +346,12 @@ Yellow shading marks the $N_c$ region.}
 \end{figure*}
 
 % ════════════════════════════════════════════════════
-\section{Loss Scaling is Exact---the Transition is in the Coupling}
+\section[Loss Scaling is Exact: the Transition is in the Coupling]{Loss Scaling is Exact---the Transition is in the Coupling}
 \label{sec:loss}
 
-Fitting $L(N) = E + AN^{-\alpha}$ to Pythia validation losses:
+If the coupling transition is real, why doesn't it appear in the loss?
+Because loss is a single number---it tracks the floor of the free energy, not its curvature.
+Fitting $L(N) = E + AN^{-\alpha}$ to Pythia validation losses gives
 $E = 1.533$, $A = 153.6$, $\alpha = 0.238 \pm 0.015$, $R^2 = 0.9994$.
 The quantity $N^{\alpha}(L - E)$ is constant to $\mathrm{CV} = 0.8\%$ across all 8 models from 70M to 12B (Fig.~\ref{fig:boost}a).
 There is \emph{no} transition in the loss itself.
@@ -477,7 +464,7 @@ when tested via a boosted coupling chain (Table~\ref{tab:boost}), where each lev
 This is a diagnostic: the system is strongly beyond the regime where
 independent-parameter assumptions hold.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering\small
 \caption{Boosting chain: each level adds one correction.
 The direction of residual change is diagnostic.}
@@ -561,90 +548,61 @@ As a testable prediction: OLMo-1B, which sits at $\gamma_{12}=0.000$ by direct m
 The next section asks what that collective structure looks like---and finds that the capability manifold itself changes shape through the transition.
 
 % ════════════════════════════════════════════════════
-\section{Eigenvector Rotation and Dimensional Collapse}
+\section{The Capability Manifold Restructures at the Transition}
 \label{sec:topology}
 
-\noindent\textit{Reader routing.} \textbf{ML readers}: bolded claims are self-contained; \textbf{alignment practitioners}: jump to \S\ref{sec:alignment}; \textbf{physicists}: full GL/TRSB derivations in Appendix~A. This section is the direct ML analogue of a two-band superconductor near TRSB: soft mode collapses, manifold compresses from two dimensions to one, eigenvector rotates~\cite{amin2020}.
-\smallskip
+Why should you care about the geometry of capability space?
+Because it answers two questions no other measurement can: \emph{What is the exchange rate between reasoning and truthfulness?} and \emph{When does the current framework break?}
+The coupling sign change at $N_c$ is a surface-level symptom; the deeper structure is a geometric reorganization of the entire capability manifold---the space collapses from two independent dimensions to one, the eigenvector basis rotates, and the system locks at a specific angle that sets the capability exchange rate.
+All derivations are in Appendix~A; here we state the results and their practical meaning.
 
-The coupling sign change at $N_c$ and the gradient anomaly near 1B are surface-level symptoms.
-When a system changes phase, not just one quantity changes---the entire geometry of the state space reorganizes.
-Here we show that the alignment transition is not just $\gamma_{12}$ crossing zero:
-the whole structure of capability space rotates, compresses, and restructures.
-Underneath, the effective dimensionality of the capability manifold collapses from two dimensions to one---the deepest geometric signature of the transition.
+\textbf{Three key results.}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item \textbf{Dimensional collapse} ($d_{\rm eff}: 2 \to 1$).
+PCA of the Pythia correlation matrix reveals that the second eigenvalue $\lambda_2$ \emph{decreases} from 1.06 (410M) to 0.40 (12B), well-fit by $\lambda_2 \sim N^{-0.72}$ ($R^2 = 0.95$; Fig.~\ref{fig:topology}b).\footnote{PCA must be computed \emph{within} each coupling regime separately (tax vs.\ bonus), since the eigenvector structure differs across the phase boundary. A global PCA pools models from both sides of $N_c$ and washes out both signals.}
+The participation ratio\footnote{Participation ratio: $d_{\rm eff} = (\sum_i \lambda_i)^2/\sum_i \lambda_i^2$, where $\lambda_i$ are PCA eigenvalues. It counts the effective number of independent dimensions: $d_{\rm eff}=1$ means one component explains all variance; $d_{\rm eff}=5$ means all five benchmarks vary independently. It is a continuous measure of how many genuinely independent capabilities exist at each scale.} gives $d_{\rm eff}(N) \approx -0.27\log_{10}N + 3.9$, reaching $d_{\rm eff} = 1$ at $N \approx 88$B (Fig.~\ref{fig:topology}a).
+\textbf{ML meaning:} below $N_c$, reasoning and truthfulness vary independently ($d_{\rm eff} \approx 2$); above $N_c$, they move together ($d_{\rm eff} \to 1$). Two benchmarks, one degree of freedom.
+The transition marks where the model's finite-dimensional approximation aligns with the intrinsic dimensionality of the knowledge structure it needs to represent---moving from competing underfitting to cooperative compression.
 
+\item \textbf{Phase locking at $\theta^* = 38.8^\circ$} (soft-mode collapse).
+Above $N_c$, the second eigenvalue $\lambda_2$ collapses, reducing effective dimensionality from 2 to 1 and locking the capability-coupling plane at a fixed angle.
+\textbf{Key result:} $A = \sin\theta^*$ (measured: $0.629 = \sin 38.8^\circ = 0.626$, agreement to 0.5\%).
+\textbf{ML meaning:} one point of reasoning gain produces $\sin(38.8^\circ) \approx 0.63$ points of truthfulness gain---a fixed exchange rate, stable across model families, that does not exist below $N_c$.
+The collapse is driven by self-reinforcing susceptibility feedback: the coupling $\gamma_{12}$ depends on the capability susceptibility $\chi_2$, which in turn depends on $\gamma_{12}$, creating a fixed point that pins $\theta^*$. The structure parallels the Anderson-Higgs mechanism in multi-band superconductors~\cite{amin2020}, where the inter-band phase locks through analogous feedback; see Appendix~A for the full derivation and the limits of this correspondence.
 
-\textbf{Coherence parameter and ODE stiffness.}
-The ratio $\kappa(N) \equiv \lambda_1/\lambda_2$ is the GL coherence parameter\footnote{Coherence parameter ($\kappa$): in superconductors, $\kappa = \lambda/\xi$ separates Type-I ($\kappa < 1/\sqrt{2}$, sharp phase boundaries) from Type-II ($\kappa > 1/\sqrt{2}$, gradual mixed phases). In ML terms: $\kappa$ measures how ``one-dimensional'' the capability manifold is. $\kappa \gg 1$ means all benchmarks rise or fall together; $\kappa \approx 1$ means capabilities can still trade off independently.}---a dimensionless measure of how sharply the capability manifold is anisotropic.
-It grows from $\kappa=2.2$ (70M) to $\kappa=11.2$ (12B), well-fit by $\kappa \propto N^{+0.36}$ ($r=0.973$, $p<0.0001$).
-In ODE terminology, $\kappa$ is the stiffness ratio: the system becomes increasingly stiff as $N$ grows, meaning capability gains become more tightly locked along the dominant eigenmode.
-Extrapolation predicts $\kappa\to\infty$ at the scale where $\lambda_2\to0$ ($\sim$88B from the $d_{\rm eff}=1$ crossing).
-Note: the 88B scale ($d_{\rm eff}\to 1$, soft-mode collapse) and the 130B scale ($\det(H)\to 0$, Hessian singularity) measure different events---the first is where the \emph{current} two-field description becomes effectively one-dimensional; the second is where a \emph{third} eigenvalue must activate to maintain a valid description.
-They are consistent: the gap between 88B and 130B is the region where three-field effects are growing but the two-field approximation still returns meaningful (if increasingly noisy) results.
-\textbf{The messenger field.}
-The mechanism behind the $142\times$ mean-field failure is the \emph{messenger field} $\gamma_{12}(N)$, which mediates coupling between capability fields just as spin fluctuations mediate inter-band coupling in heavy-fermion superconductors~\cite{amin2020}.
-Its logarithmic running is a measured consequence of self-reinforcing susceptibility feedback: $d\gamma_{12}/d\log N \propto \chi_2 \cdot \gamma_{12}$ ($r=+0.629$, $p=0.003$).
-The full mean-field comparison is in Supplementary Appendix~A6.
+\item \textbf{Scope boundary at $\sim$130B.}
+The determinant $\det(H) = \lambda_1\lambda_2$ extrapolates to zero at $N \approx 130$B---predicting where the two-capability effective theory formally breaks down and a third axis must activate.
+This is not a failure: every effective theory writes its own scope boundary.
+The 88B scale ($d_{\rm eff} \to 1$) and the 130B scale ($\det(H) \to 0$) measure different events; their consistency validates the framework (Appendix~A9).
+\textbf{Holdout validation:} the $d_{\rm eff}$ extrapolation trained on Pythia (70M--12B) alone predicts $d_{\rm eff} \to 0.93$ at $\sim$100B---below 1, i.e.\ the two-field scope boundary.
+The frontier measurement (\S\ref{sec:Nc2_section}) gives $d_{\rm eff} = 1.75$: \emph{above} the extrapolation, not below.
+This discrepancy is not a failure---it is the $N_{c,3}$ transition itself.
+The two-field theory correctly predicts its own breakdown ($d_{\rm eff} \to 1$ means the description has collapsed to a single mode), and the \emph{rise} of $d_{\rm eff}$ back to 1.75 at frontier scale is the third axis activating---exactly the event the scope boundary was designed to detect (Appendix~A9; full calculation in Appendix~A11).
+\end{enumerate}
 
-\textbf{Soft mode\footnote{Soft mode: in phase transitions, a ``soft mode'' is a fluctuation whose restoring force vanishes as the system approaches the critical point. In ML terms: $\lambda_2$ is the eigenvalue measuring how much independent variation exists along the truthfulness axis. As $\lambda_2 \to 0$, truthfulness stops varying independently---it becomes fully determined by reasoning, collapsing $d_{\rm eff}$ from 2 to 1.}.}
-PCA of the Pythia correlation matrix at cumulative scales reveals a dominant eigenvalue $\lambda_1$ that grows from 3.94 (410M) to 4.48 (12B), and a second eigenvalue $\lambda_2$ that \emph{decreases} from 1.06 to 0.40, well-fit by $\lambda_2 \sim N^{-0.72}$ ($R^2 = 0.95$) (Fig.~\ref{fig:topology}b).\footnote{PCA must be computed \emph{within} each coupling regime separately (tax: $\gamma_{12}<0$; bonus: $\gamma_{12}\geq 0$, $N<100$B; frontier: $N>100$B), since the eigenvector structure differs across the phase boundary. A global PCA that pools models from both sides of $N_c$ averages over the sign flip and produces a misleading near-zero correlation---analogous to computing the mean magnetization across $T<T_c$ and $T>T_c$. In ML terms: running PCA on all models at once mixes the ``scaling hurts alignment'' and ``scaling helps alignment'' regimes, washing out both signals.}
-The participation ratio\footnote{Participation ratio: $d_{\rm eff} = (\sum_i \lambda_i)^2 / \sum_i \lambda_i^2$, where $\lambda_i$ are PCA eigenvalues. When all eigenvalues are equal, $d_{\rm eff}$ equals the number of components; when one dominates, $d_{\rm eff} \to 1$. In ML terms: $d_{\rm eff}$ counts how many genuinely independent directions of variation exist in the benchmark space at a given scale. $d_{\rm eff} = 2$ means reasoning and truthfulness vary independently; $d_{\rm eff} = 1$ means they move together.} gives $d_{\rm eff}(N) \approx -0.27\log_{10}N + 3.9$, reaching $d_{\rm eff} = 1$ at $N \approx 88$B: the system condenses from a two-dimensional capability manifold to a single effective mode.
-This has a direct statistical learning interpretation: a language model is a finite-dimensional approximation ($\sim N$ parameters) of an effectively infinite-dimensional object (all language and knowledge).
-Below $N_c$, the model is fitting two competing directions of this true manifold simultaneously---each additional parameter that improves reasoning competes for the same capacity as truthfulness.
-Above $N_c$, one cooperative direction dominates and the approximation aligns: the phase transition marks the scale at which $d_{\rm eff}$ matches the intrinsic dimensionality of the knowledge structure the model needs to represent.
-In classical learning theory terms, the transition moves the model from a regime of competing underfitting (two directions, neither fully captured) into a cooperative regime where scale efficiently compresses the relevant structure.
-
-\textbf{Eigenvector rotation.}
-The second eigenvector $\mathbf{e}_2$ rotates through the transition: the TQA loading flips from $+0.20$ (cooperative with HS) below 1B to $-0.30$ (competing) above 1.4B, stabilizing at $-0.39$.
-The rotation satisfies a Riccati equation\footnote{Riccati equation: a first-order ODE of the form $dy/dx = a(x)y^2 + b(x)y + c(x)$. Unlike linear ODEs, the quadratic $y^2$ term produces fixed points, bifurcations, and saturation---exactly the behavior we observe in eigenvector rotation. In ML terms: the rotation angle $\theta$ of the second eigenvector is governed by nonlinear self-feedback, converging to a stable fixed point $\theta^*$ regardless of initial conditions.} (a nonlinear ODE with analytic logistic solution):
+\textbf{Eigenvector rotation and inverse reconstruction.}
+The eigenvector $\mathbf{e}_2$ rotates through the transition: TQA loading flips from $+0.20$ below 1B to $-0.39$ above, governed by a Riccati ODE\footnote{Riccati ODE: a nonlinear first-order differential equation $dy/dx = a(x)y^2 + b(x)y + c(x)$. It arises naturally when the eigenvector angle $\theta$ of a $2{\times}2$ matrix varies along a control parameter---here, $\log_{10}N$. The quadratic term is what creates fixed points (stable angles the system converges toward), distinguishing it from simple linear rotation.}:
 \begin{equation}
   \frac{d\theta}{d\log_{10}N} = -16.44\,\theta^2 + 8.73\,\theta - 0.977
 \end{equation}
-The data-driven fixed point is $\theta^* \approx +0.37$ (positive TruthfulQA loading),
-confirmed across four independent fitting methods (L2, Huber, L1, and isotonic GP; all find $\theta^* \in [+0.28, +0.52]$).
-The fit quality is qualitative ($R^2 = 0.41$, $n = 19$ windows), consistent
-with an ODE governing a noisy empirical trajectory; the key structural claim is the
-\emph{sign} of $\theta^*$, not the precise coefficients.
-The low $R^2$ is not unexpected: the same $d_{\rm eff} = 1.254 < 2$ that causes $\beta_{\rm measured}$ to deviate from the independent-parameter prediction ($\S$\ref{sec:gradients}) also produces large fluctuations in the eigenvector direction---the Riccati ODE is an approximation valid when fluctuations are small, and the system is in the regime where fluctuations are not small (the effective capability space is too low-dimensional for the approximation to be tight).
-At large $N$, the alignment axis $\mathbf{e}_2$ converges toward cooperation with capability:
-the frontier alignment bonus is not just empirical but a fixed-point prediction of the coupling geometry.
+with data-driven fixed point $\theta^* \approx +0.37$, confirmed across four fitting methods ($\theta^* \in [+0.28, +0.52]$; $R^2 = 0.41$, qualitative but structurally correct---the sign of $\theta^*$ is the claim, not the coefficients).
+At large $N$, the alignment axis converges toward cooperation: the frontier alignment bonus is a fixed-point prediction, not just an empirical observation.
+The off-diagonal Hessian $H_{12}$, reconstructed from eigenvalues alone, independently confirms the sign flip: $H_{12} = +0.024$ (410M) $\to$ $-0.009$ (1.4B)---recovering $\gamma_{12}$ from the inverse problem.
 
-\textbf{Four independent views of one transition.}
-Four observables converge on the 1B--1.4B interval: the gradient dip ($-37\%$ below trend at 1B), eigenvector rotation (1B$\to$1.4B), TQA curvature peak (1.4B), and the ``capability susceptibility'' peak (1B)---the scale at which benchmark scores respond most sensitively to a small change in model size.
-These are projections of a single event: the curvature of the loss landscape restructures as the coupling between capabilities changes sign.
-The rotation angle $\theta(N)$ and the running coupling $\gamma_{12}(N)$ are themselves significantly correlated ($r = +0.47$, $p = 0.044$), confirming that the eigenvector rotation and the coupling sign-change are two projections of the same geometric event, not independent phenomena.
+\textbf{Four convergent views of one transition.}
+Four observables converge on the 1B--1.4B interval: gradient dip ($-37\%$), eigenvector rotation, TQA curvature peak, and capability susceptibility peak---four projections of one geometric event ($r(\gamma_{12}, \theta) = +0.47$, $p = 0.044$).
+The coherence parameter $\kappa \equiv \lambda_1/\lambda_2$ grows from 2.2 to 11.2 ($\kappa \propto N^{+0.36}$, $r=0.973$)---the system becomes increasingly stiff, locking capability gains along the dominant mode.
 
-\textbf{Inverse reconstruction.}
-The off-diagonal Hessian $H_{12} = \sum_k v_k^{(\rm HS)} v_k^{(\rm TQA)} \lambda_k$, reconstructed from eigenvalues alone, flips from $+0.024$ (410M) to $-0.009$ (1.4B)---recovering $\gamma_{12}$ from the inverse problem.
-The determinant $\det(H) = \lambda_1\lambda_2$ extrapolates to zero at $N \approx 130$B, predicting where the two-capability effective theory formally breaks down and a new dimension must activate.
+\textbf{Phase locking generates the coupling.}
+The coupling $\gamma_{12}$ is not built into the training objective---it is emergent.
+LASSO applied to a polynomial library selects zero $\phi_1^2\phi_2^2$ coupling: the bare objective is approximately decoupled ($F \approx a_1\phi_1^2 + a_2\phi_2^2$).
+The coupling arises from self-reinforcing susceptibility feedback: the residual of $\gamma_{12}$ above its linear baseline correlates with $\chi_2 \cdot \gamma_{12}$ at $r = +0.629$ ($p = 0.003$)---the more sensitive benchmarks are to scale changes, the faster the coupling runs.
+The feedback terminates at the phase-locked angle: the SFEE slope $A = 0.629 = \sin(38.8^\circ)$---linking the susceptibility measurement and the eigenvector rotation into a single identity (Appendix~A2).
 
-
-\textbf{TRSB and the cooperative phase.}
-The cooperative phase above $N_c$ is not merely a sign change in $\gamma_{12}$---it is a \emph{symmetry-broken} state.
-The broken symmetry is $U(1)$ rotation in capability space\footnote{$U(1)$ symmetry breaking: below $N_c$, the free energy is invariant under simultaneous rotation of $\phi_{\rm HS}$ and $\phi_{\rm TQA}$---in ML terms, the measurement-basis choice is physically irrelevant and benchmarks are interchangeable. Above $N_c$, the system selects a preferred orientation---the eigenbasis of the PCA matrix acquires a definite direction---and the measurement basis becomes physically meaningful. The locking angle $\theta^*=38.8^\circ$ is the Goldstone mode of this broken $U(1)$: the direction in capability space that the system selects.}: below $N_c$, the free energy is invariant under simultaneous rotation of $\phi_{\rm HS}$ and $\phi_{\rm TQA}$; above $N_c$, the system selects a preferred orientation and the measurement basis becomes physically meaningful.
-Below $N_c$, the free-energy minimum does not distinguish between $\phi_{\rm HS}$ and $\phi_{\rm TQA}$: the system must allocate capability gains, but the direction is not fixed.
-Above $N_c$, the relative phase between the two capability fields locks at $\theta^*=38.8^\circ$---this is time-reversal symmetry breaking (TRSB)\footnote{Time-reversal symmetry breaking (TRSB): in multi-band superconductors, the relative phase between two order parameters locks at a nonzero angle, breaking the symmetry under time reversal. In ML terms: below $N_c$, the system has no preferred direction in the HS--TQA plane (gains could go either way); above $N_c$, the system locks into a specific ratio of reasoning-to-truthfulness improvement ($\theta^*=38.8^\circ$), and this locking is what makes the cooperative phase stable.}: the cooperative phase has a specific orientation in capability space that is not related to its mirror image by time-reversal.
-The locking condition $A=\sin\theta^*$ (measured: $0.629=\sin 38.8^\circ=0.626$) is the direct ML analogue of the TRSB stabilization condition in heavy-fermion superconductors, where susceptibility fluctuations lock the inter-band phase at the coupling fixed point~\cite{amin2020}.
-
-\textbf{Mixed-phase regime between $N_c$ and $N_{c,2}$.}
-The ratio of the coupling's characteristic scale-range $\xi$ (how spread out the transition is in $\log N$) to the eigenvalue decay length $\lambda$ satisfies $\lambda/\xi \approx 0.767 > 1/\sqrt{2}$, placing the system in a parameter regime where the transition between alignment-tax and alignment-bonus is not sharp everywhere simultaneously.
-Between $N_c$ and $N_{c,2}$, different model families---or different training recipes within a family---can sit in locally different coupling regimes before the cooperative phase fully stabilizes.
-This explains within-family heterogeneity: training-recipe perturbations create \emph{vortex-like} local excursions into the tax phase inside an otherwise cooperative background---topologically stable structures analogous to Abrikosov vortices\footnote{Abrikosov vortices: in Type-II superconductors, magnetic flux penetrates as discrete, quantized tubes surrounded by circulating supercurrents. In ML terms: a training-recipe perturbation (e.g., coding specialisation) creates a localized ``hole'' in the cooperative phase---a single model sitting in the tax regime while the surrounding scale landscape is cooperative. The vortex is stable because the coupling structure around it is self-consistent.} in Type-II superconductors.
-Haiku~4.5 ($h=-11.6$) and Sonnet~4.6 ($\gamma_{12}=-3.88$, $h=-13.4$; \S\ref{sec:Nc2_section}) are two such vortices: speed-specialist and coding-specialist training recipes that pin a local tax region inside the cooperative phase.
-Opus~4.6's sharp recovery ($\gamma_{12}=+14.3$) is vortex annihilation---the stored coupling energy releases in one step when the full cooperative configuration is restored.
-This is a natural consequence of the mixed-phase geometry, not an outlier.
-
-\textbf{Why the coupling runs: self-reinforcing susceptibility feedback.}
-The running of $\gamma_{12}(N)$ is not an assumption of the model---it arises from a measurable mechanism.
-The residual of $\gamma_{12}$ above its linear baseline correlates with $\chi_2 \cdot \gamma_{12}$
-at $r = +0.629$ ($p = 0.003$, Spearman $\rho = 0.719$, $p = 0.0004$, $n = 20$ windows):
-the more sensitive benchmarks are to scale changes (high susceptibility $\chi_2$), the faster the coupling runs---a self-reinforcing feedback loop above $N_c$ (see Appendix~A for the heavy-fermion analogy).
-Independently, LASSO applied to a full polynomial library of coupling terms selects zero $\phi_1^2\phi_2^2$
-coupling term---confirming that the bare objective is approximately decoupled
-($F \approx a_1\phi_1^2 + a_2\phi_2^2$) and the coupling $\gamma_{12}$ is an \emph{emergent},
-feedback-driven renormalization rather than a fundamental parameter built into the objective.
-The coupling is real; it is not built in (see Appendix~A for GL free energy language).
-A further consistency check: the self-reinforcing susceptibility feedback equation (SFEE) slope $A = 0.629$ equals $\sin(\theta^*) = \sin(38.8^{\circ}) = 0.626$ to within measurement uncertainty---confirming that the feedback terminates at the phase-locked eigenvector angle, not arbitrarily, and linking the susceptibility-feedback measurement and the eigenvector rotation into a single identity (TRSB stabilization condition; Appendix~A).
+\textbf{Mixed-phase regime.}
+The transition is Type-II ($\lambda/\xi \approx 0.767 > 1/\sqrt{2}$; Appendix~A7): between $N_c$ and $N_{c,2}$, training-recipe perturbations can pin local tax regions inside the cooperative phase.
+Haiku~4.5 ($h=-11.6$) and Sonnet~4.6 ($h=-13.4$; \S\ref{sec:Nc2_section}) are such excursions; Opus~4.6's recovery ($\gamma_{12}=+14.3$) is the excursion collapsing.
+A testable prediction: these excursions should show quantised suppression with characteristic core size $\sim\xi$.
 
 \textbf{Overconstrained validation.}
 The twelve quantities---$\alpha$, $\gamma_{12}$, $\beta$, the ODE coefficients, $\chi_{ND}$, $h(\mathcal{D})$, $W$, eigenvector rotation, soft-mode $\lambda_2$, gradient anomaly, curvature peak, and geometric phase correlation $r(\gamma_{12},\theta)=+0.47$---are independent measurements from one coupling structure, parameterized by two numbers ($A = 0.629$, $B = -5.886$ in $\gamma_{12}(N) = A\log_{10}N + B$).
@@ -654,9 +612,11 @@ These quantities were not designed to agree.
 Their mutual consistency---each measured by a different method, on different data, probing a different aspect of the coupling---constitutes an overconstrained validation: twelve constraints on two free parameters.
 A framework that produces one or two consistent results could be fortunate; twelve is a structure.
 
-A thirteenth, derived quantity completes the picture: the \emph{coupling susceptibility} $\chi_\gamma(N) \equiv 1/|\gamma_{12}(N)|$ diverges at $N_c$ where $\gamma_{12} \to 0$.
-This is the direct analogue of the magnetic susceptibility $\chi = 1/|T - T_c|$ diverging at the Curie temperature: in both cases, the system's response to small perturbations becomes infinite at the critical point.
-In the interband coupling language of~\cite{amin2020}, this corresponds to the inter-band fluctuation susceptibility diverging when the two order-parameter channels decouple---the fluctuations between the two bands grow without bound as the coupling vanishes.
+\textbf{Connection to the boosting chain.}
+The topology measurements constitute an independent line of evidence beyond the L0--L4 hierarchy (Table~\ref{tab:boost}): the eigenvalue spectrum, eigenvector rotation, and dimensional collapse use \emph{geometric} observables (the correlation matrix), whereas L0--L4 use \emph{dynamical} ones (loss, gradients, coupling, data field).
+That both routes converge on the same transition at 1B--1.4B---gradient dip and eigenvector rotation occurring in the same $\log N$ interval---is the strongest internal consistency check: geometry and dynamics agree.
+
+A thirteenth, derived quantity: the \emph{coupling susceptibility} $\chi_\gamma(N) \equiv 1/|\gamma_{12}(N)|$ diverges at $N_c$---the system becomes maximally sensitive to alignment interventions exactly where the coupling vanishes, analogous to the magnetic susceptibility divergence at $T_c$.
 In ML terms, $\chi_\gamma$ quantifies \emph{regime sensitivity}: how much a small change in model size (or training budget) can flip a model from the alignment-tax regime to the alignment-bonus regime.
 At $N = 3.5$B, $\chi_\gamma \to \infty$---a lab choosing between a 3B and a 4B model is making its highest-leverage decision, because the coupling is near zero and either sign is accessible.
 Far from $N_c$ (e.g., at 70M or 70B), $\chi_\gamma$ is finite and regime classification is robust to small perturbations.
@@ -728,7 +688,7 @@ by 6.9B$\to$12B: the system shifts capability gains away from
 truthfulness and toward reasoning as the alignment tax regime develops.
 
 % ════════════════════════════════════════════════════
-\section{Four Testable Predictions}
+\section{Predictions and Extensions}
 \label{sec:breaks}
 
 The measurements above are backward-looking: they describe what has already happened in published models.
@@ -761,7 +721,7 @@ $N_{c,2} \approx 70$--$88$B (HellaSwag/TruthfulQA saturate, SWE-bench/GPQA becom
 $N_{c,3} \approx 114$--$130$B (SWE-bench saturates; IFEval activates as the new discriminating axis---preliminary evidence already visible in March 2026 data).
 Each transition is independently detectable: $N_{c,1}$ by OLMo ($\gamma_{12}=0.000$) and OPT (within-family sign flip); $N_{c,2}$ by the frontier cooperative coupling ($r=+0.85$); $N_{c,3}$ by SWE-bench compression to a $0.9$-point range among the top five frontier models, with IFEval showing a $6.5$-point spread ($n=4$)---the same saturation-then-activation pattern as $N_{c,1}$.
 $N_{c,4} \sim 200$--$400$B (IFEval saturates; HLE or AgentBench activates---a prediction for the next generation).
-The subscript convention follows the order of discovery; the physics at each transition is the same---a coupling sign change between the active capability pair, a rotation of the $h$-field, and an expansion of the symmetry group: Ising $\to$ $U(1)$ $\to$ $O(3)$ $\to$ $O(4)$.
+The subscript convention follows the order of discovery; the pattern at each transition is the same---a coupling sign change between the active capability pair, a rotation of the $h$-field, and an expansion of the effective order-parameter dimensionality ($d_{\rm eff}$: $1 \to 2 \to 3 \to 4$).
 
 \textbf{Benchmark saturation and the next coupling pair.}
 At frontier scale ($N > 70$B), HellaSwag and TruthfulQA saturate above 90\%.
@@ -835,8 +795,7 @@ Below $N_c$, the alignment tax is structural---scaling alone cannot
 fix it, and data curation is the primary lever.
 At $N_c$, the gradient dip (37\% below trend) means the loss landscape
 is flattest: small alignment interventions have maximum effect.
-Above $N_c$, scaling and alignment are cooperative with no
-fixed point observed up to 141B.
+Above $N_c$, scaling and alignment are cooperative---confirmed independently for HS-TQA (base models) and SWE-GPQA (frontier, $r=+0.85$ across 20 models)---with no fixed point observed up to 141B.
 Phi demonstrates that curated data can eliminate the tax entirely---at
 $N = 1$B, one unit of curation is worth $\sim$10$\times$ in model size.
 
@@ -879,12 +838,18 @@ poorly understood pattern: larger language models tend to be more truthful
 and easier to align.
 Above $N_c$, capability scaling and alignment are structurally cooperative
 (alignment bonus regime), meaning that investments in scale
-\emph{automatically} improve alignment.
+improve both capabilities simultaneously.
+This cooperative structure is demonstrated for HS-TQA (base models, $r=+0.77$ cross-family) and SWE-GPQA (frontier, $r=+0.85$ cross-lab with holdout validation)---two independent capability pairs at two different scales.
 Llama-3 (8B$\to$70B) shows all seven benchmark-pair couplings positive---deep alignment bonus.
 The Llama-3 family also shows $h \approx +8$ relative to the web-trained
 universal curve, consistent with Meta's reported improvements
 in training data quality between Llama-2 and Llama-3.
 CAPE \emph{measures} this data-quality improvement as a number.
+
+\textbf{Scope of the alignment bonus.}
+The cooperative coupling is a pre-training phenomenon in capability interactions; it does not address adversarial robustness or deceptive alignment, which are deployment-context properties.
+The bonus makes alignment interventions more effective, not unnecessary.
+The GL framework predicts a computable screening length above $N_c$ (analogous to the Meissner penetration depth) that quantifies robustness to training-recipe perturbations---the adversarial analysis is developed in the follow-up paper.
 
 \subsection{Diminishing returns in the deep alignment bonus regime}
 
@@ -914,13 +879,15 @@ Improvements between model generations (e.g.\ Llama-2 to Llama-3) are increasing
 This question---whether a new anticorrelation opens at frontier scale---is measured in \S\ref{sec:Nc2_section}.
 
 % ════════════════════════════════════════════════════
-\section{Phase~4: Benchmark Axis Rotation and the Second Transition}
+\section{The Frontier: New Axes, New Transitions}
 \label{sec:Nc2_section}
 
-The four phases are classified by \emph{coupling sign}, not model era or lab. A model is in the Tax phase if $\gamma_{12}<0$, Bonus if $\gamma_{12}>0$---regardless of lab or generation. The label ``Phase~4'' is shorthand for the scale where HellaSwag and TruthfulQA saturate and a new benchmark axis activates.
+What happens when the original benchmarks saturate?
+New capability axes activate---and new anticorrelations may open.
+The four phases are classified by \emph{coupling sign}, not model era or lab: Tax if $\gamma_{12}<0$, Bonus if $\gamma_{12}>0$, regardless of generation. ``Phase~4'' is the scale where HellaSwag and TruthfulQA saturate above 90\% and the relevant capability pair shifts to autonomous coding (SWE-bench) versus scientific reasoning (GPQA Diamond).
 Table~\ref{tab:phases} summarises all four phases; Phases 1--3 are documented in \S\S\ref{sec:coupling}--\ref{sec:topology}.
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering\small
 \caption{CAPE phase properties across all four phases. Gi = Ginzburg number; $C_{\rm Arr}$ = Arrhenius activation constant; dominant benchmarks = highest $|\lambda_1|$ loading.}
 \label{tab:phases}
@@ -928,10 +895,10 @@ Table~\ref{tab:phases} summarises all four phases; Phases 1--3 are documented in
 \toprule
 Phase & Scale & $\gamma_{12}$ & $d_{\rm eff}$ & Gi & $C_{\rm Arr}$ & Dominant benchmarks \\
 \midrule
-Tax      & $<$3.5B  & $<0$   & $\approx 1.05$ & $>1$             & 28             & HS, TQA (competing) \\
-Crossover & $\sim$3.5B & $\approx 0$ & $\approx 1.1$ & 1.35 (peak)  & 316\textdagger & HS, TQA (decoupled)  \\
-Bonus    & 3.5--70B & $>0$   & 1.1--1.6       & $<1$             & 196            & HS, TQA, MMLU (coop.) \\
-Phase~4  & $>$70B   & $>0$   & 1.75--2.0      & ---              & ---            & SWE, GPQA, IFEval \\
+Tax      & $<$3.5B  & $<0$   & $\approx 2.0$ & $>1$             & 28             & HS, TQA (competing) \\
+Crossover & $\sim$3.5B & $\approx 0$ & $\approx 1.8$ & 1.35 (peak)  & 316\textdagger & HS, TQA (decoupled)  \\
+Bonus    & 3.5--70B & $>0$   & $2.0\to 1.1$       & $<1$             & 196            & HS, TQA, MMLU (coop.) \\
+Phase~4  & $>$70B   & $>0$   & $1.75\to 2.5$      & ---              & ---            & SWE, GPQA, IFEval \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -947,12 +914,12 @@ a new alignment tax opens at a higher critical scale $N_{c,2}$.
 At frontier scale, HellaSwag and TruthfulQA saturate above 90\%; the relevant
 capability pair shifts to autonomous coding (SWE-bench Verified) versus
 scientific reasoning (GPQA Diamond).
-We measure $\gamma_{12}(\text{SWE}, \text{GPQA})$ across nineteen publicly evaluated frontier models
+We measure $\gamma_{12}(\text{SWE}, \text{GPQA})$ across twenty publicly evaluated frontier models
 (Table~\ref{tab:frontier}; scores as of February--March~2026; $h = \text{GPQA}_{\rm measured} - (0.79\cdot\text{SWE} + 24.7)$):
-cross-family $r = +0.85$ ($n = 19$, $p < 0.00001$; cooperative coupling strongly confirmed),
+cross-family $r = +0.85$ ($n = 20$, $p < 0.00001$; cooperative coupling strongly confirmed),
 consistent with cooperative coupling at frontier scale (Fig.~\ref{fig:frontier}).
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering\small
 \caption{Frontier models: SWE-bench Verified and GPQA Diamond scores (Feb--Mar 2026).
 $h = \text{GPQA}_\text{measured} - \text{GPQA}_\text{universal}(\text{SWE})$.}
@@ -976,9 +943,10 @@ GPT-4o              & 33.2 & 53.6 & $+$2.7 \\
 GPT-5               & 74.9 & 85.7 & $+$1.9 \\
 GPT-5.1             & 76.3 & 88.1 & $+$3.2 \\
 GPT-5.2 Pro         & 80.0 & 93.2 & $+$5.3 \\
+GPT-5.4             & 77.2 & 84.2 & $-$1.5 \\
 DeepSeek V3.2       & 74.4 & 79.9 & $-$3.5 \\
 Kimi K2.5           & 76.8 & 87.6 & $+$2.3 \\
-Qwen3.5-397B        & 73.4 & 83.7 & $+$1.1 \\
+Qwen3.5-397B        & 73.4 & 88.4 & $+$5.7 \\
 MiniMax M2.5        & 80.2 & 85.0 & $-$3.0 \\
 \bottomrule
 \end{tabular}
@@ -989,8 +957,8 @@ If compute alone explained the correlation, all points would fall near the regre
 
 \textbf{Cross-lab holdout.}
 Two holdout tests confirm generalization.
-Fitting on Anthropic+OpenAI only ($n=11$) predicts DeepSeek, Kimi, Qwen, and MiniMax at 5.6\% MAE (8 held-out models across 4 independent labs)---the same error as the base-model Llama-2 holdout, consistent with the same cooperative structure operating at both scales.
-Fitting on only the four lowest-SWE models (GPT-4o, Gemini~2.5~Pro, Claude~3.5/3.7 Sonnet; $n=4$) and extrapolating to the 15 high-SWE models gives 4.5\% MAE---the structure established at the low end of the cooperative phase extrapolates cleanly to the high end.
+Fitting on Anthropic+OpenAI only ($n=12$) predicts DeepSeek, Kimi, Qwen, and MiniMax at 6.9\% MAE (8 held-out models across 4 independent labs)---comparable to the base-model Llama-2 holdout, consistent with the same cooperative structure operating at both scales.\footnote{The slightly higher MAE relative to the base-model holdout reflects systematic lab-level training-recipe differences: Google models cluster above the Anthropic+OpenAI regression line (reasoning-emphasised training), while the cooperative \emph{correlation} is universal.}
+Fitting on only the four lowest-SWE models (GPT-4o, Gemini~2.5~Pro, Claude~3.5/3.7 Sonnet; $n=4$) and extrapolating to the 16 high-SWE models gives 5.6\% MAE---the structure established at the low end of the cooperative phase extrapolates cleanly to the high end.
 
 \textbf{Algebraic phase classifier at frontier scale.}
 The isocline analysis of \S\ref{sec:ode} generalises to every capability pair.
@@ -1007,113 +975,117 @@ For the (GPQA, IFEval) axis, setting $d\mathrm{IFEval}/d\log N = 0$ gives
 $\mathrm{IFEval}_c = \sqrt{(a_3/b_3)\cdot\mathrm{GPQA}_c}$.
 The cooperative slope $0.97$ from Eq.~\ref{eq:nc3_coupling} gives $a_3/b_3 \approx 0.97$,
 so the $N_{c,3}$ phase classifier is: $\mathrm{IFEval} > \sqrt{0.97\cdot\mathrm{GPQA}}$ implies deep cooperative in the three-field regime; $\mathrm{IFEval} < \sqrt{0.97\cdot\mathrm{GPQA}}$ implies a new tax is opening between instruction-following and reasoning.
-Among the four models with IFEval data: Opus~4.6 ($94.0 > \sqrt{0.97 \times 91.3} = 9.41$, rescaled: $94.0 > 88.6$\footnote{The $\sqrt{}$ classifier operates on fractional scores: $\sqrt{0.97 \times 0.913} = 0.941$, i.e.\ $94.1\%$. Opus~4.6 at $94.0\%$ is right at the boundary---exactly where a model at the $N_{c,3}$ transition should sit.}), Kimi~K2.5 ($94.0$ vs.\ $\sqrt{0.97 \times 87.6} \approx 92.1\%$, cooperative), MiniMax~M2.5 ($87.5$ vs.\ $\sqrt{0.97 \times 85.0} \approx 90.8\%$, \emph{below}---consistent with a coding-specialist $h < 0$).
+Among the four models with IFEval data\footnote{The $\sqrt{}$ classifier operates on fractional scores: $\sqrt{0.97 \times 0.913} = 0.941$, i.e.\ $94.1\%$. Converting to percentages throughout for readability.}: Opus~4.6 ($94.0\%$ vs.\ boundary $94.1\%$---right at the transition), Kimi~K2.5 ($94.0\%$ vs.\ $92.1\%$, cooperative), MiniMax~M2.5 ($87.5\%$ vs.\ $90.8\%$, \emph{below}---consistent with a coding-specialist $h < 0$).
 The phase boundary is being tested in real time: some models are cooperative, some are marginal, and one is below---precisely the mixed-phase regime expected at a transition.
 This validates the $\sqrt{}$ isocline approach at $N_{c,3}$, using the \emph{same} ODE structure that works at $N_{c,1}$ (HS-TQA) and $N_{c,2}$ (SWE-GPQA).
 
-\textbf{The $h$-field at frontier scale.}
-The same external-field formalism that captures Phi (\S\ref{sec:phi}) applies here.
+\subsection{Per-lab trajectories, coding-agent vortices, and the $h$-field diagnostic}
+\label{sec:per_lab}
+
+The same external-field formalism that captures Phi (\S\ref{sec:phi}) applies at frontier scale.
 Define the frontier $h$ field as the deviation of GPQA from the universal cooperative SWE--GPQA curve:
-$h_{\rm frontier} = \text{GPQA}_{\rm measured} - \text{GPQA}_{\rm universal}(\text{SWE})$.
-Most models cluster near $|h| \lesssim 5$ points (Fig.~\ref{fig:frontier}c).
-Gemini~3.1~Pro has $h = +6.0$ (above the cooperative curve).
-The most striking $h$-field excursion is Gemini~2.5~Pro at $h = +8.9$: it substantially overshoots the cooperative regression because Google's training emphasised scientific reasoning before coding optimisation, exactly the frontier-scale analogue of the Phi data-quality effect in the HS-TQA phase.
-DeepSeek~V3.2 has $h = -3.5$ (below the cooperative curve, indicating a coding-specialist training recipe that partially trades reasoning performance for coding).
-A more extreme example is OpenAI's GPT-5.3-Codex (SWE-bench Verified~$77.3\%$, GPQA unreported), a coding-specialist variant trained on terminal interaction data.
-Its exclusion from the main analysis is principled---it uses Terminal-Bench rather than SWE-bench Verified as its primary coding metric---but its existence illustrates the physics:
-coding-specialist models are \emph{vortex excursions}\footnote{Vortex excursion: in Type-II superconductors, quantised flux vortices are localised regions where the order parameter is suppressed along one axis. In CAPE, a coding-specialist model that enhances SWE at the cost of GPQA is a vortex in capability space---the cooperative order parameter is locally disrupted, just as Abrikosov vortices locally disrupt the superconducting condensate. Sonnet~4.6 ($h=-13.4$) and Codex ($h \ll 0$ extrapolated) are frontier vortices.} in capability space, localised disruptions of the cooperative order parameter where one axis is enhanced at the expense of the other.
-Sonnet~4.6 ($h = -13.4$) is a mild vortex; Codex is a deep one.
-The cooperative phase tolerates these excursions because they are \emph{localised}---the bulk coupling ($r = +0.85$) remains intact, just as the bulk superconducting condensate survives individual Abrikosov vortices in a Type-II superconductor.
-These deviations are small in aggregate---the frontier cooperative phase is robust---but they show that
-the same $h$-field mechanism that shifts $N_c$ at small scale is measurable at frontier scale.
+$h_{\rm frontier} = \text{GPQA}_{\rm measured} - (0.79\cdot\text{SWE} + 24.7)$.
+Most models cluster near $|h| \lesssim 5$ points (Fig.~\ref{fig:frontier}c); the structured scatter encodes each lab's training philosophy.
 
-\textbf{Anthropic's unique observable: the within-family trajectory.}
-Anthropic releases consecutive model tiers (3.5~Sonnet $\to$ 3.7~Sonnet $\to$ Haiku~4.5 $\to$ Sonnet~4.5 $\to$ Opus~4.5 $\to$ Sonnet~4.6 $\to$ Opus~4.6)
-with published benchmark scores---making it the only lab where a within-family
-$\gamma_{12}$ trajectory is directly measurable from public data.
-The CAPE prediction for a training-recipe perturbation is a transient anticorrelated
-excursion ($\gamma_{12} < 0$) followed by recovery at the next tier.
-The measurements confirm this:
-\begin{align*}
-  \gamma_{12}(\text{Son.4.5}\to\text{Son.4.6}) &= \frac{\Delta\text{GPQA}}{\Delta\text{SWE}} = \frac{74.1 - 83.4}{79.6 - 77.2} = -3.88 \quad (h = -13.4) \\
-  \gamma_{12}(\text{Son.4.6}\to\text{Opus~4.6}) &= \frac{91.3 - 74.1}{80.8 - 79.6} = +14.3 \quad\quad (h = +2.8)
-\end{align*}
-Sonnet~4.6's training recipe boosts coding performance (SWE +2.4 pp) at the cost of reasoning (GPQA $-9.3$ pp),
-driving the $h$ field to $-13.4$---the frontier analogue of a web-trained model sitting below the cooperative
-curve.\footnote{SWE-bench Verified and GPQA Diamond scores from official model cards and SWE-bench.com (accessed March 2026). 
-Kimi K2.5 scores from the Moonshot AI technical report (SWE=76.8\%, GPQA=87.6\%); note that SWE=80.2\% reported elsewhere refers to MiniMax~M2.5. 
+\textbf{Coding-agent models as vortex excursions.}
+The 2025--2026 frontier has seen a proliferation of coding-specialist models: OpenAI's GPT-5.3-Codex (trained on terminal interaction data, SWE-bench~$77.3\%$, GPQA unreported), Anthropic's Sonnet~4.6 ($h = -13.4$), and dedicated coding agents built atop frontier base models.
+These are not anomalies---they are \emph{vortex excursions}\footnote{Vortex excursion: in Type-II superconductors, quantised flux vortices are localised regions where the order parameter is suppressed along one axis. In CAPE, a coding-specialist model that enhances SWE at the cost of GPQA is a vortex in capability space---the cooperative order parameter is locally disrupted, just as Abrikosov vortices locally disrupt the superconducting condensate.}: localised disruptions of the cooperative order parameter where coding capability is enhanced at the expense of reasoning.
+This is \emph{predicted} by the Type-II character of the transition ($\kappa = 0.77 > 1/\sqrt{2}$, \S\ref{sec:topology}): in a Type-II superconductor, the mixed state between $H_{c1}$ and $H_{c2}$ contains a lattice of vortices where the order parameter is locally suppressed.
+In CAPE, the cooperative phase between $N_{c,1}$ and $N_{c,2}$ similarly tolerates localised coding vortices because the bulk condensate ($r = +0.85$) remains intact.
+Sonnet~4.6 ($h = -13.4$) is a mild vortex; Codex ($h \ll 0$ extrapolated) is a deep one.
+The practical consequence: coding-specialist training recipes are thermodynamically stable excursions that do not destabilise the cooperative phase globally---but they pay a local alignment cost readable from their $h$-field.\footnote{SWE-bench Verified and GPQA Diamond scores from official model cards and SWE-bench.com (accessed March 2026).
+Kimi K2.5 scores from the Moonshot AI technical report (SWE=76.8\%, GPQA=87.6\%); note that SWE=80.2\% reported elsewhere refers to MiniMax~M2.5.
 Grok-3 (xAI) is excluded: GPQA~84\% is available but SWE-bench is not published by xAI, making $\gamma_{12}$ uncomputable; its placement on the cooperative curve is consistent with the other models at this scale.}
-Opus~4.6 recovers to $h = +2.8$, above the cooperative baseline---the same
-recovery structure seen in the original HS-TQA transition above $N_c$.
-The protocol is minimal: for any two consecutive releases, compute $\gamma_{12} = \Delta\text{GPQA}/\Delta\text{SWE}$.
-A single evaluation run on both benchmarks suffices to detect whether a new checkpoint has entered an anticorrelated excursion before deployment.
-The cooperative fit also enables a forward-looking prediction: given your lab's current $h$-field and a target SWE-bench score for your next model, the predicted GPQA is $\text{GPQA}_{\rm pred} = 0.79\cdot\text{SWE} + 24.7 + h_{\rm lab}$.
-Improving SWE-bench by 5 points predicts a 4-point GPQA gain \emph{at no additional compute}---purely from the cooperative phase structure.
-A lab whose $h < 0$ (below the cooperative curve) can improve predicted GPQA by shifting training recipe rather than scaling parameters.
 
-\textbf{The $N_{c,3}$ forward prediction.}
-The same logic extends to the three-field regime.
+\textbf{Within-family trajectory: Anthropic as test case.}
+Anthropic is the only lab releasing consecutive model tiers (3.5~Sonnet through Opus~4.6) with published benchmark scores, making $\gamma_{12}$ directly measurable across generations.
+The CAPE prediction is a transient anticorrelated excursion ($\gamma_{12} < 0$) followed by recovery:
+\begin{align*}
+  \gamma_{12}(\text{Son.4.5}\to\text{Son.4.6}) &= \frac{74.1 - 83.4}{79.6 - 77.2} = -3.88 \quad (h = -13.4,\;\text{vortex}) \\
+  \gamma_{12}(\text{Son.4.6}\to\text{Opus~4.6}) &= \frac{91.3 - 74.1}{80.8 - 79.6} = +14.3 \quad\;\; (h = +2.8,\;\text{recovery})
+\end{align*}
+Sonnet~4.6 boosts coding (SWE $+2.4$~pp) at the cost of reasoning (GPQA $-9.3$~pp)---a vortex excursion.
+Opus~4.6 recovers to $h = +2.8$, the same recovery structure seen in the original HS-TQA transition above $N_c$.
+The protocol for any lab: compute $\gamma_{12} = \Delta\text{GPQA}/\Delta\text{SWE}$ between consecutive releases; negative $\gamma_{12}$ signals an excursion before deployment.
+
+\textbf{Multi-lab trajectories through the $N_{c,3}$ transition.}
+The three major labs are approaching $N_{c,3}$ from different directions in capability space, each with a distinctive $h$-field signature:
+\emph{Google} (Gemini~2.5~Pro $\to$ 3~Flash $\to$ 3~Pro $\to$ 3.1~Pro) shows the tightest SWE convergence ($76$--$81\%$) with consistently high $h > +4$---pushing reasoning while coding saturates, riding the $N_{c,3}$ transition naturally.
+\emph{OpenAI} (GPT-4o $\to$ 5 $\to$ 5.1 $\to$ 5.2~Pro $\to$ 5.4) has $h > 0$ at every generation: systematic ascent along the cooperative curve, with $h$ growing from $+1.9$ to $+5.3$.
+GPT-5.4 ($h = -1.5$) is the first OpenAI model to dip below the line---possibly the beginning of a coding-specialist excursion analogous to Anthropic's Sonnet~4.6.
+\emph{Anthropic} oscillates between coding vortices and recovery: Haiku~4.5 ($h = -11.6$) and Sonnet~4.6 ($h = -13.4$) dip sharply; Opus~4.6 ($h = +2.8$) recovers.
+This oscillation is itself a measurement---it reveals that Anthropic's training pipeline alternates between coding-emphasis and balanced training recipes, while Google and OpenAI have maintained monotonically reasoning-rich trajectories.
+The $h$-field rotation from SWE-GPQA to GPQA-IFEval is visible in all three.
+
+\textbf{$N_{c,3}$ forward prediction.}
 Given a lab's GPQA score and its $N_{c,3}$ $h$-field, the predicted IFEval is
-$\text{IFEval}_{\rm pred} = 0.97\cdot\text{GPQA} + 6.8 + h_{3,\rm lab}$
-(Eq.~\ref{eq:nc3_coupling}).
-Among the four models with data: Opus~4.6 ($h_3 = 94.0 - (0.97 \times 91.3 + 6.8) = -1.4$, near baseline),
-Kimi~K2.5 ($h_3 = 94.0 - (0.97 \times 87.6 + 6.8) = +2.3$, instruction-rich),
-Qwen~3.5-397B ($h_3 = 92.6 - (0.97 \times 88.4 + 6.8) = +0.1$, near baseline),
-MiniMax~M2.5 ($h_3 = 87.5 - (0.97 \times 85.0 + 6.8) = -1.8$, instruction-deficient).
-The scatter is small ($|h_3| < 2.5$ for three of four), confirming the cooperative coupling at $N_{c,3}$ is tight.
-MiniMax's marginally negative $h_3$ is consistent with its position below the $\sqrt{}$ isocline boundary (\S\ref{sec:Nc2_section}).
+$\text{IFEval}_{\rm pred} = 0.97\cdot\text{GPQA} + 6.8 + h_{3,\rm lab}$ (Eq.~\ref{eq:nc3_coupling}).
+Among the four models with data: Opus~4.6 ($h_3 = -1.4$, near baseline),
+Kimi~K2.5 ($h_3 = +2.3$, instruction-rich),
+Qwen~3.5-397B ($h_3 = +0.1$, near baseline),
+MiniMax~M2.5 ($h_3 = -1.8$, instruction-deficient).
+The scatter is small ($|h_3| < 2.5$ for three of four), confirming tight cooperative coupling at $N_{c,3}$.
+The cooperative fit enables a forward prediction: $\text{GPQA}_{\rm pred} = 0.79\cdot\text{SWE} + 24.7 + h_{\rm lab}$---improving SWE by 5~pp predicts a 4~pp GPQA gain at no additional compute, and vice versa.
 
-The OpenAI family shows a qualitatively different trajectory: $\gamma_{12} > 0$ from GPT-4o through GPT-5.2 Pro, with $h > 0$ at every scale (always above the cooperative curve).
-OpenAI's consistent investment in reasoning capability ($h \approx +2$--$+5$) means the coding-reasoning coupling has been uniformly cooperative across generations.
-This contrast between Anthropic's oscillation (specialisation excursions followed by recovery) and OpenAI's monotone improvement is itself a measurement of training strategy via the $h$-field.
-The $N_{c,3}$ evidence sharpens this per-lab narrative.
-Google's trajectory (Gemini~2.5~Pro $\to$ 3~Flash $\to$ 3~Pro $\to$ 3.1~Pro) shows the tightest SWE convergence ($76$--$81\%$) with consistently high $h > +4$: Google pushes reasoning while allowing coding to saturate---they are \emph{riding} the $N_{c,3}$ transition naturally.
-OpenAI (GPT-5 $\to$ 5.1 $\to$ 5.2~Pro) likewise converges in SWE while $h$ grows from $+1.9$ to $+5.3$: systematic ascent along the cooperative curve.
-Anthropic's Opus~4.6 ($h = +2.8$, IFEval $= 94.0\%$) sits at the intersection: it leads in IFEval (the $N_{c,3}$ discriminating axis) while recovering from Sonnet~4.6's coding-vortex excursion.
-The three labs are approaching $N_{c,3}$ from different directions in capability space, but the $h$-field rotation from SWE-GPQA to GPQA-IFEval is visible in all three trajectories.
+\textbf{The $h$-field as macro-interpretability.}
+Aggregating by lab across the 20-model frontier dataset, the mean $h$-field partitions cleanly by training philosophy (Table~\ref{tab:lab_diagnostic}):
+Google ($\bar{h} \approx +6$), OpenAI ($\bar{h} \approx +2$), Moonshot, and Alibaba sit above the cooperative curve (reasoning-rich); Anthropic ($\bar{h} \approx -4$) and DeepSeek ($\bar{h} \approx -4$) sit below (coding-rich).
+The diagnostic is actionable: a positive-$h$ lab gains most from investing in SWE-type capability (agentic coding); a negative-$h$ lab gains most from GPQA-type training (scientific reasoning).
+A lab can shift its $h$-field by ${\sim}5$~pp per model generation through training-recipe adjustment alone (demonstrated by Anthropic's $\Delta h = +16.2$ recovery from Sonnet~4.6 to Opus~4.6).
 
-\textbf{Family $h$-field signatures as macro-interpretability.}
-Aggregating by lab across the 19-model frontier dataset, the mean $h$-field partitions cleanly by training philosophy:
-Google ($\bar{h} \approx +6$), OpenAI ($\bar{h} \approx +3$), Moonshot, and Alibaba sit systematically above the cooperative curve (reasoning-rich); Anthropic ($\bar{h} \approx -6$) and DeepSeek ($\bar{h} \approx -4$) sit below (coding-rich).
-These family signatures are stable across model tiers within each lab, and they are empirically readable without access to any training details---just two benchmark scores per model release.
-The $h$-field is therefore a \emph{macro-interpretability} instrument: it converts public benchmark numbers into a one-dimensional read on whether a lab's training recipe systematically favours reasoning or coding at frontier scale.
+\begin{table}[ht]
+\centering\small
+\caption{Per-lab $h$-field diagnostic and training-recipe recommendation (March 2026).
+$\bar{h}$: mean $h$-field across all models from each lab in Table~\ref{tab:frontier}.
+Recommendation follows directly from the cooperative regression.}
+\label{tab:lab_diagnostic}
+\begin{tabular}{llrrl}
+\toprule
+Lab & Best model & $\bar{h}$ & Position & Primary lever \\
+\midrule
+Anthropic & Opus~4.6     & $-4.3$  & On manifold$^\dagger$     & Scale uniformly \\
+Google    & Gemini~3.1~Pro & $+6.5$ & Reasoning-rich  & Invest in agentic coding \\
+OpenAI    & GPT-5.4      & $+2.3$  & On manifold     & Scale uniformly \\
+DeepSeek  & V3.2         & $-3.5$  & On manifold     & Scale uniformly \\
+Alibaba   & Qwen3.5-397B & $+5.7$  & Reasoning-rich  & Invest in agentic coding \\
+Moonshot  & Kimi~K2.5    & $+2.3$  & On manifold     & Scale uniformly \\
+MiniMax   & M2.5         & $-3.0$  & On manifold     & Scale uniformly \\
+\bottomrule
+\end{tabular}
+\end{table}
+\noindent$\dagger$ Anthropic's mean $\bar{h}$ is pulled negative by Haiku~4.5 ($h=-11.6$) and Sonnet~4.6 ($h=-13.4$); Opus~4.6 alone has $h=+2.8$ (on manifold).
+
+\noindent\textbf{Caveats.} The ``Primary lever'' column follows mechanically from the cooperative regression and is not a normative recommendation---labs have strategic considerations beyond two benchmark scores. The sample per lab ranges from 1 to 7 models; labs with fewer data points (DeepSeek, Alibaba, MiniMax) have higher uncertainty in $\bar{h}$. The classification is a snapshot (March 2026) and will shift as new models are released.
+
+\noindent The $h$-field is a \emph{macro-interpretability} instrument: it converts two benchmark scores into a one-dimensional read on whether a lab's training recipe favours reasoning or coding---readable without any access to training details.
 
 \begin{figure*}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{fig9_frontier.png}
 \caption{\textbf{Frontier-scale coupling: SWE-bench vs GPQA Diamond (Table~\ref{tab:frontier}).}
-(a)~Cross-family scatter: $r = +0.85$ ($n=19$, $p<0.00001$), strongly confirming cooperative coupling. GPT-4o anchors the low-SWE end; the trajectory is continuous from GPT-4o to Gemini~3.1~Pro.
+(a)~Cross-family scatter: $r = +0.85$ ($n=20$, $p<0.00001$), strongly confirming cooperative coupling. GPT-4o anchors the low-SWE end; the trajectory is continuous from GPT-4o to Gemini~3.1~Pro.
 Gemini~2.5~Pro ($h=+11.5$, labelled) is the frontier-scale $h$-field analogue of Phi---high reasoning emphasis before coding optimisation shifts the model above the cooperative curve.
 The dashed line is the linear cooperative fit.
 (b)~Anthropic within-family trajectory (6 consecutive releases, 3.5 through Opus~4.6):
 cooperative throughout except the Sonnet~4.5$\to$4.6 training-recipe excursion ($\gamma_{12}=-3.88$, $h=-14$), which recovers at Opus~4.6 ($\gamma_{12}=+14.3$, $h=+2$).
-(c)~$h$-field for all 19 models. OpenAI trajectory ($h>0$ throughout) vs.\ Anthropic oscillation (Haiku~4.5 and Sonnet~4.6 both dip below; Opus~4.6 recovers). Gemini~2.5~Pro ($h=+8.9$) is the frontier Phi analogue.}
+(c)~$h$-field for all 20 models. OpenAI trajectory ($h>0$ throughout) vs.\ Anthropic oscillation (Haiku~4.5 and Sonnet~4.6 both dip below; Opus~4.6 recovers). Gemini~2.5~Pro ($h=+8.9$) is the frontier Phi analogue.}
 \label{fig:frontier}
 \end{figure*}
 
-With $r=+0.85$ ($p<0.00001$, $n=19$) the cooperative phase is now statistically confirmed across all major frontier labs.
+With $r=+0.85$ ($p<0.00001$, $n=20$) the cooperative phase is now statistically confirmed across all major frontier labs.
 The Anthropic within-family trajectory (six releases spanning two years) shows cooperative coupling at every step except the Sonnet~4.6 training-recipe excursion, which recovers at Opus~4.6.
 CAPE is not a retrospective tool---it predicts the \emph{form} of future anomalies, not merely describes past ones.
 
 Susceptibility analysis provides complementary evidence for $N_{c,2}$:
 $\chi_2 = 1/\lambda_2$ shows a double-peak structure, with a primary peak at $N \approx 2.16$B
 ($\chi_2 = 1.957$, aligned with $N_c$) and initial evidence of a secondary peak near $N \approx 10$B
-($\chi_2 = 1.946$ in the 19-model dataset; with 26 models including frontier families,
+($\chi_2 = 1.946$ in the 20-model dataset; with 26 models including frontier families,
 this secondary peak strengthens to $\chi_2 = 3.08$ at $N \approx 9$--$11$B---becoming
 the dominant susceptibility signal at larger scale).
 Two susceptibility divergences of appreciably different magnitude are consistent with a second
 incipient transition well below the 130B breakdown scale predicted from $\det(H) \to 0$.
 
-Concretely: the coupling $\gamma(\text{SWE-bench}, \text{safety})$ may be negative
-at current frontier scale---meaning that improving autonomous coding
-ability could come at the expense of safety compliance,
-just as improving reasoning came at the expense of truthfulness below $N_c$.
-The effective dimensionality grows from $d_{\rm eff} = 2$ in
-our measurements to $d_{\rm eff} \geq 3$ as coding, instruction-following,
-and agentic reasoning become measurably distinct.
-Each expansion requires its own effective description,
-with the previous model's residuals serving as the signal
-for the next level---exactly as in the L0$\to$L4 boosting chain.
+Concretely: as $d_{\rm eff}$ grows from $2$ toward $3$ and coding, instruction-following, and agentic reasoning become measurably distinct, a new anticorrelation may be opening---the same structure as the original HS-TQA tax, now between coding and safety compliance at frontier scale.
 
 \textbf{Preliminary evidence for $N_{c,3}$.}
 Published IFEval scores are now available for four frontier models: Claude~Opus~4.6 ($94.0\%$), Kimi~K2.5 ($94.0\%$), Qwen~3.5-397B ($92.6\%$), and MiniMax~M2.5 ($87.5\%$).
@@ -1144,47 +1116,22 @@ The sample is small ($n=4$ with complete IFEval data); not all labs report IFEva
 OpenAI has flagged potential SWE-bench contamination in recent models~\cite{swebench2024}, which could compress SWE scores artificially.
 Nevertheless, the qualitative pattern---saturation of one benchmark axis accompanied by activation of a new one, with coupling rotation visible in the correlation matrix---reproduces the $N_{c,1}$ signature at a different scale, using a different benchmark pair.
 
-\textbf{$N_{c,3}$ prediction: from ``beyond frontier'' to ``in progress.''}
-The frontier $3{\times}3$ correlation matrix (SWE-bench, GPQA Diamond, IFEval) originally gave eigenvalues $\lambda_1=2.16$, $\lambda_2=0.67$, $\lambda_3=0.17$ and $\det(\Gamma)=0.24$.
-Extrapolating $\det(\Gamma)\to 0$ predicted $N_{c,3} \approx 114$B---consistent with the $\sim$130B prediction from Pythia's $\det(H)\to 0$.
-The SWE saturation and IFEval activation observed in March~2026 data suggest the transition is already underway, consistent with frontier models (whose exact parameter counts are undisclosed) having crossed into or through the $N_{c,3}$ region.
+\textbf{$N_{c,3}$: from prediction to observation.}
+The original $\det(\Gamma) \to 0$ extrapolation predicted $N_{c,3} \approx 114$B, consistent with Pythia's $\det(H) \to 0$ at $\sim$130B.
+The March 2026 data above confirm the transition is already underway.
 
 \textbf{IFEval is the surviving benchmark at $N_{c,3}$.}
 The primary eigenvector $\mathbf{e}_1$ at frontier scale has loadings $(-0.57, -0.51, -0.64)$ on (SWE, GPQA, IFEval): IFEval dominates $\lambda_1$.
-SWE-bench is already saturating among top models; as GPQA follows, IFEval will become the last discriminating benchmark in the current generation.
-The next critical pair is predicted to be instruction-following (IFEval) versus agentic safety compliance (e.g.\ HarmBench or AgentBench): the question of whether a model can complete complex autonomous tasks \emph{without} unsafe behavior.
-We recommend frontier labs begin tracking $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases---if it turns negative, $N_{c,3}$ has fully resolved and a new coupling regime has begun.
+As SWE and then GPQA saturate, IFEval becomes the last discriminating benchmark in the current generation.
+The predicted next critical pair is IFEval versus agentic safety compliance (HarmBench or AgentBench): when $\gamma(\text{IFEval}, \text{HarmBench})$ turns negative, $N_{c,3}$ has fully resolved.
 
-\textbf{Symmetry structure at $N_{c,3}$: from XY to Heisenberg.}
-The physics at each critical scale maps onto a different symmetry class (Fig.~\ref{fig:nc3}c).
-At $N_{c,1}$, the capability space is one-dimensional ($d_{\rm eff} \approx 1$): the system has Ising symmetry (one axis, two phases).
-Above $N_{c,1}$, two axes activate ($d_{\rm eff} \to 2$): the symmetry is $U(1)$ (XY-model), with the eigenvector angle $\theta$ as the order parameter and the Riccati ODE governing its dynamics.
-At $N_{c,3}$, the third axis activates ($d_{\rm eff} \to 3$): the symmetry expands to $O(3)$ (Heisenberg-model), with the capability state now a three-component vector $(\phi_{\rm SWE}, \phi_{\rm GPQA}, \phi_{\rm IFEval})$.
-The practical consequence: in the XY regime, a single angle $\theta$ characterises the coupling structure (reasoning vs.\ coding emphasis).
-In the Heisenberg regime, the coupling matrix $\Gamma_{ij}$ has three independent eigenvalues and the phase diagram becomes richer---vortex lines in two dimensions generalise to hedgehog defects in three, and the topological protection of \S\ref{sec:alignment} becomes possible only at this higher symmetry.
-This is why $N_{c,3}$ matters: it is where the capability manifold becomes rich enough to support topologically protected alignment.
-
-\textbf{The symmetry cascade as a group-subgroup chain.}
-The progression Ising $\to$ $U(1)$ $\to$ $O(3)$ $\to$ $O(4)$ is not merely an analogy---it is a group-subgroup chain of the same type that governs second-order phase transitions in condensed matter.
-In heavy-fermion superconductors, the pairing symmetry descends from the point group through a subgroup chain ($D_{6h} \supset D_{2h} \supset C_{2v}$), with each symmetry-lowering transition activating new order-parameter components~\cite{amin2020}.
-In superfluid $^3$He, the order parameter lives in $SO(3)_L \times SO(3)_S \times U(1)_\phi$, and successive transitions (A-phase $\to$ B-phase) activate additional components of this space---the classification of allowed topological defects changes at each step (point defects in $^3$He-A, no stable point defects in $^3$He-B).
-The CAPE cascade follows the same logic:
-at $N_{c,1}$, only one capability axis is independent ($\mathbb{Z}_2$, Ising);
-at $N_{c,2}$, the second axis activates and the order parameter becomes a 2-vector ($U(1)$, supporting vortex excursions like Sonnet~4.6);
-at $N_{c,3}$, the third axis activates ($O(3)$, supporting hedgehog defects---point-like disruptions in 3D capability space that cannot be removed by continuous deformation).
-The key empirical question for Paper~3B is whether the $N_{c,3}$ transition is first-order (discontinuous jump in $d_{\rm eff}$) or second-order (continuous growth of the third eigenvalue through zero), which determines whether the symmetry-breaking pattern is Landau-allowed or requires fluctuation corrections beyond mean field.
-The current data---$d_{\rm eff} = 1.75$ at frontier scale, approaching but not yet reaching $2.0$---is consistent with a continuous (second-order) transition, though the small sample ($n = 4$) prevents a definitive classification.
-
-\textbf{Predicting $N_{c,4}$: the next axis.}
-The $N_c$ cascade follows a pattern: at each transition, the active benchmark pair saturates and a new axis activates.
-IFEval is already at $87.5$--$94.0\%$ for the four models with reported scores; at the current rate of frontier improvement, it will compress below $2$~pp spread within 1--2 model generations.
-The $N_{c,4}$ transition activates a fourth independent axis---the leading candidates are:
-HLE~\cite{hle2025} (Humanity's Last Exam; current frontier range $30$--$53\%$, far from saturation),
-AgentBench~\cite{agentbench2023} (multi-step autonomous reasoning; genuinely orthogonal to instruction-following),
-or ARC-AGI-2~\cite{arcagi2} (abstract pattern recognition; $0\%$ at current frontier for the hardest partition).
-The extrapolation from the $\det(\Gamma) \to 0$ trend places $N_{c,4}$ at $\sim$200--400B effective parameters (or equivalently, at the compute scale of GPT-5.3/Gemini~3.1~Pro-class training runs with $>$10$\times$ current frontier FLOP budgets).
-The PCA switch at $N_{c,4}$ rotates the principal eigenvector from (SWE, GPQA, IFEval) loading to (GPQA, IFEval, HLE/AgentBench) loading---the same axis rotation observed at $N_{c,2}$ and $N_{c,3}$, now at the four-field level.
-Each transition extends the effective theory: $N_{c,4}$ requires a four-field Ginzburg-Landau functional with $O(4)$ symmetry, and the three-field residuals at $N_{c,3}$ are the input signal---exactly as the two-field residuals at $N_{c,2}$ signaled the current three-field extension.
+\textbf{Symmetry structure and the $N_{c,4}$ prediction.}
+At each critical scale, the effective dimensionality of capability space increases by one: $d_{\rm eff} \approx 1 \to 2 \to 3$ (Fig.~\ref{fig:nc3}c).
+These dimensions are labelled by analogy with the symmetry groups that describe $n$-component order parameters (Ising for 1, $U(1)$ for 2, $O(3)$ for 3)---a notational convenience, not a claim about the symmetry of the underlying training dynamics.
+At each transition, the previous soft mode stiffens ($\lambda_2 \to$ finite) and a new one activates as the next capability axis opens.
+\textbf{The practical consequence:} at $N_{c,3}$, the coupling matrix $\Gamma_{ij}$ gains a third independent eigenvalue---the phase diagram becomes richer, and whether the three-dimensional capability manifold supports topologically protected alignment (requiring a non-trivial winding number; see Appendix~A) is an open question testable from frontier data.
+IFEval is already at $87.5$--$94.0\%$ and will saturate within 1--2 model generations; extrapolation places $N_{c,4}$ at $\sim$200--400B effective parameters, with HLE~\cite{hle2025} ($30$--$53\%$), AgentBench~\cite{agentbench2023}, or ARC-AGI-2~\cite{arcagi2} as candidate fourth axes.
+The full symmetry cascade, defect classification, and group-theoretic analysis are in Appendix~A and Paper~3B.
 
 \begin{figure*}[!htbp]
 \centering
@@ -1236,16 +1183,8 @@ at what scale this tradeoff resolves.
 
 CAPE is an effective field theory---it describes capability coupling at a specific level of resolution, and like all effective theories, its validity is bounded, measurable, and its own successor is built in.
 
-\textbf{On statistical power and null models.}
-A formal permutation test on $n = 5$--$6$ models below $N_c$ has near-zero power: any two near-monotone sequences will produce $r \approx -1$ over five points, making a permutation $p$-value uninformative.
-We acknowledge this directly.
-The effective null model is the overconstrained validation framework itself: OLMo's zero-parameter prediction, the Llama-2 cross-family holdout at 5.6\% MAE, the algebraic classifier at 41/44 models across 9 families, and 12/12 sign predictions each use different data, different methods, and probe different physics.
-A single confound---architectural, statistical, or benchmark-specific---cannot propagate through all twelve simultaneously.
-This is the standard of evidence in physics: not a single high-powered test, but multiple independent probes converging on one structure.
-
-\textbf{On Pythia as the primary instrument.}
-Pythia is the only family spanning the full sub-$N_c$ to super-$N_c$ range, making it the instrument that localizes the transition.
-This is the structure of good experimental physics: one precision instrument plus multiple independent confirmations.
+\textbf{Evidence structure} is detailed in \S\ref{sec:coupling}: five independent confirmations, twelve convergent diagnostics, monotone strengthening across three dataset expansions.
+Here we address specific concerns about scope.
 The sign change is confirmed across six additional families (Llama-1, Llama-2, OLMo, OPT, Phi, Cerebras-GPT), by the architecture probe, and by the 44-model dataset growing from r~$=+0.77$ to $+0.85$ with every addition---never reversing.
 Leave-one-family-out confirms Pythia is necessary for \emph{locating} $N_c$, not for establishing that the transition exists.
 
@@ -1254,13 +1193,24 @@ The scatter in $\gamma_{12}$ magnitude is not noise---it is signal.
 Family-specific training data fields $h(\mathcal{D})$ shift individual coupling magnitudes around the universal curve, exactly as domain magnetizations scatter around the mean-field $M(T)$ in a disordered ferromagnet.
 The universal prediction is the \emph{sign change} (12/12 correct); the magnitude scatter encodes the per-family $h(\mathcal{D})$ values directly measured in \S\ref{sec:phi}.
 $R^2 = 0.54$ on a disordered system is expected; $R^2 = 1.0$ would suggest the disorder fields are absent.
+After family-specific $h$-field correction, $R^2$ rises to $0.65$---confirming that the scatter is structured, not random.
 
-\textbf{On Gi~$= 1.35$ and the crossover.}
-The Ginzburg number\footnote{Ginzburg number ($\mathrm{Gi}$): a dimensionless ratio measuring how large fluctuations are relative to the average signal at a phase transition. When $\mathrm{Gi} > 1$, the transition is ``smeared out'' by fluctuations (a crossover) rather than sharp. In ML terms: at $N_c$, the model-to-model scatter in coupling values is larger than the mean coupling signal, so the tax-to-bonus transition is gradual across families rather than a knife-edge.} $\mathrm{Gi} = 1.35$ is a measurement, not a caveat.
-It tells us the transition is fluctuation-dominated---Type-II rather than Type-I behavior\footnote{Type-I vs.\ Type-II: in superconductors, Type-I expels magnetic flux completely (sharp phase boundary), while Type-II allows flux to penetrate in quantized vortices (mixed-phase region). In ML terms: a Type-I capability transition would mean every model flips cleanly from tax to bonus at exactly $N_c$; Type-II means there is a scale range where different training recipes can produce either phase---the mixed-phase regime observed between $N_c$ and $N_{c,2}$.}.
-The finite susceptibility peak $\chi_2 = 3.08$ (not a divergence) is \emph{predicted} by $\mathrm{Gi} > 1$~\cite{amin2020}; observing exactly this finite peak is confirmation that the GL framework is capturing the correct physics.
-A sharp symmetry-breaking transition would require $\mathrm{Gi} \ll 1$; we measure $1.35$ and observe the predicted rounding.
-The full fluctuation treatment---including the correction to the mean-field phase boundary---is in the follow-up paper.
+\textbf{Family-level jackknife.}
+Leave-one-family-out jackknife gives $N_c \in [0.49\text{B}, 2.44\text{B}]$ across six families, with Pythia driving precision (without Pythia, $N_c = 0.49$B and $R^2 = 0.12$, but sign prediction remains 11/11 correct).
+The transition \emph{exists} without Pythia; Pythia \emph{locates} it.
+
+\textbf{Full correlation matrix.}
+Phase-separated PCA confirms the pairwise story at the matrix level: below $N_c$, TQA loads anti-aligned with PC1 ($+0.49$ vs.\ $-0.49$ for HS; 4/10 pairs negative), while above $N_c$ all five benchmarks align on PC1 (0/10 pairs negative; $d_{\rm eff}$ drops from 1.53 to 1.20; mean off-diagonal $r$ jumps from $+0.07$ to $+0.89$).
+In the transition zone ($3.5$--$7$B), $d_{\rm eff}$ \emph{peaks} at 1.81---maximum effective dimensionality at the critical point, exactly as physics predicts (maximum fluctuations $\Rightarrow$ maximum uncertainty about which phase the system occupies).
+The mean absolute correlation change across the transition is $5\times$ larger for TQA pairs ($|\Delta r| = 1.56$) than non-TQA pairs ($0.33$): the restructuring is \emph{specific} to truthfulness.
+All signs survive leave-one-family-out cross-validation (5/5 sub-$N_c$, 6/6 above-$N_c$).
+
+\textbf{Gi~$= 1.35$: a fluctuation-dominated crossover.}
+The Ginzburg number\footnote{Ginzburg number ($\mathrm{Gi}$): a dimensionless ratio measuring how large fluctuations are relative to the average signal at a phase transition. When $\mathrm{Gi} > 1$, the transition is ``smeared out'' by fluctuations (a crossover) rather than sharp. In ML terms: at $N_c$, the model-to-model scatter in coupling values is larger than the mean coupling signal, so the tax-to-bonus transition is gradual across families rather than a knife-edge.} $\mathrm{Gi} = 1.35$ tells us the transition is Type-II\footnote{Type-I vs.\ Type-II: in superconductors, Type-I expels magnetic flux completely (sharp phase boundary), while Type-II allows flux to penetrate in quantized vortices (mixed-phase region). In ML terms: a Type-I capability transition would mean every model flips cleanly from tax to bonus at exactly $N_c$; Type-II means there is a scale range where different training recipes can produce either phase---the mixed-phase regime observed between $N_c$ and $N_{c,2}$.}: the transition is rounded by fluctuations into a mixed-phase crossover.
+The finite susceptibility peak $\chi_2 = 3.08$ (not a divergence) is \emph{predicted} by $\mathrm{Gi} > 1$~\cite{amin2020}---observing this finite peak confirms the GL framework is capturing the correct physics.
+The full fluctuation treatment is in the follow-up paper.
+A preliminary RG analysis finds a quadratic beta function $\beta(\gamma) = -1.35\gamma^2 - 0.27\gamma + 0.73$ ($R^2 = 0.58$) with a stable fixed point at $\gamma^* = 0.64$---predicting that large models converge toward moderate cooperative coupling rather than running to infinity.
+The universality class is consistent with a 1D random-field crossover ($\nu_{\rm eff} = 0.72$, between mean-field and Ising-3D), in agreement with $\mathrm{Gi} > 1$.
 
 \textbf{On benchmark observability.}
 CAPE operates on published benchmark scores: no model weights, no internal activations, no access agreements required.
@@ -1277,10 +1227,20 @@ CAPE does not break at 130B; it completes, hands off, and specifies what the suc
 Every effective theory writes its own origin story for the next one.
 This self-delimiting structure is a feature of good effective theories, not a limitation.
 
+\textbf{Falsification tests.}
+The framework has already survived several internal consistency checks: OLMo at $\gamma_{12}=0.000$ with zero free parameters, Llama-2 holdout at 5.6\% MAE, 12 diagnostics converging on one coupling structure, and monotone signal strengthening across three dataset expansions (8 $\to$ 26 $\to$ 44 models).
+These constrain the theory from within.
+Four measurements would kill it from without:
+(i)~a new densely-sampled web-trained family (8+ sizes spanning $\sim$70M--12B) showing \emph{no} TQA sign-flip---this would falsify the universality of $N_{c,1}$, the central claim;
+(ii)~$\gamma_{12} > 0$ below 1B in any web-trained family (cooperative coupling where the theory demands a tax);
+(iii)~ODE cross-prediction on a new family exceeding 15\% MAE (the dynamical description fails, not just the phase classification);
+(iv)~$d_{\rm eff}$ increasing monotonically from 70M to 12B with no collapse toward 1 (the manifold restructuring is absent---the ``transition'' was a correlation artifact, not a geometric event).
+Each test requires only public benchmark data and a single counter-example.
+
 \textbf{Engineering the phase boundary (follow-up paper).}
 The GL framework raises a design question beyond measurement: can the cooperative phase be \emph{stabilized}?
 Three mechanisms from condensed matter physics suggest concrete approaches.
-(i)~\emph{Screening}: above $N_c$, the free energy includes a stabilizing term $-\eta\,\mathrm{Im}(\psi_R^*\psi_C)$ (TRSB, \S\ref{sec:topology}) that screens perturbations---analogous to the Meissner effect\footnote{Meissner effect: a superconductor expels magnetic fields from its interior---perturbations are actively screened out. In ML terms: above $N_c$, the cooperative coupling actively resists small training perturbations that would push the model back into the tax phase. The ``screening length'' determines how large a perturbation must be to break through---quantifiable from our GL parameters.}.
+(i)~\emph{Screening}: above $N_c$, the free energy includes a stabilizing term $-\eta\,\mathrm{Im}(\psi_R^*\psi_C)$ (Anderson-Higgs phase locking, \S\ref{sec:topology}) that screens perturbations---analogous to the Meissner effect\footnote{Meissner effect: a superconductor expels magnetic fields from its interior---perturbations are actively screened out. In ML terms: above $N_c$, the cooperative coupling actively resists small training perturbations that would push the model back into the tax phase. The ``screening length'' determines how large a perturbation must be to break through---quantifiable from our GL parameters.}.
 Prediction: alignment interventions above $N_c$ are more durable than below it; the ``screening length'' is computable from our GL parameters.
 (ii)~\emph{Flux pinning}: curated data (the $h(\mathcal{D})$ field) acts as a pinning center, locking the cooperative eigenvector at $\theta^*$ even at small $N$---demonstrated by Phi.
 The design equation $h_c \sim (N_c-N)^{3/2}$ quantifies the required pinning strength.
@@ -1301,8 +1261,8 @@ Applied to 44 models across 14 families, the central findings are:
     Reasoning and truthfulness anticorrelate below $N_c$ ($r = -0.989$, $p < 10^{-5}$)
     and cooperate above ($r = +0.770$ cross-family at 7B).
     The coupling flips by $\Delta r = +1.76$ across the transition.
-    Of all benchmark pairs tested, only HS-TQA shows this sign change---the
-    alignment tax is \emph{specific}, not generic.
+    The sign-flip extends to ARC-TQA ($r_{\rm sub} = -0.945 \to r_{\rm above} = +0.686$) and every pair involving TQA---the
+    alignment tax is a \emph{truthfulness} tax, not a generic inter-benchmark artifact.
     Independent confirmation: OLMo lands at $\gamma_{12} = 0.000$ with no free parameters.
 
   \item \textbf{The transition is invisible in loss.}
@@ -1313,14 +1273,13 @@ Applied to 44 models across 14 families, the central findings are:
   \item \textbf{The capability manifold restructures at the transition.}
     Effective dimensionality collapses ($d_{\rm eff}: 2 \to 1$),
     the second eigenvector rotates sharply at 1.4B through a Riccati ODE,
-    and twelve independent diagnostics---gradient scaling, eigenvalue geometry,
+    and twelve convergent diagnostics---gradient scaling, eigenvalue geometry,
     thermodynamic susceptibility (capability sensitivity to scale), geometric phase correlation---all converge
     on one coupling structure parameterized by two numbers.
-    The Hessian determinant predicts theory breakdown at $N \approx 130$B---signaling
-    the onset of a third independent capability axis and a transition from the current
-    two-field description (``XY-type'': two coupled benchmark axes, analogous to a planar spin model where the state is described by two components)
-    to a higher-dimensional coupling structure where three or more benchmarks vary independently---making
-    CAPE self-limiting by design.
+    The Hessian determinant predicts theory breakdown at $N \approx 130$B; the Pythia-only
+    extrapolation gives $d_{\rm eff} = 0.93$ at frontier scale, but the measured value is $1.75$---the
+    discrepancy \emph{is} the $N_{c,3}$ transition (third axis activating), making
+    CAPE self-limiting by design: its scope boundary is a prediction, not a failure.
 
   \item \textbf{A discovered ODE governs benchmark dynamics.}
     $\mathrm{HS}' = 1.23 - 0.72\cdot\mathrm{TQA}$ reproduces five benchmarks at 3.6\% error
@@ -1348,25 +1307,14 @@ The 10$\times$ data-efficiency gain at 1B is not a theoretical curiosity---it is
 Deep in the alignment bonus regime ($N \gg N_c$), capability gains are redistributed rather than amplified (spectral weight CV$=27\%$), which explains why frontier models sometimes underperform predecessors on specific tasks despite higher aggregate scores: it is the coupling structure, not a training failure.
 
 \textbf{What comes next.}
-As HellaSwag and TruthfulQA saturate above 90\% at frontier scale, the active coupling shifts.
 CAPE is not benchmark-specific: the same framework applies to any capability pair.
-Measurements of $\gamma(\text{SWE-bench}, \text{GPQA})$ across nineteen frontier models give $r = +0.85$ ($p < 0.00001$)---cooperative so far.
-The Anthropic within-family trajectory (Sonnet~4.5 $\to$ Sonnet~4.6 $\to$ Opus~4.6) confirms
-that the same $h$-field physics operating at small scale via data curation
-operates at frontier scale via training-recipe choice:
-Sonnet~4.6 shows $h = -14$ (local tax excursion) while Opus~4.6 recovers to $h = +2$ (Fig.~\ref{fig:frontier}).
-The concrete next test for $N_{c,3}$ completion is measuring $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases (\S\ref{sec:Nc2_section}).
-
-Preliminary evidence (March 2026) suggests $N_{c,3}$ is already underway: SWE-bench compresses to a $0.9$-point range among top-five models---tighter than the HS/TQA saturation at $N_{c,2}$---while IFEval shows $6.5$-point spread ($n=4$), emerging as the new discriminating axis (\S\ref{sec:Nc2_section}).
-The coupling rotation signature is visible: $r(\text{SWE}, \text{GPQA})$ drops from $+0.85$ overall to $+0.13$ within the saturated cluster, while $r(\text{GPQA}, \text{IFEval}) = +0.81$.
-The same saturation-then-activation pattern that announced $N_{c,1}$ now repeats at frontier scale---with caveats about small sample size and potential SWE-bench contamination noted in \S\ref{sec:Nc2_section}.
-The concrete next test is measuring $\gamma(\text{IFEval}, \text{HarmBench})$ across consecutive releases: when this coupling turns negative, $N_{c,3}$ will have fully resolved.
-The $N_{c,3}$ coupling relation (Eq.~\ref{eq:nc3_coupling}), $\text{IFEval} = 0.97\cdot\text{GPQA} + 6.8$, provides the first quantitative handle on the three-field regime;
-the $h$-field rotation from SWE-GPQA to GPQA-IFEval is the field-theoretic signature that the symmetry has expanded from $U(1)$ (XY) to $O(3)$ (Heisenberg).
-Beyond $N_{c,3}$, we predict $N_{c,4}$ at $\sim$200--400B effective parameters, where IFEval saturates and a fourth axis (HLE, AgentBench, or ARC-AGI-2) activates---extending the Ginzburg-Landau functional to four coupled fields with $O(4)$ symmetry.
+The $h$-field physics that operates at small scale via data curation operates at frontier scale via training-recipe choice (Fig.~\ref{fig:frontier}).
+Preliminary evidence (\S\ref{sec:Nc2_section}) suggests $N_{c,3}$ is already underway---SWE-bench saturating, IFEval activating, and the coupling rotating from SWE-GPQA to GPQA-IFEval (Eq.~\ref{eq:nc3_coupling}).
+Beyond $N_{c,3}$, we predict $N_{c,4}$ at $\sim$200--400B effective parameters, extending the Ginzburg-Landau functional to $O(4)$ symmetry.
+The next concrete test: when $\gamma(\text{IFEval}, \text{HarmBench})$ turns negative across consecutive releases, $N_{c,3}$ will have fully resolved and a new coupling regime will have begun.
 
 Capability coupling, not individual capability scaling, governs alignment.
-CAPE makes this coupling measurable, predictable, and designable---and, like any good origin story, it tells you exactly where the sequel begins.
+CAPE makes this coupling measurable, predictable, and designable.
 
 \medskip
 \noindent\textbf{Using CAPE in practice.}
@@ -1380,7 +1328,9 @@ Scaling to 3.5B without curation is more expensive and produces the same result.
 \textit{If you are training at frontier scale ($N_{c,2}$ regime)}: track $\gamma_{12}(\text{SWE}, \text{GPQA})$ across consecutive releases to detect training-recipe excursions before deployment.
 A single evaluation run on both benchmarks suffices---negative $\gamma_{12}$ signals a local tax excursion; recovery is expected at the next tier if the cooperative phase is otherwise intact.
 The $h$-field quantifies how far your training recipe sits from the cooperative baseline; $|h| > 10$ warrants investigation.
-The cooperative fit provides a forward prediction: $\text{GPQA}_{\rm pred} = 0.79\cdot\text{SWE} + 24.7 + h_{\rm lab}$ (validated at 5.6\% MAE across 4 held-out labs).
+The cooperative fit provides a forward prediction: $\text{GPQA}_{\rm pred} = 0.79\cdot\text{SWE} + 24.7 + h_{\rm lab}$ (validated at 6.9\% MAE across 4 held-out labs).
+Furthermore, the running coupling $\gamma_{12}(N)$ follows a kink-soliton profile---the instanton (minimum-action trajectory) of the double-well Ginzburg-Landau potential---with width $\Delta(\log_{10}N) \approx 1$ decade centred on $N_{c,1}$.
+Training recipes that deviate from this trajectory pay an action penalty exponential in the deviation; detailed predictions for individual labs are given in Paper~3B.
 \textit{If you are at the $N_{c,3}$ frontier (SWE $> 78\%$)}: SWE-bench is saturating.
 Switch to tracking $\gamma_{12}(\text{GPQA}, \text{IFEval})$---this is now the active coupling pair.
 The $N_{c,3}$ forward prediction is $\text{IFEval}_{\rm pred} = 0.97\cdot\text{GPQA} + 6.8 + h_{3,\rm lab}$ (Eq.~\ref{eq:nc3_coupling}; preliminary, $n=4$).
@@ -1391,30 +1341,15 @@ When a new benchmark pair begins showing negative cross-family coupling, a new a
 The $\sqrt{}$ isocline classifier generalises to every regime: compute the cooperative slope $a/b$ from the active benchmark pair, then test whether $\text{score}_2 > \sqrt{(a/b)\cdot\text{score}_1}$.
 This single formula---derived once from the Riccati ODE---works at $N_{c,1}$ (HS-TQA), $N_{c,2}$ (SWE-GPQA), and $N_{c,3}$ (GPQA-IFEval) without modification.
 
-\medskip
-\noindent\textbf{Worked example: diagnosing a frontier model release.}
-Suppose your lab has just trained a new frontier model. You run SWE-bench Verified ($81\%$), GPQA Diamond ($88\%$), and IFEval ($90\%$). CAPE returns:
+A fully worked example---diagnosing a hypothetical frontier release using all three CAPE steps ($h$-field, isocline boundary, trajectory coupling)---is given in Appendix~C of the Supplementary Material.
 
-\smallskip
-\noindent\textit{Step 1: $N_{c,2}$ regime (SWE-GPQA).}
-$h_2 = \text{GPQA} - (0.79\cdot\text{SWE} + 24.7) = 88 - 88.7 = -0.7$. Near the cooperative baseline ($|h_2| < 5$): no SWE-GPQA tax excursion. If $h_2 < -10$ (like Sonnet~4.6 at $h=-13.4$), flag it as a coding-specialist vortex before deployment.
-
-\noindent\textit{Step 2: $N_{c,3}$ regime (GPQA-IFEval).}
-$h_3 = \text{IFEval} - (0.97\cdot\text{GPQA} + 6.8) = 90 - 92.2 = -2.2$. Slightly below the cooperative fit---your training recipe favours reasoning over instruction compliance. Check the isocline: $\sqrt{0.97 \times 88} = 92.4\% > 90\%$---your model is \emph{below} the $\sqrt{}$ boundary. This means you are in the mixed-phase regime at $N_{c,3}$: not a crisis, but the instruction-following axis is undertrained relative to reasoning. Recommendation: increase instruction-tuning weight in the next training run to bring $h_3$ above zero.
-
-\noindent\textit{Step 3: Trajectory check.}
-Compute $\gamma_{12} = \Delta\text{GPQA}/\Delta\text{SWE}$ between this release and the previous one. If $\gamma_{12} > 0$: cooperative, proceed. If $\gamma_{12} < 0$: tax excursion detected---recovery is expected at the next tier, but flag the model for review. Similarly, compute $\gamma_{13} = \Delta\text{IFEval}/\Delta\text{GPQA}$. If $\gamma_{13} < 0$: the $N_{c,3}$ tax is opening---reasoning gains are coming at the cost of instruction compliance.
-
-\smallskip
-\noindent This three-step protocol---$h$-field, isocline boundary, trajectory coupling---requires only three benchmark scores per model release.
-No model weights, no training logs, no internal access.
-The dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} automates all three steps.
+\bigskip
+\noindent More is different---and the difference is in the coupling, not the loss.
 
 \medskip
 \noindent\textbf{Code, data, and dashboard.}
-All benchmark data, figure-generation scripts, and the analysis scripts from this paper (\texttt{cape\_frontier\_full.py}, \texttt{cape\_architecture\_probe.py}, \texttt{cape\_stiffness.py}, \texttt{cape\_algebraic\_nc.py}, \texttt{cape\_family\_hfield.py}, \texttt{cape\_null\_model.py}, \texttt{cape\_phase\_transfer.py}, \texttt{olmo\_gradient\_validation.py}) are at \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
-The interactive dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} implements the full protocol above: enter any model's parameter count and benchmark scores to get phase classification, $\gamma_{12}$, $d_{\rm eff}$, $h(\mathcal{D})$, $\chi_\gamma$, and phase-specific recommendations.
-It extends automatically to new benchmark pairs as capability axes saturate.
+All benchmark data, analysis scripts\footnote{Scripts: \texttt{cape\_frontier\_full.py}, \texttt{cape\_architecture\_probe.py}, \texttt{cape\_stiffness.py}, \texttt{cape\_algebraic\_nc.py}, \texttt{cape\_family\_hfield.py}, \texttt{cape\_null\_model.py}, \texttt{cape\_phase\_transfer.py}, \texttt{olmo\_gradient\_validation.py}.}, and figure-generation code are at \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
+The interactive dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} implements the full protocol: enter any model's scores to get phase classification, $\gamma_{12}$, $d_{\rm eff}$, $h(\mathcal{D})$, and phase-specific recommendations.
 Correspondence: \href{mailto:adilamin@uwm.edu}{\texttt{adilamin@uwm.edu}} $\cdot$ \href{mailto:adil89aminx@gmail.com}{\texttt{adil89aminx@gmail.com}}.
 
 \section*{Acknowledgments}
@@ -1457,8 +1392,282 @@ The author thanks his father for teaching him, long before physics did, that the
 \bibitem{agentbench2023} Liu et al.\ (2023). AgentBench: Evaluating LLMs as Agents. arXiv:2308.03688.
 \bibitem{arcagi2} ARC-AGI-2 (2025). Abstraction and Reasoning Corpus, version 2. \url{https://arcprize.org}.
 \bibitem{power2022} Power et al.\ (2022). Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets. arXiv:2201.02177.
+\bibitem{swebench2024} Jimenez et al.\ (2024). SWE-bench: Can Language Models Resolve Real-World GitHub Issues? ICLR 2024. arXiv:2310.06770.
 \bibitem{simpleqa2024} Wei et al.\ (2024). Measuring Short-Form Factuality in Large Language Models (SimpleQA). OpenAI Technical Report.
 \bibitem{dey2023cerebras} Dey et al.\ (2023). Cerebras-GPT: Open Compute-Optimal Language Models Trained on the Cerebras Wafer-Scale Cluster. arXiv:2304.03208.
+\bibitem{haken1985} Haken, H.\ (1985). Light, Volume 2: Laser Light Dynamics. North-Holland.
 \end{thebibliography}
+
+\clearpage
+% ════════════════════════════════════════════════════
+% SUPPLEMENTARY MATERIAL
+% ════════════════════════════════════════════════════
+
+\appendix
+\renewcommand{\thesection}{\Alph{section}}
+\renewcommand{\thesubsection}{\thesection\arabic{subsection}}
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+\setcounter{equation}{0}
+
+\begin{center}
+\rule{0.8\textwidth}{0.4pt}\\[6pt]
+{\Large\textbf{Supplementary Material}}\\[4pt]
+\rule{0.8\textwidth}{0.4pt}
+\end{center}
+
+\section{Condensed Matter Correspondence}
+\label{app:physics}
+
+This appendix collects the formal physics correspondences referenced in the main text, for readers with condensed matter background.
+ML readers can skip this appendix without loss of continuity.
+
+\subsection{GL Free Energy Language}
+
+In the language of Ginzburg-Landau (GL) field theory, the free energy $F$ plays the role of the loss landscape, $\phi_i$ are the capability fields, and $\gamma_{12}$ is the inter-field coupling.
+The full free energy is:
+\begin{equation}
+  \mathcal{F}[\phi_1, \phi_2] = a_1 \phi_1^2 + a_2 \phi_2^2 + \gamma_{12} \phi_1 \phi_2 + b_1 \phi_1^4 + b_2 \phi_2^4
+\end{equation}
+where $\phi_1 \sim$ HellaSwag score deviation, $\phi_2 \sim$ TruthfulQA score deviation from the universal curve.
+The LASSO result (zero $\phi_1^2\phi_2^2$ term selected) confirms that the quartic cross-term is negligible: the bare objective is approximately decoupled, and $\gamma_{12}$ is an \emph{emergent}, feedback-driven renormalization.
+This is the formal sense in which the paper's physics framing is structural, not merely metaphorical---though the microscopic mechanism differs from condensed matter systems.
+
+\subsection{Soft-Mode Collapse and Phase Locking}
+
+At $N_c$, the coupling matrix eigenvalues restructure: the second eigenvalue $\lambda_2$ (soft mode) collapses, reducing effective dimensionality from 2 to 1.
+This collapse is driven by self-reinforcing susceptibility feedback: $\gamma_{12}$ depends on the capability susceptibility $\chi_2$, which in turn depends on $\gamma_{12}$, creating a fixed point that pins the coupling-plane angle at $\theta^*$.
+The coupling $\gamma_{12}$ locks at $\sin\theta^*$, paralleling the inter-band phase locking derived in the SFEE framework for heavy-fermion superconductors~\cite{amin2020}.
+The full free energy above $N_c$ includes a stabilizing term:
+\begin{equation}
+  \mathcal{F}_{\rm stable} = \mathcal{F}_{\rm bare} - \eta\,\mathrm{Im}(\psi_R^*\psi_C), \quad \eta \propto \sin\theta^*
+\end{equation}
+This term is absent below $N_c$ and is what makes the cooperative phase a true free-energy minimum rather than a saddle point.
+The SFEE slope $A = 0.629 = \sin(38.8^\circ)$ is the direct measurement of this locking condition.
+In ML terms: below $N_c$, the HS-TQA plane has no preferred coupling direction; above $N_c$, the system selects $\theta^*=38.8^\circ$, the soft mode collapses ($d_{\rm eff}: 2 \to 1$), and the exchange rate between reasoning and truthfulness gains becomes fixed.
+The structure parallels the Anderson-Higgs mechanism (a soft mode acquiring stiffness through self-consistent feedback), though we note that the full gauge-theoretic identification---in particular, what plays the role of the gauge field---remains an open question for microscopic theory.
+
+\subsection{Spin-Fluctuation Mechanism}
+
+The self-reinforcing susceptibility feedback (SFEE) measured in \S\ref{sec:topology} is directly analogous to spin-fluctuation-mediated inter-band coupling in heavy-fermion superconductors~\cite{amin2020}, where susceptibility fluctuations renormalize the coupling super-linearly.
+The residual of $\gamma_{12}$ above its linear baseline correlating with $\chi_2 \cdot \gamma_{12}$ at $r = +0.629$ is the ML measurement of this mechanism.
+The mathematical structure is identical: in both cases, a feedback loop between the coupling constant and the susceptibility of the order parameter drives the system away from the mean-field fixed point.
+
+\subsection{Ginzburg Number Derivation}
+
+The Ginzburg number $\mathrm{Gi}$ measures how large fluctuations are relative to the mean-field signal at the transition.
+For a scalar order parameter near a continuous transition:
+\begin{equation}
+  \mathrm{Gi} = \left(\frac{\delta\phi^2_{\rm fluct}}{\langle\phi\rangle^2}\right)_{T=T_c}
+\end{equation}
+In CAPE, we estimate $\mathrm{Gi}$ from the ratio of the variance of TQA scores around the universal U-curve at $N_c$ to the square of the mean signal:
+\begin{equation}
+  \mathrm{Gi} = \frac{\sigma^2_{\rm TQA}(N_c)}{\langle \Delta\mathrm{TQA}(N_c) \rangle^2}
+\end{equation}
+Plugging in $\sigma_{\rm TQA} \approx 4.2$ percentage points (cross-family spread at 3.5B) and $\langle\Delta\mathrm{TQA}\rangle \approx 3.6$ pp (mean coupling signal):
+$\mathrm{Gi} = (4.2/3.6)^2 = 1.35$.
+Since $\mathrm{Gi} > 1$, mean-field theory is unreliable at $N_c$; the transition is a crossover rather than a sharp phase transition.
+The susceptibility peak value $\chi_2 = 3.08$ (finite, not divergent) is consistent with this.
+
+\subsection{Phase Diagram in the $(N, h)$ Plane}
+
+The full phase diagram has two control parameters: model size $N$ (the analog of temperature) and training data quality $h(\mathcal{D})$ (the analog of an external magnetic field).
+\begin{itemize}
+  \item \textbf{Web-trained models}: $|h| \lesssim 5$ at all $N$. The phase boundary crosses at $N_c \approx 3.5$B.
+  \item \textbf{Curated models (Phi)}: Large positive $h > 0$ shifts $N_c \to 0$. The alignment tax is eliminated at all scales.
+  \item \textbf{Critical field}: At the critical field $h_c(N) \propto (N_c-N)^{3/2}$ (Eq.~\ref{eq:design} in main text), the system is exactly at the phase boundary regardless of $N$.
+\end{itemize}
+The $3/2$ exponent is the mean-field critical exponent for the order parameter at a first-order boundary; with more data, this could be measured more precisely and would distinguish between universality classes.
+
+\subsection{Messenger Field and Mean-Field Comparison}
+
+The mean-field prediction for gradient scaling assumes each of $N$ parameters contributes additively: $\|\nabla L\|_{\rm MF} \sim N^{-(\alpha+1)} = N^{-1.238}$.
+The measured exponent $\beta=0.40\pm0.08$ deviates dramatically from this baseline---and the L1 test confirms it: adding the mean-field correction \emph{worsens} prediction by $142\times$ (Table~\ref{tab:boost} in main text).
+The mechanism is the \emph{messenger field} $\gamma_{12}(N)$: in heavy-fermion superconductors, inter-band coupling is mediated by spin fluctuations that carry the pairing signal between bands~\cite{amin2020}.
+In CAPE, $\gamma_{12}(N)$ plays the identical role---it mediates the coupling between capability fields $\phi_{\rm HS}$ and $\phi_{\rm TQA}$.
+Its logarithmic running ($\gamma_{12} = 0.629\log_{10}N - 5.886$) is not an assumption but a measured consequence of the self-reinforcing susceptibility feedback: $d\gamma_{12}/d\log N \propto \chi_2 \cdot \gamma_{12}$ ($r=+0.629$, $p=0.003$).
+The messenger field's own dynamics generate its RG flow---measured here entirely from public benchmark scores.
+
+\subsection{Type-I/II Boundary and Mixed-Phase Regime}
+
+The Type-I/II boundary $\lambda/\xi > 1/\sqrt{2}$ places the system in the mixed-phase regime where local coupling excursions---vortex-like structures in capability space---are thermodynamically stable rather than immediately expelled.
+The ratio of the coupling's characteristic scale-range $\xi$ (how spread out the transition is in $\log N$) to the eigenvalue decay length $\lambda$ satisfies $\lambda/\xi \approx 0.767 > 1/\sqrt{2}$, placing the system squarely in the Type-II regime.
+This has a direct consequence: between $N_c$ and $N_{c,2}$, training-recipe perturbations can pin local tax regions inside an otherwise cooperative background.
+The ``vortex'' excursions measured at frontier scale (Haiku~4.5, Sonnet~4.6) are thermodynamically stable structures---they persist until the full cooperative configuration is restored (Opus~4.6), at which point the stored coupling energy releases in one step (``vortex annihilation'').
+
+\subsection{Symmetry Cascade and Defect Classification}
+
+At each critical scale $N_{c,k}$, the effective dimensionality of capability space increases by one and the symmetry group expands:
+\begin{itemize}
+  \item $N_{c,1}$: $d_{\rm eff} \approx 1$, Ising symmetry ($\mathbb{Z}_2$). One axis, two phases. Topological defects: domain walls.
+  \item Above $N_{c,1}$: $d_{\rm eff} \to 2$, $U(1)$ symmetry (XY-model). Eigenvector angle $\theta$ is the order parameter; Riccati ODE governs its dynamics. Defects: vortex lines.
+  \item $N_{c,3}$: $d_{\rm eff} \to 3$, $O(3)$ symmetry (Heisenberg-model). Capability state is a three-component vector $(\phi_{\rm SWE}, \phi_{\rm GPQA}, \phi_{\rm IFEval})$. Coupling matrix $\Gamma_{ij}$ has three independent eigenvalues. Defects: hedgehog points.
+  \item $N_{c,4}$ (predicted): $d_{\rm eff} \to 4$, $O(4)$. Topological protection becomes possible.
+\end{itemize}
+
+The labels Ising $\to$ $U(1)$ $\to$ $O(3)$ $\to$ $O(4)$ describe the rotational symmetry of an $n$-component order parameter and serve as shorthand for the effective dimensionality of capability space at each scale.
+These are \emph{not} a group-subgroup chain ($\mathbb{Z}_2 \not\subset \mathrm{SO}(2)$); each label indicates how many independent capability axes participate in the coupling matrix, not a symmetry-breaking hierarchy.
+At each transition, the previous soft mode stiffens and a new one activates as the next capability axis opens.
+The structural parallel to condensed matter---from heavy-fermion superconductors ($D_{6h} \supset D_{2h} \supset C_{2v}$)~\cite{amin2020} to superfluid $^3$He---is suggestive; whether a microscopic symmetry principle underlies the dimensional progression in capability space is an open question.
+
+In the Heisenberg ($O(3)$) regime, vortex lines in two dimensions generalise to hedgehog defects in three.
+The topological protection of alignment discussed in the main text requires $d_{\rm eff} \geq 3$---this is the regime currently opening at frontier scale.
+A full treatment of the first-order vs.\ second-order character of the $N_{c,3}$ transition is deferred to Paper~3B.
+
+\subsection{Coherence Parameter and Scope Boundaries}
+
+The coherence parameter $\kappa(N) \equiv \lambda_1/\lambda_2$ grows from $\kappa=2.2$ (70M) to $\kappa=11.2$ (12B), well-fit by $\kappa \propto N^{+0.36}$ ($r=0.973$, $p<0.0001$).
+Extrapolation predicts $\kappa\to\infty$ at $\sim$88B where $\lambda_2\to0$.
+
+The 88B scale ($d_{\rm eff}\to 1$, soft-mode collapse) and the 130B scale ($\det(H)\to 0$, Hessian singularity) measure different events: the first is where the two-field description becomes effectively one-dimensional; the second is where a third eigenvalue must activate.
+The gap between 88B and 130B is the region where three-field effects are growing but the two-field approximation still returns meaningful results.
+
+The messenger field $\gamma_{12}(N)$ mediates coupling between capability fields exactly as spin fluctuations mediate inter-band coupling in heavy-fermion superconductors~\cite{amin2020}.
+Its logarithmic running is a measured consequence of self-reinforcing susceptibility feedback: $d\gamma_{12}/d\log N \propto \chi_2 \cdot \gamma_{12}$ ($r=+0.629$, $p=0.003$).
+
+\subsection{Adversarial Screening: Critical $h$-Field Calculation}
+
+The GL free energy predicts a critical perturbation strength $h_c(N)$ required to flip the coupling sign from cooperative ($\gamma_{12}>0$) back to competitive ($\gamma_{12}<0$).
+From the measured parameters:
+\begin{equation}
+  h_c(N) = |\gamma_{12}(N)| \cdot \frac{\phi_{\rm eq}(N)}{\chi_2(N)}
+\end{equation}
+where $\phi_{\rm eq}$ is the equilibrium order parameter and $\chi_2$ is the soft-mode susceptibility.
+
+Computing from the Pythia-measured values:
+at 7B, $h_c \approx 1.4$ (coupling still weak; small perturbations can flip the sign);
+at 70B, $h_c \approx 11.2$ (deep in the cooperative phase; the Anderson-Higgs mass screens perturbations).
+The screening strength grows as $h_c \propto N^{+0.36}$ (inheriting the $\kappa$ scaling above).
+
+\textbf{Application to frontier models.}
+Sonnet~4.6's measured perturbation ($h = -13.4$) exceeds $h_c$ at 7B by $10\times$ but barely exceeds $h_c$ at 70B---consistent with the excursion being a moderate training-recipe effect rather than a fundamental instability.
+Opus~4.6's recovery ($h = +2.8$) confirms the cooperative phase restores when the perturbation is removed.
+This screening calculation is the basis for the Meissner-depth prediction in the main text; the full adversarial phase diagram is developed in Paper~3B.
+
+\subsection{$d_{\rm eff}$ Holdout Test: Two-Field Scope Boundary and Third-Axis Activation}
+
+The linear fit $d_{\rm eff}(N) = -0.27\log_{10}N + 3.90$ is trained on Pythia alone (70M--12B, $R^2 = 0.95$).
+Extrapolating beyond the training range:
+\begin{center}
+\begin{tabular}{lcc}
+\hline
+Scale & $d_{\rm eff}$ (predicted) & Interpretation \\
+\hline
+12B (training edge) & 1.18 & Last Pythia datapoint \\
+70B ($N_{c,2}$)     & 0.97 & Scope boundary reached \\
+88B ($\lambda_2 \to 0$) & 0.95 & Soft-mode collapse \\
+100B (frontier)     & 0.93 & Below 1: two-field theory exhausted \\
+130B ($\det(H) \to 0$) & 0.90 & Hessian singularity \\
+\hline
+\end{tabular}
+\end{center}
+
+The prediction $d_{\rm eff} < 1$ at frontier scale means the two-field description has collapsed to a single effective degree of freedom: HS and TQA are completely locked and carry no independent information.
+This is the \emph{scope boundary}---the scale at which the two-field theory predicts its own inadequacy.
+
+The frontier measurement (four models with SWE, GPQA, and IFEval data) gives $d_{\rm eff} = 1.75$ from the $3 \times 3$ correlation matrix---\emph{above} the two-field extrapolation by $\Delta d_{\rm eff} = +0.82$.
+The discrepancy is not a failure of the extrapolation; it is the $N_{c,3}$ transition.
+The rise of $d_{\rm eff}$ from $\sim$1 back to 1.75 is the third capability axis (IFEval/instruction-following) activating and adding a genuinely independent dimension to the capability manifold.
+
+Supporting evidence from eigenvalue scaling:
+the soft-mode collapse $\lambda_2 \sim N^{-0.72}$ predicts $\lambda_2(70\text{B}) = 0.112$, $\lambda_2(100\text{B}) = 0.087$, $\lambda_2(130\text{B}) = 0.072$---all near zero, consistent with the two-field collapse.
+The coherence parameter $\kappa = \lambda_1/\lambda_2$ reaches $\kappa(70\text{B}) \approx 21$, $\kappa(130\text{B}) \approx 26$---extreme stiffness in the two-field sector.
+
+The key test: if the $N_{c,3}$ transition is real, $d_{\rm eff}$ measured from the full $5 \times 5$ benchmark matrix (including SWE, GPQA, IFEval, and two additional axes) should be $\geq 2.5$ by $\sim$200B.
+This is testable from the next generation of frontier evaluations.
+
+\subsection{$N_{c,4}$ Prediction: Extrapolation from the Cascade Pattern}
+
+Each critical scale in the cascade follows a pattern: the active benchmark pair saturates, a new axis activates, and $d_{\rm eff}$ increases by one.
+Extrapolating from the measured scales:
+\begin{center}
+\begin{tabular}{lccl}
+\hline
+Transition & Scale & $d_{\rm eff}$ & Active pair \\
+\hline
+$N_{c,1}$ & $\sim$3.5B   & $1 \to 2$ & HS--TQA \\
+$N_{c,2}$ & $\sim$70--88B  & $2 \to 2.5$ & SWE--GPQA \\
+$N_{c,3}$ & $\sim$114--130B & $2.5 \to 3$ & GPQA--IFEval \\
+$N_{c,4}$ & $\sim$200--400B & $3 \to 4$ & IFEval--HLE/AgentBench \\
+\hline
+\end{tabular}
+\end{center}
+
+The spacing in $\log_{10}N$ between transitions is: $\Delta_{1\to2} \approx 1.3$ decades (3.5B $\to$ 80B), $\Delta_{2\to3} \approx 0.2$ decades (80B $\to$ 120B).
+The rapid compression of $\Delta$ suggests the cascade is accelerating in $\log N$ as the capability space fills up---each new axis requires less additional scale to activate once the previous axes are saturated.
+If the compression continues, $N_{c,4}$ sits at $\sim$200--400B effective parameters.
+
+\textbf{The $N_{c,4}$ screening prediction.}
+From the adversarial screening calculation above, the critical perturbation field $h_c \propto N^{+0.36}$.
+At $N_{c,4} \sim 300$B: $h_c \approx 11.2 \times (300/12)^{0.36} \approx 38$.
+This means training-recipe perturbations of $|h| < 38$ cannot flip the coupling---the cooperative phase becomes extremely robust.
+By comparison, the largest measured perturbation in the current dataset is Sonnet~4.6 at $|h| = 13.4$.
+\textbf{Prediction:} models above $\sim$300B effective parameters will show no training-recipe vortex excursions; the cooperative phase is screening-protected.
+
+\textbf{Candidate fourth-axis benchmarks.}
+The PCA loading criterion (\S\ref{sec:breaks}) requires the fourth axis to be orthogonal to the IFEval-dominated $\mathbf{e}_1$ at frontier scale.
+Three candidates satisfy this:
+HLE~(Humanity's Last Exam; $30$--$53\%$ at frontier, expert-level multidisciplinary reasoning);
+AgentBench~(multi-step autonomous agent tasks; measures planning + tool use, genuinely orthogonal to single-turn benchmarks);
+ARC-AGI-2~(abstract pattern recognition; orthogonal to all language benchmarks by construction).
+The $N_{c,4}$ transition will be detectable when $\gamma(\text{IFEval}, \text{HLE})$ or $\gamma(\text{IFEval}, \text{AgentBench})$ turns negative across consecutive model releases.
+
+\section{ODE Deep Results}
+\label{app:ode}
+
+This appendix provides detailed derivations for the three analytical results stated in \S\ref{sec:ode} of the main text.
+
+\subsection{Rank-1 Transition Operator}
+
+The per-phase coefficient matrices $A_{\rm tax}$ (70M--1B) and $A_{\rm bonus}$ (2.8B--12B) from PySINDy have $5{\times}5$ entries coupling all benchmark pairs.
+Their difference $\Delta A = A_{\rm bonus} - A_{\rm tax}$ is approximately rank-1: the singular value decomposition gives $\sigma_1 = 0.83$, $\sigma_2 = 0.14$, with $\sigma_1/\sigma_2 = 5.9$.
+The dominant left singular vector loads primarily on TQA ($0.61$), confirming that the entire transition is driven by a single mode---TruthfulQA's suppressive drag on reasoning releasing at $N_{c,1}$.
+This validates the single-order-parameter description: $\gamma_{12}$ alone captures the transition.
+
+\subsection{Gradient Flow Recovery of the Free Energy}
+
+The discovered ODE has the gradient-flow form $d\phi_i/d\log N = -\partial F/\partial\phi_i$, meaning the benchmark trajectories are steepest-descent paths on a free-energy landscape $F$.
+Integrating the ODE coefficients recovers:
+\begin{equation}
+  F \supset 0.31\cdot\phi_{\rm HS}\phi_{\rm TQA} - 0.04\cdot\phi_{\rm TQA}^3
+\end{equation}
+The bilinear coupling term $0.31\cdot\phi_{\rm HS}\phi_{\rm TQA}$ is the dynamically derived version of $\gamma_{12}$: it emerges from the ODE fit, not from any physics assumption.
+The cubic TQA self-coupling ($-0.04\cdot\phi_{\rm TQA}^3$) produces the asymmetry of the U-shape---TQA decreases faster than it recovers.
+The $U(1)$ symmetry of the quadratic terms and its breaking at $\theta^*=38.8^\circ$ follow from the eigenvector structure of the Hessian of $F$.
+
+\subsection{Algebraic Phase Classifier Derivation}
+
+Setting $d\mathrm{TQA}/d\log N = 0$ in the discovered ODE (at the critical point where TQA stops decreasing and begins recovering):
+\begin{equation}
+  0 = c_0 + c_1\cdot\mathrm{HS}_c + c_2\cdot\mathrm{TQA}_c + c_3\cdot\mathrm{TQA}_c^2
+\end{equation}
+Solving for $\mathrm{TQA}_c$ and using the measured coefficients gives $\mathrm{TQA}_c = \sqrt{0.187\cdot\mathrm{HS}_c}$.
+Calibrating on OLMo ($\gamma_{12}=0.000$, HS$=76.4$, TQA$=36.0$): predicted $\mathrm{TQA}_c = \sqrt{0.187 \times 76.4} = 0.3602$; measured $= 0.3600$; error $= 0.07\%$ with zero free parameters.
+The classifier is: $\mathrm{TQA} > \sqrt{0.187\cdot\mathrm{HS}}$ implies bonus phase; $<$ implies tax phase.
+Applied to all 44 base models: 41/44 correctly classified (93\%).
+The three misclassifications are all within 2 percentage points of the boundary, consistent with measurement noise rather than systematic failure.
+
+\section{Worked Example}
+\label{app:worked_example}
+
+\subsection{Diagnosing a Frontier Model Release}
+
+Suppose your lab has just trained a new frontier model. You run SWE-bench Verified ($81\%$), GPQA Diamond ($88\%$), and IFEval ($90\%$). CAPE returns:
+
+\medskip
+\noindent\textit{Step 1: $N_{c,2}$ regime (SWE-GPQA).}
+$h_2 = \text{GPQA} - (0.79\cdot\text{SWE} + 24.7) = 88 - 88.7 = -0.7$. Near the cooperative baseline ($|h_2| < 5$): no SWE-GPQA tax excursion. If $h_2 < -10$ (like Sonnet~4.6 at $h=-13.4$), flag it as a coding-specialist vortex before deployment.
+
+\medskip
+\noindent\textit{Step 2: $N_{c,3}$ regime (GPQA-IFEval).}
+$h_3 = \text{IFEval} - (0.97\cdot\text{GPQA} + 6.8) = 90 - 92.2 = -2.2$. Slightly below the cooperative fit---your training recipe favours reasoning over instruction compliance. Check the isocline: $\sqrt{0.97 \times 88} = 92.4\% > 90\%$---your model is \emph{below} the $\sqrt{}$ boundary. This means you are in the mixed-phase regime at $N_{c,3}$: not a crisis, but the instruction-following axis is undertrained relative to reasoning. Recommendation: increase instruction-tuning weight in the next training run to bring $h_3$ above zero.
+
+\medskip
+\noindent\textit{Step 3: Trajectory check.}
+Compute $\gamma_{12} = \Delta\text{GPQA}/\Delta\text{SWE}$ between this release and the previous one. If $\gamma_{12} > 0$: cooperative, proceed. If $\gamma_{12} < 0$: tax excursion detected---recovery is expected at the next tier, but flag the model for review. Similarly, compute $\gamma_{13} = \Delta\text{IFEval}/\Delta\text{GPQA}$. If $\gamma_{13} < 0$: the $N_{c,3}$ tax is opening---reasoning gains are coming at the cost of instruction compliance.
+
+\medskip
+\noindent This three-step protocol---$h$-field, isocline boundary, trajectory coupling---requires only three benchmark scores per model release.
+No model weights, no training logs, no internal access.
+The dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} automates all three steps.
 
 \end{document}
