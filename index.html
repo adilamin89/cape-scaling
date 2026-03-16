@@ -310,56 +310,51 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
 <div id="tab-frontier" class="tab-content" style="display:none">
   <div class="card">
     <div class="card-title">Frontier Coupling <span>— SWE-bench vs GPQA Diamond (Feb–Mar 2026)</span></div>
-    <canvas id="frontier-chart" height="360"></canvas>
+    <canvas id="frontier-chart" height="480"></canvas>
     <div style="margin-top:12px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">
       r = +0.85 (n=19, p&lt;0.00001) — cooperative coupling strongly confirmed. Sonnet 4.6 shows h = −13.4 anomaly (tax excursion). Opus 4.6 recovers h = +2.8.
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Within-Family Trajectory <span>— Anthropic as Phase Diagnostic</span></div>
-    <table class="tbl">
-      <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h(D)</th><th>Interpretation</th></tr></thead>
-      <tbody>
-        <tr><td>Sonnet 4.5 → Sonnet 4.6</td><td class="pos">+2.4</td><td class="neg">−9.3</td><td class="neg flip">−3.88</td><td class="neg">−13.4</td><td>Tax excursion: coding optimized at reasoning cost</td></tr>
-        <tr><td>Sonnet 4.6 → Opus 4.6</td><td class="pos">+1.2</td><td class="pos">+17.2</td><td class="pos">+14.3</td><td class="pos">+2.8</td><td>Recovery: full cooperative phase restored</td></tr>
-      </tbody>
-    </table>
-    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7">
-      <strong style="color:var(--text)">Protocol:</strong> For any two consecutive releases, compute γ₁₂ = ΔGPQA/ΔSWE. If negative: training recipe entered a tax excursion. Single eval run suffices to detect it before deployment.
+    <div class="card-title">Within-Family Trajectories <span>— Per-Lab Phase Diagnostics</span></div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.6">
+      <strong style="color:var(--text)">Protocol:</strong> For any two consecutive releases, compute γ₁₂ = ΔGPQA/ΔSWE. Negative → tax excursion. One eval run detects it before deployment.
     </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Within-Family Trajectory <span>— Google Gemini as Independent Test</span></div>
-    <table class="tbl">
-      <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h(D)</th><th>Interpretation</th></tr></thead>
-      <tbody>
-        <tr><td>2.5 Pro → 3 Flash</td><td class="pos">+14.2</td><td class="pos">+6.4</td><td class="pos">+0.45</td><td style="color:var(--accent)">+8.9 → +4.1</td><td>Cooperative: both improve</td></tr>
-        <tr><td>3 Flash → 3 Pro</td><td class="neg">−1.8</td><td class="pos">+1.5</td><td class="neg flip">−0.83</td><td style="color:var(--accent)">+4.1 → +7.0</td><td>Flash→Pro tradeoff: reasoning prioritized over coding</td></tr>
-        <tr><td>3 Pro → 3.1 Pro</td><td class="pos">+4.4</td><td class="pos">+2.4</td><td class="pos">+0.55</td><td style="color:var(--accent)">+7.0 → +6.0</td><td>Recovery: both capabilities improve</td></tr>
-      </tbody>
-    </table>
-    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7">
-      <strong style="color:var(--text)">Second within-family test:</strong> Gemini's h-field stays positive throughout (+4 to +9) — a reasoning-specialist training recipe, the frontier analogue of Phi.
-      The Flash→Pro excursion (γ₁₂ = −0.83) mirrors Anthropic's Sonnet→Opus pattern: tier-specialist training creates a local tax that recovers at the next release.
-      <strong style="color:var(--accent)">Two labs, same physics.</strong>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">OpenAI Trajectory <span>— Monotone Cooperation</span></div>
-    <table class="tbl">
-      <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h(D)</th><th>Interpretation</th></tr></thead>
-      <tbody>
-        <tr><td>GPT-4o → GPT-5</td><td class="pos">+41.7</td><td class="pos">+32.1</td><td class="pos">+0.77</td><td style="color:var(--bonus)">+2.7 → +1.9</td><td>Strongly cooperative: massive joint gain</td></tr>
-        <tr><td>GPT-5 → GPT-5.1</td><td class="pos">+1.4</td><td class="pos">+2.4</td><td class="pos">+1.71</td><td style="color:var(--bonus)">+1.9 → +3.2</td><td>Cooperative: reasoning outpaces coding</td></tr>
-        <tr><td>GPT-5.1 → GPT-5.2 Pro</td><td class="pos">+3.7</td><td class="pos">+5.1</td><td class="pos">+1.38</td><td style="color:var(--bonus)">+3.2 → +5.3</td><td>Cooperative: h-field rising steadily</td></tr>
-      </tbody>
-    </table>
-    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7">
-      <strong style="color:var(--text)">Contrast with Anthropic/Gemini:</strong> OpenAI shows γ₁₂ > 0 at every transition — no excursions. h > 0 throughout (always above the cooperative curve).
-      This is a measurement of training strategy: OpenAI's consistent reasoning investment keeps the coupling uniformly cooperative across generations.
+    <details open style="margin-bottom:8px">
+      <summary style="cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;padding:6px 0">Anthropic — Oscillating (excursion + recovery)</summary>
+      <table class="tbl" style="margin-top:6px">
+        <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h</th><th>Phase</th></tr></thead>
+        <tbody>
+          <tr><td>Son 4.5→Son 4.6</td><td class="pos">+2.4</td><td class="neg">−9.3</td><td class="neg flip">−3.88</td><td class="neg">−13.4</td><td>Tax excursion</td></tr>
+          <tr><td>Son 4.6→Opus 4.6</td><td class="pos">+1.2</td><td class="pos">+17.2</td><td class="pos">+14.3</td><td class="pos">+2.8</td><td>Recovery</td></tr>
+        </tbody>
+      </table>
+    </details>
+    <details style="margin-bottom:8px">
+      <summary style="cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;padding:6px 0">Google Gemini — Reasoning-first (h > 0 throughout)</summary>
+      <table class="tbl" style="margin-top:6px">
+        <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h</th><th>Phase</th></tr></thead>
+        <tbody>
+          <tr><td>2.5Pro→3Flash</td><td class="pos">+14.2</td><td class="pos">+6.4</td><td class="pos">+0.45</td><td style="color:var(--accent)">+8.9→+4.1</td><td>Cooperative</td></tr>
+          <tr><td>3Flash→3Pro</td><td class="neg">−1.8</td><td class="pos">+1.5</td><td class="neg flip">−0.83</td><td style="color:var(--accent)">+4.1→+7.0</td><td>Tier tradeoff</td></tr>
+          <tr><td>3Pro→3.1Pro</td><td class="pos">+4.4</td><td class="pos">+2.4</td><td class="pos">+0.55</td><td style="color:var(--accent)">+7.0→+6.0</td><td>Recovery</td></tr>
+        </tbody>
+      </table>
+    </details>
+    <details style="margin-bottom:4px">
+      <summary style="cursor:pointer;font-family:var(--font-mono);font-size:12px;color:var(--accent);font-weight:700;padding:6px 0">OpenAI — Monotone cooperative (no excursions)</summary>
+      <table class="tbl" style="margin-top:6px">
+        <thead><tr><th>Transition</th><th>ΔSWE</th><th>ΔGPQA</th><th>γ₁₂</th><th>h</th><th>Phase</th></tr></thead>
+        <tbody>
+          <tr><td>GPT-4o→GPT-5</td><td class="pos">+41.7</td><td class="pos">+32.1</td><td class="pos">+0.77</td><td style="color:var(--bonus)">+2.7→+1.9</td><td>Strongly coop.</td></tr>
+          <tr><td>GPT-5→5.1</td><td class="pos">+1.4</td><td class="pos">+2.4</td><td class="pos">+1.71</td><td style="color:var(--bonus)">+1.9→+3.2</td><td>Cooperative</td></tr>
+          <tr><td>GPT-5.1→5.2Pro</td><td class="pos">+3.7</td><td class="pos">+5.1</td><td class="pos">+1.38</td><td style="color:var(--bonus)">+3.2→+5.3</td><td>Cooperative</td></tr>
+        </tbody>
+      </table>
+    </details>
+    <div style="margin-top:8px;font-size:11px;color:var(--text3);line-height:1.5">
+      Three labs, same physics: oscillation (Anthropic/Gemini) vs monotone (OpenAI) is a measurement of training strategy via the h-field.
     </div>
   </div>
 
@@ -1078,11 +1073,15 @@ function getPhysicsDiagnostic(g, N, logN, deff, chi, hField, benchScores){
     const tqaNorm=benchScores.tqa/100;
     const tqaCrit=Math.sqrt(0.187*hsNorm);
     const inBonus=tqaNorm>tqaCrit;
+    const gammaPhase=g>0?'bonus':'tax';
+    const algPhase=inBonus?'bonus':'tax';
+    const disagree=gammaPhase!==algPhase;
     html+=`<div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.7;font-family:var(--font-mono)">
       <span style="color:var(--accent2)">Algebraic classifier (zero-parameter):</span>
       TQA = ${tqaNorm.toFixed(3)} ${inBonus?'>':'<'} √(0.187·HS) = ${tqaCrit.toFixed(3)}
       → <span style="color:${inBonus?'var(--bonus)':'var(--tax)'}"><strong>${inBonus?'BONUS phase':'TAX phase'}</strong></span>
-      <span style="color:var(--text3)">(Calibrated on OLMo: 0.07% error, zero free parameters)</span>
+      ${disagree?`<br><span style="color:var(--trans)">Note: γ₁₂ says ${gammaPhase} but algebraic says ${algPhase} — this model is near the phase boundary (3/44 boundary cases expected)</span>`:''}
+      <span style="color:var(--text3)">(41/44 accuracy, calibrated on OLMo at 0.07% error)</span>
     </div>`;
   }
   // Frontier algebraic classifier
@@ -1657,60 +1656,149 @@ function drawFrontierChart(){
   const cv=document.getElementById('frontier-chart');
   if(!cv)return;
   const dpr=window.devicePixelRatio||1;
-  const W=cv.parentElement.clientWidth||700, H=360;
+  const W=cv.parentElement.clientWidth||700, H=480;
   cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
   const c=cv.getContext('2d'); c.scale(dpr,dpr);
-  const p={l:56,r:20,t:24,b:52};
+  const p={l:60,r:140,t:36,b:56};
   const sL=30,sH=84,gL=50,gH=97;
   const X=s=>p.l+(s-sL)/(sH-sL)*(W-p.l-p.r);
   const Y=g=>p.t+(gH-g)/(gH-gL)*(H-p.t-p.b);
   c.clearRect(0,0,W,H);
-  c.strokeStyle='rgba(255,255,255,0.03)'; c.lineWidth=1;
-  for(let s=40;s<=80;s+=10){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
-  for(let g=55;g<=95;g+=10){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
+
+  // Phase regions — subtle background shading
+  const regX=X(0.79*50>50?50:30); // regression crosses gL at some SWE
+  c.fillStyle='rgba(255,77,109,0.03)';
+  c.beginPath();c.moveTo(p.l,H-p.b);
+  for(let s=sL;s<=sH;s+=1){const gy=0.79*s+24.7; c.lineTo(X(s),Y(Math.min(gy,gH)));}
+  c.lineTo(W-p.r,H-p.b);c.closePath();c.fill();
+  c.fillStyle='rgba(6,214,160,0.03)';
+  c.beginPath();c.moveTo(p.l,p.t);
+  for(let s=sL;s<=sH;s+=1){const gy=0.79*s+24.7; c.lineTo(X(s),Y(Math.min(gy,gH)));}
+  c.lineTo(W-p.r,p.t);c.closePath();c.fill();
+
+  // Grid
+  c.strokeStyle='rgba(255,255,255,0.04)'; c.lineWidth=0.5;
+  for(let s=35;s<=80;s+=5){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
+  for(let g=55;g<=95;g+=5){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
+
   // Regression line: GPQA = 0.79*SWE + 24.7
-  c.strokeStyle='rgba(76,201,240,0.25)'; c.lineWidth=1.5; c.setLineDash([4,4]);
-  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7)); c.lineTo(X(84),Y(0.79*84+24.7)); c.stroke(); c.setLineDash([]);
-  // Draw within-family trajectory lines first (behind dots)
-  const labs={Anthropic:[],Google:[],OpenAI:[]};
-  FRONTIER.forEach(m=>{if(labs[m.lab])labs[m.lab].push(m);});
-  Object.entries(labs).forEach(([lab,models])=>{
+  c.strokeStyle='rgba(76,201,240,0.3)'; c.lineWidth=1.5; c.setLineDash([6,4]);
+  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7)); c.lineTo(X(84),Y(Math.min(0.79*84+24.7,gH))); c.stroke(); c.setLineDash([]);
+
+  // Within-family trajectory lines (behind dots)
+  const labGroups={Anthropic:[],Google:[],OpenAI:[]};
+  FRONTIER.forEach(m=>{if(labGroups[m.lab])labGroups[m.lab].push(m);});
+  Object.entries(labGroups).forEach(([lab,models])=>{
     if(models.length<2)return;
-    c.strokeStyle=models[0].fc; c.lineWidth=1.5; c.globalAlpha=0.4;
+    c.strokeStyle=models[0].fc; c.lineWidth=1.5; c.globalAlpha=0.35;
     c.beginPath();
     models.forEach((m,i)=>{
       const x=X(m.swe),y=Y(m.gpqa);
       if(i===0)c.moveTo(x,y); else c.lineTo(x,y);
     });
-    c.stroke();
-    c.globalAlpha=1;
+    c.stroke();c.globalAlpha=1;
   });
+
   // Sonnet 4.6 anomaly dashed line
   const son45=FRONTIER.find(f=>f.n==='Sonnet 4.5');
   const son46=FRONTIER.find(f=>f.n==='Sonnet 4.6');
   if(son45&&son46){
-    c.strokeStyle='#ff4d6d'; c.lineWidth=2; c.setLineDash([4,3]);
+    c.strokeStyle='rgba(255,77,109,0.6)'; c.lineWidth=2; c.setLineDash([4,3]);
     c.beginPath();c.moveTo(X(son45.swe),Y(son45.gpqa));c.lineTo(X(son46.swe),Y(son46.gpqa));c.stroke();
     c.setLineDash([]);
+    // Anomaly label
+    const mx=(X(son45.swe)+X(son46.swe))/2, my=(Y(son45.gpqa)+Y(son46.gpqa))/2;
+    c.fillStyle='#ff4d6d'; c.font='bold 9px Space Mono'; c.textAlign='center';
+    c.fillText('tax excursion',mx-20,my+4);
   }
 
+  // Draw dots
   FRONTIER.forEach(m=>{
     const x=X(m.swe), y=Y(m.gpqa);
-    c.fillStyle=m.fc;
-    c.beginPath(); c.arc(x,y,6,0,Math.PI*2); c.fill();
-    c.fillStyle='#c8d8f0'; c.font='8px Space Mono'; c.textAlign='left';
-    const short=m.n.replace('Claude ','').replace('Gemini ','G').replace('DeepSeek ','DS ');
-    c.fillText(short,x+8,y+3);
-    if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.fillText('anomaly',x+8,y+12);}
+    c.fillStyle=m.fc; c.globalAlpha=0.85;
+    c.beginPath(); c.arc(x,y,5.5,0,Math.PI*2); c.fill();
+    c.strokeStyle='rgba(255,255,255,0.3)'; c.lineWidth=0.5;
+    c.stroke(); c.globalAlpha=1;
   });
-  c.fillStyle='rgba(6,214,160,0.5)'; c.font='bold 10px Space Mono'; c.textAlign='right';
-  c.fillText('r = +0.85 (n=19, p<0.00001)',W-p.r,p.t+14);
-  c.fillStyle='#3d5a7a'; c.font='10px DM Sans'; c.textAlign='center';
-  for(let s=40;s<=80;s+=10) c.fillText(s+'%',X(s),H-p.b+16);
-  c.fillText('SWE-bench Verified (%)',W/2,H-6);
+
+  // ─── LABEL COLLISION AVOIDANCE ───
+  // Build label objects with initial positions
+  const LBL_FONT='9px Space Mono';
+  c.font=LBL_FONT;
+  const labels=FRONTIER.map(m=>{
+    const short=m.n.replace('Claude ','').replace('Gemini ','G').replace('DeepSeek ','DS ');
+    const tw=c.measureText(short).width;
+    const dx=X(m.swe), dy=Y(m.gpqa);
+    return {text:short,ox:dx,oy:dy,x:dx+9,y:dy+3,w:tw+4,h:12,fc:m.fc,model:m};
+  });
+
+  // Simple force-directed repulsion (10 iterations)
+  for(let iter=0;iter<15;iter++){
+    for(let i=0;i<labels.length;i++){
+      for(let j=i+1;j<labels.length;j++){
+        const a=labels[i], b=labels[j];
+        const overlapX=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x);
+        const overlapY=Math.min(a.y+a.h/2,b.y+b.h/2)-Math.max(a.y-a.h/2,b.y-b.h/2);
+        if(overlapX>0 && overlapY>0){
+          const pushY=(overlapY/2)+1;
+          if(a.y<b.y){a.y-=pushY;b.y+=pushY;}
+          else{a.y+=pushY;b.y-=pushY;}
+          const pushX=(overlapX/4)+0.5;
+          if(a.x<b.x){a.x-=pushX;b.x+=pushX;}
+          else{a.x+=pushX;b.x-=pushX;}
+        }
+      }
+      // Keep labels within chart bounds
+      const a=labels[i];
+      a.x=Math.max(p.l,Math.min(a.x,W-p.r-a.w));
+      a.y=Math.max(p.t+6,Math.min(a.y,H-p.b-4));
+    }
+  }
+
+  // Draw leader lines + labels
+  labels.forEach(lb=>{
+    const dist=Math.hypot(lb.x-lb.ox,lb.y-lb.oy);
+    if(dist>12){
+      c.strokeStyle='rgba(200,216,240,0.2)'; c.lineWidth=0.7;
+      c.beginPath();c.moveTo(lb.ox,lb.oy);c.lineTo(lb.x,lb.y);c.stroke();
+    }
+    c.fillStyle=lb.fc; c.globalAlpha=0.9;
+    c.font=LBL_FONT; c.textAlign='left';
+    c.fillText(lb.text,lb.x,lb.y);
+    c.globalAlpha=1;
+  });
+
+  // r-value annotation
+  c.fillStyle='rgba(6,214,160,0.6)'; c.font='bold 11px Space Mono'; c.textAlign='left';
+  c.fillText('r = +0.85',p.l+8,p.t+16);
+  c.fillStyle='rgba(6,214,160,0.35)'; c.font='10px Space Mono';
+  c.fillText('n=19, p<0.00001',p.l+8,p.t+30);
+
+  // Phase labels
+  c.fillStyle='rgba(6,214,160,0.2)'; c.font='bold 9px Space Mono'; c.textAlign='left';
+  c.fillText('COOPERATIVE (above line)',p.l+8,p.t+46);
+  c.fillStyle='rgba(255,77,109,0.2)';
+  c.fillText('TAX EXCURSION (below line)',p.l+8,p.t+58);
+
+  // Legend — right side
+  const legendX=W-p.r+12, legendY=p.t+20;
+  const labColors=[{l:'Anthropic',c:'#CC785C'},{l:'Google',c:'#4285f4'},{l:'OpenAI',c:'#10a37f'},{l:'DeepSeek',c:'#e11d48'},{l:'Kimi',c:'#7c3aed'},{l:'Alibaba',c:'#f59e0b'},{l:'MiniMax',c:'#6366f1'}];
+  c.font='bold 10px DM Sans'; c.fillStyle='#8aa8c8'; c.textAlign='left';
+  c.fillText('Labs',legendX,legendY-4);
+  labColors.forEach((lc,i)=>{
+    const ly=legendY+14+i*18;
+    c.fillStyle=lc.c; c.beginPath(); c.arc(legendX+5,ly-3,4,0,Math.PI*2); c.fill();
+    c.fillStyle='#a0b8d0'; c.font='10px DM Sans'; c.textAlign='left';
+    c.fillText(lc.l,legendX+14,ly);
+  });
+
+  // Axes
+  c.fillStyle='#4a6b8a'; c.font='10px DM Sans'; c.textAlign='center';
+  for(let s=35;s<=80;s+=5) c.fillText(s+'%',X(s),H-p.b+16);
+  c.fillText('SWE-bench Verified (%)',W/2,H-p.b+36);
   c.textAlign='right';
-  for(let g=55;g<=95;g+=10){c.fillStyle='#3d5a7a';c.fillText(g+'%',p.l-6,Y(g)+4);}
-  c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('GPQA Diamond (%)',0,0);c.restore();
+  for(let g=55;g<=95;g+=5){c.fillStyle='#4a6b8a';c.fillText(g+'%',p.l-6,Y(g)+4);}
+  c.save();c.translate(16,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('GPQA Diamond (%)',0,0);c.restore();
 }
 
 function buildFrontierTable(){
