@@ -748,25 +748,6 @@ are the strongest $N_{c,4}$-detection candidates based on this criterion (the $N
 Importantly: the goal is not to maximize $d_{\rm eff}$ but to have \emph{one good benchmark per active axis}.
 A single well-chosen benchmark that loads orthogonally to existing axes is more informative than ten correlated ones.
 
-\subsection{Extensions beyond LLM scaling}
-
-\textbf{MoE and effective parameter count.}
-Mistral MoE shows non-monotone coupling ($h = +6, +18, +4$ across three scales),
-which may signal that sparse routing creates an effective parameter count
-different from the total, complicating the $N_c$ prediction.
-
-\textbf{Multimodal coupling.}
-Vision--language models introduce a cross-modal coupling $\gamma_{RV}$.
-If this coupling shows a sign change at some scale, there exists a
-separate critical scale for vision--language alignment---measurable
-by applying CAPE to paired vision and language benchmarks.
-
-\textbf{CAPE as a general coupling detector.}
-The protocol---compute $\gamma_{12}$ across a scaling axis, locate the sign change---is not specific to model size or to reasoning/truthfulness.
-The same measurement applies directly to: \emph{grokking}~\cite{power2022} (scaling axis = training steps; $\gamma_{12}$ between two tasks detects whether they generalize cooperatively or competitively); \emph{multilingual models} (scaling axis = model size or number of training languages; $\gamma_{12}$ between two languages detects the scale at which the ``curse of multilinguality'' becomes a multilingual bonus); and \emph{modality coupling} in vision-language models ($\gamma_{RV}$ between vision and language benchmark scores).
-Each setting introduces its own critical scale $N_c$ with the same GL phase structure.
-These extensions require no new theoretical machinery---only paired benchmark measurements along the relevant scaling axis.
-
 % ════════════════════════════════════════════════════
 \section{Alignment Implications}
 \label{sec:alignment}
@@ -1231,6 +1212,12 @@ The design equation $h_c \sim (N_c-N)^{3/2}$ quantifies the required pinning str
 (iii)~\emph{Topological protection}: if the eigenvector rotation has a non-zero winding number in a three-dimensional capability space, the cooperative phase becomes topologically protected against local perturbations.
 This requires $d_{\rm eff} \geq 3$, i.e.\ the regime currently opening at frontier scale.
 Measurement, prediction, and engineering of the phase boundary are the program of Paper~3B.
+
+\textbf{Extensions beyond LLM scaling.}
+The CAPE protocol---compute $\gamma_{12}$ across a scaling axis, locate the sign change---is not specific to model size or to reasoning/truthfulness.
+It applies directly to \emph{grokking}~\cite{power2022} (scaling axis = training steps), \emph{multilingual models} (scaling axis = number of training languages; detecting the scale at which the ``curse of multilinguality'' becomes a multilingual bonus), and \emph{modality coupling} in vision-language models ($\gamma_{RV}$ between vision and language benchmark scores).
+Each setting introduces its own critical scale $N_c$ with the same GL phase structure; these extensions require no new theoretical machinery---only paired benchmark measurements along the relevant scaling axis.
+MoE architectures may complicate the picture: Mistral MoE shows non-monotone coupling ($h = +6, +18, +4$ across three scales), possibly because sparse routing creates an effective parameter count different from the total.
 
 % ════════════════════════════════════════════════════
 \section{Conclusions}
