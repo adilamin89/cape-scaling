@@ -120,6 +120,15 @@ The key diagnostics (Ginzburg number, $\kappa$, phase-locking angle, Riccati rot
 Loss laws~\cite{kaplan2020,chinchilla2022}, observational scaling~\cite{ruan2024}, and emergent abilities~\cite{wei2022} all treat each capability as an independent scalar trajectory.
 CAPE measures the \emph{coupling} between them; the full comparison is in \S\ref{sec:related}.
 
+\begin{center}
+\fbox{\begin{minipage}{0.92\textwidth}
+\small
+\textbf{Reader guide.}
+\textit{Physics readers:} the GL free energy, symmetry-breaking pattern, and diagnostics parallel those of multi-band superconductors~\cite{amin2020} and laser threshold dynamics~\cite{haken1985}. All key quantities (Ginzburg number, $\kappa=\lambda_1/\lambda_2$, phase-locking angle, Riccati rotation) have direct ML interpretations and are measured from public benchmark data.
+\textit{ML readers:} the physics frames are optional context---every section's bolded claims are self-contained empirical results requiring no physics background.
+\end{minipage}}
+\end{center}
+
 
 % ════════════════════════════════════════════════════
 \section{Related Work}
@@ -153,16 +162,6 @@ Young et al.~\cite{young2026} derive a geometric theory of the alignment tax und
 Every prior framework for capability evaluation treats each benchmark as an independent trajectory.
 None asks whether the trajectories are coupled, and if so, whether that coupling changes sign.
 The coupling $\gamma_{12}(N)$, it turns out, is the object that governs alignment---and the manifold it defines changes geometry, dimensionality, and eigenbasis as models scale through the phase boundary.
-
-
-\begin{center}
-\fbox{\begin{minipage}{0.92\textwidth}
-\small
-\textbf{Reader guide.}
-\textit{Physics readers:} the GL free energy, symmetry-breaking pattern, and diagnostics parallel those of multi-band superconductors~\cite{amin2020} and laser threshold dynamics~\cite{haken1985}. All key quantities (Ginzburg number, $\kappa=\lambda_1/\lambda_2$, phase-locking angle, Riccati rotation) have direct ML interpretations and are measured from public benchmark data.
-\textit{ML readers:} the physics frames are optional context---every section's bolded claims are self-contained empirical results requiring no physics background.
-\end{minipage}}
-\end{center}
 
 % ════════════════════════════════════════════════════
 \section{Measuring Capability Coupling}
@@ -511,26 +510,11 @@ rather than training time and dataset size.
 
 \subsection{Why power-law scaling exists}
 
-The Arrhenius gradient form has a fundamental implication for training dynamics.
-If $\|\nabla L\| \sim \exp(-C/L)$, then training dynamics
-slow exponentially as loss decreases: each unit of loss improvement
-requires exponentially more gradient steps.
-Combined with $L = E + AN^{-\alpha}$, this gives a formal reason for
-power-law scaling: the compute needed to reach loss $L$ scales as
-$T_{\rm train}(L) \sim \int \exp(C/L)\,dL$, which produces an
-approximately power-law relationship between compute and loss
-without assuming power-law behavior a priori.
-
-\textbf{Arrhenius activation energy is phase-specific.}
-Fitting the Arrhenius form $\log(\mathrm{d}S/\mathrm{d}\log N) = A - C/S$ separately in each phase reveals that the activation constant $C$ is \emph{not} universal---it changes sharply at $N_c$:
-Tax phase ($C \approx 28$, $r^2 = 0.32$);
-Transition ($C \approx 316$, $r^2 = 0.88$, a $10{\times}$ spike);
-Bonus phase ($C \approx 196$, $r^2 = 0.94$).
-The spike at transition is precisely why the gradient dips 37\% at 1B: the loss landscape becomes exponentially flat at $N_c$, the Arrhenius saddle point.
-This means the gradient dip is not an architectural quirk---it is the thermodynamic signature of the phase boundary, measurable from gradient norms alone without any benchmark data.
-A predicted consequence: any model trained at exactly $N_c$ will show minimum gradient norm and maximum susceptibility\footnote{Susceptibility ($\chi$): in physics, how strongly a system responds to a small external perturbation (e.g., how much magnetization changes per unit applied field). In ML terms: $\chi$ at $N_c$ measures how much a small change in training data or recipe shifts the model between tax and bonus phases. $\chi$ peaks at the transition because the ``restoring force'' toward either phase vanishes---the system is maximally sensitive to interventions. This is why $N_c$ is the optimal scale for alignment fine-tuning.} to alignment interventions.
-More broadly, the phase boundary is a \emph{surface} in $(N, D, T)$ space rather than a point: scaling training time $T$ is a partial substitute for scaling model size $N$, coupled through $\chi_{ND} = 0.102$.
-A 3.5B model trained for $2\times$ standard compute may enter the cooperative phase along the temporal axis rather than the size axis---a prediction testable from intermediate training checkpoints.
+The Arrhenius gradient form implies that training dynamics slow exponentially as loss decreases: $T_{\rm train}(L) \sim \int \exp(C/L)\,dL$, producing approximately power-law scaling without assuming it a priori.
+The activation constant $C$ is phase-specific: $C \approx 28$ (tax), $316$ (transition, a $10\times$ spike), $196$ (bonus).
+The spike at transition is why the gradient dips 37\% at 1B---the loss landscape becomes exponentially flat at $N_c$, the Arrhenius saddle point.
+\textbf{Key consequence:} any model at $N_c$ shows minimum gradient norm and maximum susceptibility\footnote{Susceptibility ($\chi$): how strongly the system responds to a small perturbation. $\chi$ peaks at $N_c$ because the ``restoring force'' toward either phase vanishes---the optimal scale for alignment interventions.} to alignment interventions.
+The full Arrhenius derivation and phase-boundary surface analysis are in Supplementary Appendix~A.
 
 The gradient measurements in this section tell us \emph{that} parameters are collectively coupled.
 A complementary view from the ODE: eigenvalues of the tax-phase coefficient matrix are $[-0.416, +0.536]$---one stable mode, one unstable---meaning the alignment tax is a \emph{dynamical instability}, not a static constraint.
@@ -622,9 +606,7 @@ At $N = 3.5$B, $\chi_\gamma \to \infty$---a lab choosing between a 3B and a 4B m
 Far from $N_c$ (e.g., at 70M or 70B), $\chi_\gamma$ is finite and regime classification is robust to small perturbations.
 The divergence is not fitted; it follows algebraically from the linear running of $\gamma_{12}$, making it a zero-parameter prediction.
 
-Beyond these structural diagnostics, three independent universality tests confirm the same structure across unseen data: (i)~OLMo (AI2) at $\gamma_{12} = 0.000$ with zero free parameters (\S\ref{sec:intro}); (ii)~Llama-2 benchmark scores predicted at 5.6\% MAE from a model trained on Pythia+Llama-1 alone (\S\ref{sec:holdout}); and (iii)~the mean-field gradient correction (L1) makes prediction error $142\times$ \emph{worse}, not better---the strongest single diagnostic that parameters are collectively coupled (\S\ref{sec:gradients}).
-
-Table~\ref{tab:phases} (in \S\ref{sec:Nc2_section}) summarises the key physical quantities across all four phases.
+Table~\ref{tab:phases} (in \S\ref{sec:Nc2_section}) summarises the key physical quantities across all regimes.
 
 \begin{figure*}[!htbp]
 \centering
@@ -795,7 +777,7 @@ Below $N_c$, the alignment tax is structural---scaling alone cannot
 fix it, and data curation is the primary lever.
 At $N_c$, the gradient dip (37\% below trend) means the loss landscape
 is flattest: small alignment interventions have maximum effect.
-Above $N_c$, scaling and alignment are cooperative---confirmed independently for HS-TQA (base models) and SWE-GPQA (frontier, $r=+0.85$ across 20 models)---with no fixed point observed up to 141B.
+Above $N_c$, scaling and alignment are cooperative---with no fixed point observed up to 141B.
 Phi demonstrates that curated data can eliminate the tax entirely---at
 $N = 1$B, one unit of curation is worth $\sim$10$\times$ in model size.
 
@@ -884,8 +866,8 @@ This question---whether a new anticorrelation opens at frontier scale---is measu
 
 What happens when the original benchmarks saturate?
 New capability axes activate---and new anticorrelations may open.
-The four phases are classified by \emph{coupling sign}, not model era or lab: Tax if $\gamma_{12}<0$, Bonus if $\gamma_{12}>0$, regardless of generation. ``Phase~4'' is the scale where HellaSwag and TruthfulQA saturate above 90\% and the relevant capability pair shifts to autonomous coding (SWE-bench) versus scientific reasoning (GPQA Diamond).
-Table~\ref{tab:phases} summarises all four phases; Phases 1--3 are documented in \S\S\ref{sec:coupling}--\ref{sec:topology}.
+The regimes are classified by \emph{coupling sign}, not model era or lab: Tax if $\gamma_{12}<0$, Bonus if $\gamma_{12}>0$, regardless of generation. Above $N_{c,2} \approx 70$--$88$B, HellaSwag and TruthfulQA saturate above 90\% and the relevant capability pair shifts to autonomous coding (SWE-bench) versus scientific reasoning (GPQA Diamond)---the \emph{frontier cooperative regime}.
+Table~\ref{tab:phases} summarises all four regimes; the first three are documented in \S\S\ref{sec:coupling}--\ref{sec:topology}.
 
 \begin{table}[ht]
 \centering\small
@@ -898,7 +880,7 @@ Phase & Scale & $\gamma_{12}$ & $d_{\rm eff}$ & Gi & $C_{\rm Arr}$ & Dominant be
 Tax      & $<$3.5B  & $<0$   & $\approx 2.0$ & $>1$             & 28             & HS, TQA (competing) \\
 Crossover & $\sim$3.5B & $\approx 0$ & $\approx 1.8$ & 1.35 (peak)  & 316\textdagger & HS, TQA (decoupled)  \\
 Bonus    & 3.5--70B & $>0$   & $2.0\to 1.1$       & $<1$             & 196            & HS, TQA, MMLU (coop.) \\
-Phase~4  & $>$70B   & $>0$   & $1.75\to 2.5$      & ---              & ---            & SWE, GPQA, IFEval \\
+Frontier & $>$70B   & $>0$   & $1.75\to 2.5$      & ---              & ---            & SWE, GPQA, IFEval \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1009,13 +991,17 @@ Opus~4.6 recovers to $h = +2.8$, the same recovery structure seen in the origina
 The protocol for any lab: compute $\gamma_{12} = \Delta\text{GPQA}/\Delta\text{SWE}$ between consecutive releases; negative $\gamma_{12}$ signals an excursion before deployment.
 
 \textbf{Multi-lab trajectories through the $N_{c,3}$ transition.}
-The three major labs are approaching $N_{c,3}$ from different directions in capability space, each with a distinctive $h$-field signature:
-\emph{Google} (Gemini~2.5~Pro $\to$ 3~Flash $\to$ 3~Pro $\to$ 3.1~Pro) shows the tightest SWE convergence ($76$--$81\%$) with consistently high $h > +4$---pushing reasoning while coding saturates, riding the $N_{c,3}$ transition naturally.
-\emph{OpenAI} (GPT-4o $\to$ 5 $\to$ 5.1 $\to$ 5.2~Pro $\to$ 5.4) has $h > 0$ at every generation: systematic ascent along the cooperative curve, with $h$ growing from $+1.9$ to $+5.3$.
-GPT-5.4 ($h = -1.5$) is the first OpenAI model to dip below the line---possibly the beginning of a coding-specialist excursion analogous to Anthropic's Sonnet~4.6.
-\emph{Anthropic} oscillates between coding vortices and recovery: Haiku~4.5 ($h = -11.6$) and Sonnet~4.6 ($h = -13.4$) dip sharply; Opus~4.6 ($h = +2.8$) recovers.
-This oscillation is itself a measurement---it reveals that Anthropic's training pipeline alternates between coding-emphasis and balanced training recipes, while Google and OpenAI have maintained monotonically reasoning-rich trajectories.
-The $h$-field rotation from SWE-GPQA to GPQA-IFEval is visible in all three.
+The three major labs approach $N_{c,3}$ from different directions in capability space:
+
+\smallskip\noindent\textit{Anthropic} (6 releases, 3.5~Son.\ through Opus~4.6) oscillates between coding vortices and recovery: Haiku~4.5 ($h = -11.6$) and Sonnet~4.6 ($h = -13.4$) are coding-emphasis excursions; Opus~4.6 ($h = +2.8$) recovers to the cooperative manifold. The oscillation reveals alternating training-recipe emphasis---readable directly from the $h$-field.
+
+\smallskip\noindent\textit{OpenAI} (GPT-4o through 5.2~Pro) shows steady cooperative ascent: $h > 0$ at every generation, growing from $+1.9$ to $+5.3$. GPT-5.4 ($h = -1.5$) is the first to dip below the line---possibly the beginning of a coding-specialist excursion analogous to Anthropic's Sonnet~4.6.
+
+\smallskip\noindent\textit{Google} (Gemini~2.5~Pro through 3.1~Pro) maintains consistently high $h > +4$ with the tightest SWE convergence ($76$--$81\%$)---pushing reasoning while coding saturates, riding the $N_{c,3}$ transition naturally.
+
+\smallskip\noindent\textit{Other labs.} DeepSeek, Alibaba, Moonshot, and MiniMax each have single datapoints; all are consistent with the cooperative manifold ($|h| < 6$; Table~\ref{tab:lab_diagnostic}).
+
+\smallskip\noindent These distinct signatures---oscillating, monotone ascending, reasoning-saturated---are readable from two benchmark scores without training-log access.
 
 \textbf{$N_{c,3}$ forward prediction.}
 Given a lab's GPQA score and its $N_{c,3}$ $h$-field, the predicted IFEval is
@@ -1035,27 +1021,26 @@ A lab can shift its $h$-field by ${\sim}5$~pp per model generation through train
 
 \begin{table}[ht]
 \centering\small
-\caption{Per-lab $h$-field diagnostic and training-recipe recommendation (March 2026).
-$\bar{h}$: mean $h$-field across all models from each lab in Table~\ref{tab:frontier}.
-Recommendation follows directly from the cooperative regression.}
+\caption{Per-lab $h$-field diagnostic (March 2026).
+$\bar{h}$: mean $h$-field across all models from each lab in Table~\ref{tab:frontier}. Validated by cross-lab holdout at 6.9\% MAE (\S\ref{sec:Nc2_section}).}
 \label{tab:lab_diagnostic}
 \begin{tabular}{llrrl}
 \toprule
-Lab & Best model & $\bar{h}$ & Position & Primary lever \\
+Lab & Best model & $\bar{h}$ & Position & Signature \\
 \midrule
-Anthropic & Opus~4.6     & $-4.3$  & On manifold$^\dagger$     & Scale uniformly \\
-Google    & Gemini~3.1~Pro & $+6.5$ & Reasoning-rich  & Invest in agentic coding \\
-OpenAI    & GPT-5.4      & $+2.3$  & On manifold     & Scale uniformly \\
-DeepSeek  & V3.2         & $-3.5$  & On manifold     & Scale uniformly \\
-Alibaba   & Qwen3.5-397B & $+5.7$  & Reasoning-rich  & Invest in agentic coding \\
-Moonshot  & Kimi~K2.5    & $+2.3$  & On manifold     & Scale uniformly \\
-MiniMax   & M2.5         & $-3.0$  & On manifold     & Scale uniformly \\
+Anthropic & Opus~4.6     & $-4.3$  & On manifold$^\dagger$     & Oscillating (coding $\leftrightarrow$ recovery) \\
+Google    & Gemini~3.1~Pro & $+6.5$ & Reasoning-rich  & Monotone reasoning emphasis \\
+OpenAI    & GPT-5.4      & $+2.3$  & On manifold     & Steady cooperative ascent \\
+DeepSeek  & V3.2         & $-3.5$  & On manifold     & Coding-rich (single datapoint) \\
+Alibaba   & Qwen3.5-397B & $+5.7$  & Reasoning-rich  & Reasoning-rich (single datapoint) \\
+Moonshot  & Kimi~K2.5    & $+2.3$  & On manifold     & Near baseline (single datapoint) \\
+MiniMax   & M2.5         & $-3.0$  & On manifold     & Coding-rich (single datapoint) \\
 \bottomrule
 \end{tabular}
 \end{table}
 \noindent$\dagger$ Anthropic's mean $\bar{h}$ is pulled negative by Haiku~4.5 ($h=-11.6$) and Sonnet~4.6 ($h=-13.4$); Opus~4.6 alone has $h=+2.8$ (on manifold).
 
-\noindent\textbf{Caveats.} The ``Primary lever'' column follows mechanically from the cooperative regression and is not a normative recommendation---labs have strategic considerations beyond two benchmark scores. The sample per lab ranges from 1 to 7 models; labs with fewer data points (DeepSeek, Alibaba, MiniMax) have higher uncertainty in $\bar{h}$. The classification is a snapshot (March 2026) and will shift as new models are released.
+\noindent\textbf{Caveats.} The ``Signature'' column is descriptive, not normative---it follows mechanically from the cooperative regression and reflects training-recipe emphasis readable from two benchmark scores. Labs have strategic considerations far beyond this diagnostic. The sample per lab ranges from 1 to 7 models; single-datapoint labs (DeepSeek, Alibaba, MiniMax, Moonshot) have high uncertainty in $\bar{h}$. The classification is a snapshot (March 2026) and will shift as new models are released.
 
 \noindent The $h$-field is a \emph{macro-interpretability} instrument: it converts two benchmark scores into a one-dimensional read on whether a lab's training recipe favours reasoning or coding---readable without any access to training details.
 
@@ -1316,41 +1301,27 @@ The next concrete test: when $\gamma(\text{IFEval}, \text{HarmBench})$ turns neg
 Capability coupling, not individual capability scaling, governs alignment.
 CAPE makes this coupling measurable, predictable, and designable.
 
-\medskip
-\noindent\textbf{Using CAPE in practice.}
+\subsection{Using CAPE in practice}
+
 The framework reduces to a three-step protocol: (1)~run any two capability benchmarks on your model; (2)~compute $\gamma_{12} = \Delta\text{score}_2/\Delta\text{score}_1$ between consecutive sizes or releases; (3)~read off the phase.
 No model weights, no internal access, no calibration required---only published evaluation scores.
+The $\sqrt{}$ isocline classifier generalises to every regime: $\text{score}_2 > \sqrt{(a/b)\cdot\text{score}_1}$ implies cooperative phase; below implies a tax is opening.
+This single formula works at $N_{c,1}$ (HS-TQA), $N_{c,2}$ (SWE-GPQA), and $N_{c,3}$ (GPQA-IFEval) without modification.
 
-The implications differ by audience.
-\textit{If you are building models below 3.5B parameters}: data curation is your primary alignment lever---one unit of curation quality is worth roughly $10\times$ in parameter count.
-The design equation $h_c \sim (N_c - N)^{3/2}$ tells you how much curation is needed at your target scale; Phi-level curation at 1B eliminates the alignment tax entirely.
-Scaling to 3.5B without curation is more expensive and produces the same result.
-\textit{If you are training at frontier scale ($N_{c,2}$ regime)}: track $\gamma_{12}(\text{SWE}, \text{GPQA})$ across consecutive releases to detect training-recipe excursions before deployment.
-A single evaluation run on both benchmarks suffices---negative $\gamma_{12}$ signals a local tax excursion; recovery is expected at the next tier if the cooperative phase is otherwise intact.
-The $h$-field quantifies how far your training recipe sits from the cooperative baseline; $|h| > 10$ warrants investigation.
-The cooperative fit provides a forward prediction: $\text{GPQA}_{\rm pred} = 0.79\cdot\text{SWE} + 24.7 + h_{\rm lab}$ (validated at 6.9\% MAE across 4 held-out labs).
-Furthermore, the running coupling $\gamma_{12}(N)$ follows a kink-soliton profile---the instanton (minimum-action trajectory) of the double-well Ginzburg-Landau potential---with width $\Delta(\log_{10}N) \approx 1$ decade centred on $N_{c,1}$.
-Training recipes that deviate from this trajectory pay an action penalty exponential in the deviation; detailed predictions for individual labs are given in Paper~3B.
-\textit{If you are at the $N_{c,3}$ frontier (SWE $> 78\%$)}: SWE-bench is saturating.
-Switch to tracking $\gamma_{12}(\text{GPQA}, \text{IFEval})$---this is now the active coupling pair.
-The $N_{c,3}$ forward prediction is $\text{IFEval}_{\rm pred} = 0.97\cdot\text{GPQA} + 6.8 + h_{3,\rm lab}$ (Eq.~\ref{eq:nc3_coupling}; preliminary, $n=4$).
-If your model's IFEval is below $\sqrt{0.97\cdot\text{GPQA}}$ (the isocline boundary), your training recipe is entering a new tax regime between reasoning and instruction-following---the $N_{c,3}$ analogue of the original alignment tax.
-The practical lever at this scale is no longer data curation (the $N_{c,1}$ lever) or coding optimisation (the $N_{c,2}$ lever), but the balance between reasoning depth and instruction compliance---a training-recipe choice visible in the $h_3$-field.
-\textit{If you are a researcher or evaluator}: $\gamma(\text{benchmark}_1, \text{benchmark}_2)$ is a phase detector for any capability pair.
-When a new benchmark pair begins showing negative cross-family coupling, a new alignment tax is opening at that scale---measure it before the field discovers it empirically.
-The $\sqrt{}$ isocline classifier generalises to every regime: compute the cooperative slope $a/b$ from the active benchmark pair, then test whether $\text{score}_2 > \sqrt{(a/b)\cdot\text{score}_1}$.
-This single formula---derived once from the Riccati ODE---works at $N_{c,1}$ (HS-TQA), $N_{c,2}$ (SWE-GPQA), and $N_{c,3}$ (GPQA-IFEval) without modification.
+The implications differ by scale:
+\textit{Below $N_{c,1}$ ($N < 3.5$B):} data curation is the primary alignment lever---one unit of quality is worth ${\sim}10\times$ in parameter count (the Phi demonstration).
+\textit{At frontier scale ($N_{c,2}$ regime):} track $\gamma_{12}(\text{SWE}, \text{GPQA})$ across consecutive releases; $|h| > 10$ warrants investigation.
+The cooperative fit provides a forward prediction validated at 6.9\% MAE across 4 held-out labs.
+\textit{At the $N_{c,3}$ frontier (SWE $> 78\%$):} switch to tracking $\gamma_{12}(\text{GPQA}, \text{IFEval})$---the practical lever shifts from coding optimisation to the balance between reasoning depth and instruction compliance.
+A fully worked example is given in Appendix~C.
 
-A fully worked example---diagnosing a hypothetical frontier release using all three CAPE steps ($h$-field, isocline boundary, trajectory coupling)---is given in Appendix~C of the Supplementary Material.
+\medskip
+\noindent\textbf{Code, data, and dashboard.}\footnote{Scripts: \texttt{cape\_frontier\_full.py}, \texttt{cape\_architecture\_probe.py}, \texttt{cape\_stiffness.py}, \texttt{cape\_algebraic\_nc.py}, \texttt{cape\_family\_hfield.py}, \texttt{cape\_null\_model.py}, \texttt{cape\_phase\_transfer.py}, \texttt{olmo\_gradient\_validation.py}.}
+All benchmark data, analysis scripts, and figure-generation code are at \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
+The interactive dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} implements the full protocol.
 
 \bigskip
 \noindent More is different---and the difference is in the coupling, not the loss.
-
-\medskip
-\noindent\textbf{Code, data, and dashboard.}
-All benchmark data, analysis scripts\footnote{Scripts: \texttt{cape\_frontier\_full.py}, \texttt{cape\_architecture\_probe.py}, \texttt{cape\_stiffness.py}, \texttt{cape\_algebraic\_nc.py}, \texttt{cape\_family\_hfield.py}, \texttt{cape\_null\_model.py}, \texttt{cape\_phase\_transfer.py}, \texttt{olmo\_gradient\_validation.py}.}, and figure-generation code are at \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
-The interactive dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} implements the full protocol: enter any model's scores to get phase classification, $\gamma_{12}$, $d_{\rm eff}$, $h(\mathcal{D})$, and phase-specific recommendations.
-Correspondence: \href{mailto:adilamin@uwm.edu}{\texttt{adilamin@uwm.edu}} $\cdot$ \href{mailto:adil89aminx@gmail.com}{\texttt{adil89aminx@gmail.com}}.
 
 \section*{Acknowledgments}
 
