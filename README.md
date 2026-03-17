@@ -29,6 +29,11 @@ Standard scaling laws predict how *loss* falls with compute. They say nothing ab
 ```bash
 git clone https://github.com/adilamin89/cape-scaling
 cd cape-scaling
+
+# One-command setup (creates venv, installs deps, runs smoke test)
+bash setup.sh
+
+# Or manual install
 pip install -r requirements.txt
 
 # Classify any model in one command

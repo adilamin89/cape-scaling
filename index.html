@@ -1810,6 +1810,9 @@ function drawPhaseChart(){
 }
 
 // ── CANVAS: FRONTIER CHART ────────────────────────────────
+// Store frontier chart coords for hover
+let _fState={pts:[],X:null,Y:null,p:null,W:0,H:0};
+
 function drawFrontierChart(){
   const cv=document.getElementById('frontier-chart');
   if(!cv)return;
@@ -1821,14 +1824,31 @@ function drawFrontierChart(){
   const sL=30,sH=84,gL=50,gH=97;
   const X=s=>p.l+(s-sL)/(sH-sL)*(W-p.l-p.r);
   const Y=g=>p.t+(gH-g)/(gH-gL)*(H-p.t-p.b);
+  _fState={pts:[],X,Y,p,W,H};
   c.clearRect(0,0,W,H);
   c.strokeStyle='rgba(255,255,255,0.03)'; c.lineWidth=1;
   for(let s=40;s<=80;s+=10){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
   for(let g=55;g<=95;g+=10){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
-  // Regression line: GPQA = 0.79*SWE + 24.7
+
+  // Cooperative/tax zones
+  c.fillStyle='rgba(6,214,160,0.03)';
+  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7));
+  c.lineTo(X(84),Y(0.79*84+24.7)); c.lineTo(X(84),Y(gH)); c.lineTo(X(30),Y(gH)); c.closePath(); c.fill();
+  c.fillStyle='rgba(239,71,111,0.03)';
+  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7));
+  c.lineTo(X(84),Y(0.79*84+24.7)); c.lineTo(X(84),Y(gL)); c.lineTo(X(30),Y(gL)); c.closePath(); c.fill();
+
+  // Regression line
   c.strokeStyle='rgba(76,201,240,0.25)'; c.lineWidth=1.5; c.setLineDash([4,4]);
   c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7)); c.lineTo(X(84),Y(0.79*84+24.7)); c.stroke(); c.setLineDash([]);
-  // Draw within-family trajectory lines first (behind dots)
+
+  // Zone labels
+  c.save(); c.globalAlpha=0.2; c.font='bold 11px Space Mono';
+  c.fillStyle='#06d6a0'; c.textAlign='left'; c.fillText('h > 0  cooperative',p.l+8,p.t+40);
+  c.fillStyle='#ef476f'; c.fillText('h < 0  tax excursion',p.l+8,H-p.b-10);
+  c.restore();
+
+  // Within-family trajectory lines
   const labs={Anthropic:[],Google:[],OpenAI:[]};
   FRONTIER.forEach(m=>{if(labs[m.lab])labs[m.lab].push(m);});
   Object.entries(labs).forEach(([lab,models])=>{
@@ -1839,9 +1859,9 @@ function drawFrontierChart(){
       const x=X(m.swe),y=Y(m.gpqa);
       if(i===0)c.moveTo(x,y); else c.lineTo(x,y);
     });
-    c.stroke();
-    c.globalAlpha=1;
+    c.stroke(); c.globalAlpha=1;
   });
+
   // Sonnet 4.6 anomaly dashed line
   const son45=FRONTIER.find(f=>f.n==='Sonnet 4.5');
   const son46=FRONTIER.find(f=>f.n==='Sonnet 4.6');
@@ -1851,17 +1871,45 @@ function drawFrontierChart(){
     c.setLineDash([]);
   }
 
+  // Smart label positioning to avoid overlaps
+  const labelPts=[];
   FRONTIER.forEach(m=>{
     const x=X(m.swe), y=Y(m.gpqa);
+    _fState.pts.push({x,y,m});
     c.fillStyle=m.fc;
     c.beginPath(); c.arc(x,y,6,0,Math.PI*2); c.fill();
-    c.fillStyle='#c8d8f0'; c.font='8px Space Mono'; c.textAlign='left';
+    // Compute label position (nudge crowded ones)
     const short=m.n.replace('Claude ','').replace('Gemini ','G').replace('DeepSeek ','DS ');
-    c.fillText(short,x+8,y+3);
-    if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.fillText('anomaly',x+8,y+12);}
+    let lx=x+9, ly=y+3;
+    // Push overlapping labels
+    for(const prev of labelPts){
+      if(Math.abs(lx-prev.x)<60 && Math.abs(ly-prev.y)<10) ly=prev.y+10;
+    }
+    labelPts.push({x:lx,y:ly});
+    c.fillStyle='rgba(200,216,240,0.7)'; c.font='8px Space Mono'; c.textAlign='left';
+    c.fillText(short,lx,ly);
+    if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.fillText('anomaly',lx,ly+10);}
   });
+
+  // Stats
   c.fillStyle='rgba(6,214,160,0.5)'; c.font='bold 10px Space Mono'; c.textAlign='right';
   c.fillText('r = +0.85 (n=20, p<0.00001)',W-p.r,p.t+14);
+
+  // Legend
+  const legItems=[
+    {c:'#CC785C',l:'Anthropic'},{c:'#4285f4',l:'Google'},{c:'#10a37f',l:'OpenAI'},
+    {c:'#e11d48',l:'DeepSeek'},{c:'#7c3aed',l:'Kimi'},{c:'#f59e0b',l:'Alibaba'},{c:'#6366f1',l:'MiniMax'}
+  ];
+  let legX=p.l+4, legY=p.t+8;
+  legItems.forEach(it=>{
+    c.fillStyle=it.c; c.beginPath(); c.arc(legX+4,legY,3.5,0,Math.PI*2); c.fill();
+    c.fillStyle='#8a9ab0'; c.font='8px DM Sans'; c.textAlign='left';
+    c.fillText(it.l,legX+10,legY+3);
+    legX+=c.measureText(it.l).width+20;
+    if(legX>W*0.6){legX=p.l+4;legY+=14;}
+  });
+
+  // Axes
   c.fillStyle='#3d5a7a'; c.font='10px DM Sans'; c.textAlign='center';
   for(let s=40;s<=80;s+=10) c.fillText(s+'%',X(s),H-p.b+16);
   c.fillText('SWE-bench Verified (%)',W/2,H-6);
@@ -1869,6 +1917,46 @@ function drawFrontierChart(){
   for(let g=55;g<=95;g+=10){c.fillStyle='#3d5a7a';c.fillText(g+'%',p.l-6,Y(g)+4);}
   c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('GPQA Diamond (%)',0,0);c.restore();
 }
+
+// ── Frontier chart hover tooltip ──
+(function(){
+  let tip=null;
+  function getTip(){
+    if(!tip){
+      tip=document.createElement('div');
+      tip.style.cssText='position:fixed;pointer-events:none;background:rgba(15,23,42,0.95);border:1px solid rgba(76,201,240,0.4);border-radius:6px;padding:8px 12px;font-size:11px;font-family:Space Mono,monospace;color:#c8d8f0;z-index:9999;display:none;backdrop-filter:blur(8px);line-height:1.6;max-width:220px';
+      document.body.appendChild(tip);
+    }
+    return tip;
+  }
+  document.addEventListener('mousemove',function(e){
+    const cv=document.getElementById('frontier-chart');
+    if(!cv||!_fState.pts.length)return;
+    const rect=cv.getBoundingClientRect();
+    const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    let hit=null;
+    for(const pt of _fState.pts){
+      if(Math.hypot(mx-pt.x,my-pt.y)<12){hit=pt;break;}
+    }
+    const t=getTip();
+    if(hit){
+      const m=hit.m;
+      const hColor=m.h>2?'#06d6a0':m.h<-2?'#ff4d6d':'#ffd166';
+      const phase=m.h>2?'Cooperative':m.h<-2?'Tax excursion':'Transition';
+      t.innerHTML=`<div style="color:${m.fc};font-weight:700;margin-bottom:4px">${m.n}</div>`+
+        `<div>SWE: ${m.swe}% · GPQA: ${m.gpqa}%</div>`+
+        `<div>h-field: <span style="color:${hColor};font-weight:700">${m.h>0?'+':''}${m.h}</span> → ${phase}</div>`+
+        `<div style="color:#7a9abf">${m.lab}</div>`;
+      t.style.display='block';
+      t.style.left=(e.clientX+14)+'px';
+      t.style.top=(e.clientY-10)+'px';
+      cv.style.cursor='crosshair';
+    } else {
+      t.style.display='none';
+      cv.style.cursor='default';
+    }
+  });
+})();
 
 function buildFrontierTable(){
   const tb=document.getElementById('frontier-table');
@@ -1888,46 +1976,105 @@ function drawCascadeChart(){
   const cv=document.getElementById('cascade-chart');
   if(!cv)return;
   const dpr=window.devicePixelRatio||1;
-  const W=cv.parentElement.clientWidth||700, H=300;
+  const W=cv.parentElement.clientWidth||700, H=340;
   cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
   const c=cv.getContext('2d'); c.scale(dpr,dpr);
-  const p={l:52,r:20,t:30,b:44};
-  const nL=7,nH=12.5;
+  const p={l:58,r:30,t:36,b:48};
+  const nL=7.5,nH=12.3;
   const X=n=>p.l+(n-nL)/(nH-nL)*(W-p.l-p.r);
   c.clearRect(0,0,W,H);
-  // deff curve
   const Yd=v=>p.t+(2.2-v)/1.4*(H-p.t-p.b);
-  c.strokeStyle='rgba(76,201,240,0.7)'; c.lineWidth=2.5;
+
+  // ── Phase-colored background bands ──
+  const phases=[
+    {l:7.5, r:Math.log10(3.5e9), c:'rgba(239,71,111,0.06)', label:'TAX', lc:'rgba(239,71,111,0.35)'},
+    {l:Math.log10(3.5e9), r:Math.log10(3.5e9)+0.3, c:'rgba(255,209,102,0.08)', label:'TRANS', lc:'rgba(255,209,102,0.4)'},
+    {l:Math.log10(3.5e9)+0.3, r:Math.log10(10e9), c:'rgba(6,214,160,0.06)', label:'BONUS', lc:'rgba(6,214,160,0.35)'},
+    {l:Math.log10(10e9), r:Math.log10(114e9), c:'rgba(76,201,240,0.05)', label:'FRONTIER', lc:'rgba(76,201,240,0.3)'},
+    {l:Math.log10(114e9), r:12.3, c:'rgba(123,47,255,0.05)', label:'Nc3+', lc:'rgba(123,47,255,0.3)'}
+  ];
+  phases.forEach(ph=>{
+    c.fillStyle=ph.c;
+    const x1=Math.max(X(ph.l),p.l), x2=Math.min(X(ph.r),W-p.r);
+    c.fillRect(x1,p.t,x2-x1,H-p.t-p.b);
+    c.fillStyle=ph.lc; c.font='bold 9px Space Mono'; c.textAlign='center';
+    c.fillText(ph.label,(x1+x2)/2,H-p.b-6);
+  });
+
+  // ── Measured d_eff data points per phase ──
+  const deffPts=[
+    {n:Math.log10(0.5e9), d:1.53, label:'Tax', c:'#ef476f'},
+    {n:Math.log10(2e9),   d:1.81, label:'Trans', c:'#ffd166'},
+    {n:Math.log10(5e9),   d:1.20, label:'Bonus', c:'#06d6a0'},
+    {n:Math.log10(40e9),  d:1.15, label:'Frontier', c:'#4cc9f0'},
+    {n:Math.log10(114e9), d:1.33, label:'Nc3', c:'#7b2fff'}
+  ];
+
+  // ── d_eff regression curve ──
+  c.strokeStyle='rgba(76,201,240,0.5)'; c.lineWidth=2;
   c.beginPath();
-  for(let n=7;n<=12.5;n+=0.05){
-    const deff=Math.max(1,-0.27*n+3.9);
+  for(let n=7.5;n<=12.3;n+=0.05){
+    const deff=Math.max(0.9,-0.27*n+3.9);
     const x=X(n),y=Yd(deff);
-    if(n===7)c.moveTo(x,y); else c.lineTo(x,y);
+    if(n===7.5)c.moveTo(x,y); else c.lineTo(x,y);
   }
   c.stroke();
-  // Nc markers
-  const NCS=[{n:Math.log10(3.5e9),l:'Nc1 3.5B',c:'#ffd166'},{n:10,l:'Nc2 ~10B',c:'#4cc9f0'},{n:Math.log10(114e9),l:'Nc3 ~114B',c:'#7b2fff'}];
+
+  // ── Draw data points with pulsing halos ──
+  deffPts.forEach(pt=>{
+    const x=X(pt.n), y=Yd(pt.d);
+    // Halo
+    c.beginPath(); c.arc(x,y,10,0,Math.PI*2);
+    c.fillStyle=pt.c.replace(')',',0.15)').replace('rgb','rgba');
+    c.fill();
+    // Dot
+    c.beginPath(); c.arc(x,y,4.5,0,Math.PI*2);
+    c.fillStyle=pt.c; c.fill();
+    c.strokeStyle='rgba(0,0,0,0.5)'; c.lineWidth=0.5; c.stroke();
+    // Value label
+    c.fillStyle=pt.c; c.font='bold 10px Space Mono'; c.textAlign='center';
+    c.fillText(pt.d.toFixed(2),x,y-14);
+  });
+
+  // ── d_eff peak annotation at transition ──
+  const peakX=X(Math.log10(2e9)), peakY=Yd(1.81);
+  c.strokeStyle='rgba(255,209,102,0.5)'; c.lineWidth=1; c.setLineDash([2,2]);
+  c.beginPath(); c.moveTo(peakX,peakY); c.lineTo(peakX+50,peakY-30); c.stroke(); c.setLineDash([]);
+  c.fillStyle='rgba(255,209,102,0.8)'; c.font='9px DM Sans'; c.textAlign='left';
+  c.fillText('← peak fluctuations',peakX+52,peakY-28);
+
+  // ── Nc markers (vertical dashed lines) ──
+  const NCS=[
+    {n:Math.log10(3.5e9),l:'Nc₁ 3.5B',c:'#ffd166'},
+    {n:10,l:'Nc₂ ~10B',c:'#4cc9f0'},
+    {n:Math.log10(114e9),l:'Nc₃ ~114B',c:'#7b2fff'}
+  ];
   NCS.forEach(nc=>{
     c.strokeStyle=nc.c; c.lineWidth=1.5; c.setLineDash([5,4]);
     c.beginPath(); c.moveTo(X(nc.n),p.t); c.lineTo(X(nc.n),H-p.b); c.stroke(); c.setLineDash([]);
-    c.fillStyle=nc.c; c.font='bold 9px Space Mono'; c.textAlign='center';
-    c.fillText(nc.l,X(nc.n),p.t-8);
+    c.fillStyle=nc.c; c.font='bold 10px Space Mono'; c.textAlign='center';
+    c.fillText(nc.l,X(nc.n),p.t-12);
   });
-  // Theory breakdown
-  c.strokeStyle='rgba(200,200,200,0.3)'; c.lineWidth=1; c.setLineDash([3,3]);
+
+  // ── Theory breakdown marker ──
+  c.strokeStyle='rgba(200,200,200,0.25)'; c.lineWidth=1; c.setLineDash([3,3]);
   c.beginPath(); c.moveTo(X(Math.log10(130e9)),p.t); c.lineTo(X(Math.log10(130e9)),H-p.b); c.stroke(); c.setLineDash([]);
   c.fillStyle='rgba(200,200,200,0.4)'; c.font='9px Space Mono'; c.textAlign='center';
-  c.fillText('det(H)→0',X(Math.log10(130e9)),p.t-8);
-  // Axis
+  c.fillText('det(H)→0',X(Math.log10(130e9)),p.t-12);
+
+  // ── Axes ──
   c.fillStyle='#3d5a7a'; c.font='10px DM Sans'; c.textAlign='center';
   const labels={8:'100M',9:'1B',10:'10B',11:'100B',12:'1T'};
-  for(const [i,l] of Object.entries(labels)) c.fillText(l,X(parseInt(i)),H-p.b+16);
-  c.fillText('Parameters N',W/2,H-6);
+  for(const [i,l] of Object.entries(labels)){
+    const ni=parseInt(i);
+    if(ni>=nL && ni<=nH) c.fillText(l,X(ni),H-p.b+18);
+  }
+  c.fillText('Parameters N',W/2,H-4);
   c.textAlign='right';
-  for(let d=1;d<=2;d+=0.5){c.fillStyle='#3d5a7a';c.fillText('d='+d,p.l-6,Yd(d)+4);}
-  c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('d_eff',0,0);c.restore();
-  c.fillStyle='rgba(76,201,240,0.6)'; c.font='10px DM Sans'; c.textAlign='left';
-  c.fillText('d_eff = −0.27·log₁₀N + 3.9',p.l+8,p.t+14);
+  for(let d=1;d<=2;d+=0.5){c.fillStyle='#3d5a7a';c.fillText('d='+d,p.l-8,Yd(d)+4);}
+  c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('d_eff (effective dimensionality)',0,0);c.restore();
+  c.fillStyle='rgba(76,201,240,0.5)'; c.font='10px DM Sans'; c.textAlign='left';
+  c.fillText('d_eff = −0.27·log₁₀N + 3.9 (regression)',p.l+8,p.t+14);
 }
 
 // ── INIT ─────────────────────────────────────────────────
