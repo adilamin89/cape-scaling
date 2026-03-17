@@ -140,7 +140,7 @@ The field has built excellent foundations, each sharing one structural assumptio
 These laws are exact---our own loss fit achieves $R^2=0.9994$---but single-observable: the capability structure invisible to loss has its own phase diagram, which no loss-based framework can detect.
 
 \textit{Observational scaling} (Ruan et al.~\cite{ruan2024}) take a cross-sectional snapshot of model performance across many families and find the capability space is low-dimensional ($\sim$80\% of variation on PC1).
-This is consistent with our Phase~4 measurement at large $N$ ($d_{\rm eff}\to 1$, deep cooperative regime).
+This is consistent with our Frontier measurement at large $N$ ($d_{\rm eff}\to 1$, deep cooperative regime).
 But Ruan et al.\ treat this as a fixed property of the capability space; CAPE shows the manifold is \emph{dynamic}.
 Its dimensionality changes with scale ($d_{\rm eff}: 2\to1$ across the transition); its eigenbasis rotates---the TQA loading of $\mathbf{e}_2$ flips from $+0.20$ below $N_c$ to $-0.39$ above it, governed by a Riccati ODE; and the dominant benchmark axes change entirely between phases (HellaSwag/TruthfulQA below 70B; SWE-bench/GPQA above).
 The capability manifold is not a static geometric object: it is phase-dependent, and its phase is determined by the inter-capability coupling $\gamma_{12}(N)$.
@@ -497,17 +497,6 @@ Critically, OLMo-1B has the \emph{same} 16-layer architecture as Pythia-1B but l
 The layer count alone does not explain the dip magnitude; the sign change is physical.
 OPT and BLOOM families with 24-layer 1B models show $\gamma_{12} \approx 0$, consistent with sitting at the transition, not in the deep tax regime---confirming that the transition region near $N_c$ is universal and the Pythia dip magnitude is partly architectural but the sign change is thermodynamic.
 
-\textbf{Connection to double descent.}
-The gradient dip near $N_c$ is reminiscent of the double descent phenomenon~\cite{nakkiran2020},
-where test loss exhibits non-monotonic behavior near the interpolation threshold.
-The heavy-tailed structure of weight matrices documented by Martin \& Mahoney~\cite{martin2021} provides a complementary view: their implicit self-regularization framework connects gradient statistics to the same collective coupling behavior we measure here.
-Caballero et al.~\cite{caballero2022} show that broken power-law scaling (the ``broken neural scaling law'') is common at fine-grained task level---our per-phase ODE fit is consistent with their piecewise picture, where different phases have different dynamics.
-In both cases, the loss landscape restructures at a critical point:
-parameters that previously competed
-begin to cooperate, temporarily flattening the gradient.
-Our observation extends this picture to \emph{pre-training} and \emph{model size}
-rather than training time and dataset size.
-
 \subsection{Why power-law scaling exists}
 
 The Arrhenius gradient form implies that training dynamics slow exponentially as loss decreases: $T_{\rm train}(L) \sim \int \exp(C/L)\,dL$, producing approximately power-law scaling without assuming it a priori.
@@ -516,10 +505,7 @@ The spike at transition is why the gradient dips 37\% at 1B---the loss landscape
 \textbf{Key consequence:} any model at $N_c$ shows minimum gradient norm and maximum susceptibility\footnote{Susceptibility ($\chi$): how strongly the system responds to a small perturbation. $\chi$ peaks at $N_c$ because the ``restoring force'' toward either phase vanishes---the optimal scale for alignment interventions.} to alignment interventions.
 The phase-boundary surface analysis (Appendix~A, phase diagram) and gradient-scaling derivation (Appendix~A, messenger field) develop these results formally.
 
-The gradient measurements in this section tell us \emph{that} parameters are collectively coupled.
-A complementary view from the ODE: eigenvalues of the tax-phase coefficient matrix are $[-0.416, +0.536]$---one stable mode, one unstable---meaning the alignment tax is a \emph{dynamical instability}, not a static constraint.
-The bonus-phase eigenvalues $[-0.106, +0.186]$ are qualitatively the same structure but the instability weakens $3\times$.
-The tax is structural not because it is locked in, but because the dynamics actively push TQA and HS apart.
+The gradient measurements in this section tell us \emph{that} parameters are collectively coupled---and the ODE eigenvalues (\S\ref{sec:ode}) tell us \emph{how}: the tax-phase coefficient matrix has one unstable mode ($\lambda = +0.536$), meaning the alignment tax is a dynamical instability that actively pushes TQA and HS apart, not a static constraint.
 
 \textbf{Why the gradient dip must exist: a consequence chain.}
 The gradient dip is not an independent observation---it is a \emph{necessary consequence} of the free-energy structure.
@@ -528,6 +514,14 @@ In the other direction: $\gamma_{12}=0$ at $N_{c,1}$ implies the free energy is 
 \textbf{Gradient dip $\Leftrightarrow$ $N_{c,1}$}: they are the same event measured by different instruments.
 This means gradient norms alone---with no benchmark evaluations---can locate $N_{c,1}$: any model family showing a non-monotonic Arrhenius gradient dip has a capability coupling sign change at that scale.
 As a testable prediction: OLMo-1B, which sits at $\gamma_{12}=0.000$ by direct measurement, must show a gradient norm below the power-law trend.
+
+\textbf{Connection to double descent.}
+The gradient dip near $N_c$ is reminiscent of the double descent phenomenon~\cite{nakkiran2020},
+where test loss exhibits non-monotonic behavior near the interpolation threshold.
+The heavy-tailed structure of weight matrices documented by Martin \& Mahoney~\cite{martin2021} provides a complementary view: their implicit self-regularization framework connects gradient statistics to the same collective coupling behavior we measure here.
+Caballero et al.~\cite{caballero2022} show that broken power-law scaling (the ``broken neural scaling law'') is common at fine-grained task level---our per-phase ODE fit is consistent with their piecewise picture, where different phases have different dynamics.
+Our observation extends this picture to \emph{pre-training} and \emph{model size}
+rather than training time and dataset size.
 
 The next section asks what that collective structure looks like---and finds that the capability manifold itself changes shape through the transition.
 
@@ -675,7 +669,8 @@ truthfulness and toward reasoning as the alignment tax regime develops.
 
 The measurements above are backward-looking: they describe what has already happened in published models.
 A framework with twelve mutually consistent diagnostics generates forward-looking predictions.
-CAPE makes four testable predictions beyond the current dataset.
+
+\subsection{Testable predictions}
 
 \textbf{Chinchilla as a free-energy consequence.}
 Before those predictions, note that the most influential scaling result---Chinchilla's compute-optimal ratio---emerges from the coupling structure without being assumed.
@@ -731,6 +726,8 @@ may avoid the alignment tax entirely.
 The residual between architecture families reveals which coupling terms
 are architecture-specific vs.\ universal.
 
+\subsection{Practical guide: $d_{\rm eff}$ and benchmark selection}
+
 \textbf{Why $d_{\rm eff}$ matters: an intuition.}
 The participation ratio $d_{\rm eff}$ tells you how many \emph{genuinely independent} capability axes are active at a given scale.
 $d_{\rm eff} \approx 1$: all your benchmarks are measuring the same thing from different angles; adding more benchmarks adds no information.
@@ -750,6 +747,8 @@ and ARC-AGI-2~\cite{arcagi2}~(abstract pattern recognition, genuinely orthogonal
 are the strongest $N_{c,4}$-detection candidates based on this criterion (the $N_{c,3}$ transition is already being confirmed by IFEval, \S\ref{sec:Nc2_section}).
 Importantly: the goal is not to maximize $d_{\rm eff}$ but to have \emph{one good benchmark per active axis}.
 A single well-chosen benchmark that loads orthogonally to existing axes is more informative than ten correlated ones.
+
+\subsection{Extensions beyond LLM scaling}
 
 \textbf{MoE and effective parameter count.}
 Mistral MoE shows non-monotone coupling ($h = +6, +18, +4$ across three scales),
