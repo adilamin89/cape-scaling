@@ -514,7 +514,7 @@ The Arrhenius gradient form implies that training dynamics slow exponentially as
 The activation constant $C$ is phase-specific: $C \approx 28$ (tax), $316$ (transition, a $10\times$ spike), $196$ (bonus).
 The spike at transition is why the gradient dips 37\% at 1B---the loss landscape becomes exponentially flat at $N_c$, the Arrhenius saddle point.
 \textbf{Key consequence:} any model at $N_c$ shows minimum gradient norm and maximum susceptibility\footnote{Susceptibility ($\chi$): how strongly the system responds to a small perturbation. $\chi$ peaks at $N_c$ because the ``restoring force'' toward either phase vanishes---the optimal scale for alignment interventions.} to alignment interventions.
-The full Arrhenius derivation and phase-boundary surface analysis are in Supplementary Appendix~A.
+The phase-boundary surface analysis and gradient-scaling derivation are developed in Supplementary Appendix~A (see especially \S A.5 and \S A.6).
 
 The gradient measurements in this section tell us \emph{that} parameters are collectively coupled.
 A complementary view from the ODE: eigenvalues of the tax-phase coefficient matrix are $[-0.416, +0.536]$---one stable mode, one unstable---meaning the alignment tax is a \emph{dynamical instability}, not a static constraint.
@@ -701,7 +701,7 @@ CAPE identifies a sequence of critical scales as new capability axes activate:
 $N_{c,1} \approx 3.5$B (coupling sign flip: competition resolves to cooperation---the main finding of this paper);
 $N_{c,2} \approx 70$--$88$B (HellaSwag/TruthfulQA saturate, SWE-bench/GPQA become the active axis---benchmark axis rotation);
 $N_{c,3} \approx 114$--$130$B (SWE-bench saturates; IFEval activates as the new discriminating axis---preliminary evidence already visible in March 2026 data).
-Each transition is independently detectable: $N_{c,1}$ by OLMo ($\gamma_{12}=0.000$) and OPT (within-family sign flip); $N_{c,2}$ by the frontier cooperative coupling ($r=+0.85$); $N_{c,3}$ by SWE-bench compression to a $0.9$-point range among the top five frontier models, with IFEval showing a $6.5$-point spread ($n=4$)---the same saturation-then-activation pattern as $N_{c,1}$.
+Each transition is independently detectable: $N_{c,1}$ by independent confirmation (\S\ref{sec:coupling}) and OPT sign flip; $N_{c,2}$ by the frontier cooperative coupling ($r=+0.85$); $N_{c,3}$ by SWE-bench compression to a $0.9$-point range among the top five frontier models, with IFEval showing a $6.5$-point spread ($n=4$)---the same saturation-then-activation pattern as $N_{c,1}$.
 $N_{c,4} \sim 200$--$400$B (IFEval saturates; HLE or AgentBench activates---a prediction for the next generation).
 The subscript convention follows the order of discovery; the pattern at each transition is the same---a coupling sign change between the active capability pair, a rotation of the $h$-field, and an expansion of the effective order-parameter dimensionality ($d_{\rm eff}$: $1 \to 2 \to 3 \to 4$).
 
@@ -1213,7 +1213,7 @@ Every effective theory writes its own origin story for the next one.
 This self-delimiting structure is a feature of good effective theories, not a limitation.
 
 \textbf{Falsification tests.}
-The framework has already survived several internal consistency checks: OLMo at $\gamma_{12}=0.000$ with zero free parameters, Llama-2 holdout at 5.6\% MAE, 12 diagnostics converging on one coupling structure, and monotone signal strengthening across three dataset expansions (8 $\to$ 26 $\to$ 44 models).
+The framework has already survived several internal consistency checks: the OLMo confirmation (\S\ref{sec:coupling}), the Llama-2 holdout at 5.6\% MAE (\S\ref{sec:holdout}), 12 diagnostics converging on one coupling structure, and monotone signal strengthening across three dataset expansions (8 $\to$ 26 $\to$ 44 models).
 These constrain the theory from within.
 Four measurements would kill it from without:
 (i)~a new densely-sampled web-trained family (8+ sizes spanning $\sim$70M--12B) showing \emph{no} TQA sign-flip---this would falsify the universality of $N_{c,1}$, the central claim;
@@ -1248,7 +1248,7 @@ Applied to 44 models across 14 families, the central findings are:
     The coupling flips by $\Delta r = +1.76$ across the transition.
     The sign-flip extends to ARC-TQA ($r_{\rm sub} = -0.945 \to r_{\rm above} = +0.686$) and every pair involving TQA---the
     alignment tax is a \emph{truthfulness} tax, not a generic inter-benchmark artifact.
-    Independent confirmation: OLMo lands at $\gamma_{12} = 0.000$ with no free parameters.
+    Independent confirmation: OLMo lands exactly at the predicted transition with no free parameters (\S\ref{sec:coupling}).
 
   \item \textbf{The transition is invisible in loss.}
     Loss scaling is exact to CV $= 0.8\%$ with no anomaly at $N_c$.
