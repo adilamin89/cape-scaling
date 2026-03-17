@@ -315,7 +315,7 @@ and $\gamma_{12} = 0.000$ exactly in the 1B--1.4B transition interval.
 The decoupling at $N_c$ is confirmed by an independent dynamical method.
 
 \textbf{Three deeper results from the ODE structure.}
-Three further analytical results follow from the ODE and are derived in Supplementary Appendix~B; the headline findings are:
+Three further analytical results follow from the ODE and are derived in Appendix~B; the headline findings are:
 (i)~\emph{Rank-1 transition operator}: the per-phase coefficient matrices differ by $\Delta A = A_{\rm bonus} - A_{\rm tax}$, which is approximately rank-1 with dominant entry $\Delta A[\mathrm{HS},\mathrm{TQA}] = +0.61$---the transition is driven by a single mode (TruthfulQA's suppressive drag on reasoning releasing at $N_{c,1}$), confirming $\gamma_{12}$ as the sole order parameter.
 (ii)~\emph{Gradient flow and free energy}\footnote{Gradient flow: the ODE $d\phi_i/d\log N = -\partial F/\partial\phi_i$ means the benchmark trajectories are steepest-descent paths on the free-energy landscape $F$. In ML terms, models follow the path of maximum local improvement in capability space---and the coupling term $\gamma_{12}\phi_{\rm HS}\phi_{\rm TQA}$ in $F$ is what makes this path change direction at $N_c$.}: the ODE has the form $d\phi_i/d\log N = -\partial F/\partial\phi_i$, so the GL free energy is recovered by integration: $F \supset 0.31\cdot\phi_{\rm HS}\phi_{\rm TQA} - 0.04\cdot\phi_{\rm TQA}^3$---the coupling term derived from dynamics, not assumed.
 The $U(1)$ symmetry and its breaking at $\theta^*=38.8^\circ$ follow directly (see \S\ref{sec:topology}).
@@ -514,7 +514,7 @@ The Arrhenius gradient form implies that training dynamics slow exponentially as
 The activation constant $C$ is phase-specific: $C \approx 28$ (tax), $316$ (transition, a $10\times$ spike), $196$ (bonus).
 The spike at transition is why the gradient dips 37\% at 1B---the loss landscape becomes exponentially flat at $N_c$, the Arrhenius saddle point.
 \textbf{Key consequence:} any model at $N_c$ shows minimum gradient norm and maximum susceptibility\footnote{Susceptibility ($\chi$): how strongly the system responds to a small perturbation. $\chi$ peaks at $N_c$ because the ``restoring force'' toward either phase vanishes---the optimal scale for alignment interventions.} to alignment interventions.
-The phase-boundary surface analysis and gradient-scaling derivation are developed in Supplementary Appendix~A (see especially \S A.5 and \S A.6).
+The phase-boundary surface analysis and gradient-scaling derivation are developed in Appendix~A (see especially \S A.5 and \S A.6).
 
 The gradient measurements in this section tell us \emph{that} parameters are collectively coupled.
 A complementary view from the ODE: eigenvalues of the tax-phase coefficient matrix are $[-0.416, +0.536]$---one stable mode, one unstable---meaning the alignment tax is a \emph{dynamical instability}, not a static constraint.
@@ -1309,7 +1309,6 @@ CAPE makes this coupling measurable, predictable, and designable---the full prot
 The author thanks Julio Candanedo for early conversations that first raised the possibility of a phase transition in AI capability scaling.
 Daniel Agterberg taught that symmetry is the only honest starting point---and that theory which cannot be pinned to experiment is merely beautiful; this work is the attempt to do both at once.
 Christian Parsons was the first to challenge whether any of this was real.
-Computational assistance with symbolic regression and literature synthesis: Claude (Anthropic).
 
 This work is written in the conviction, shared with Anderson, Landau, and Gor'kov, that the right effective theory contains more truth than the microscopic one it summarises.
 
@@ -1317,8 +1316,6 @@ This work is written in the conviction, shared with Anderson, Landau, and Gor'ko
 
 All benchmark data, analysis scripts,\footnote{Scripts: \texttt{cape\_frontier\_full.py}, \texttt{cape\_architecture\_probe.py}, \texttt{cape\_stiffness.py}, \texttt{cape\_algebraic\_nc.py}, \texttt{cape\_family\_hfield.py}, \texttt{cape\_null\_model.py}, \texttt{cape\_phase\_transfer.py}, \texttt{olmo\_gradient\_validation.py}.} and figure-generation code are at \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
 The interactive dashboard at \href{https://adilamin89.github.io/cape-scaling}{\texttt{adilamin89.github.io/cape-scaling}} implements the full CAPE protocol.
-
-The author thanks his father for teaching him, long before physics did, that the fragment always contains the whole.
 
 \begin{thebibliography}{99}
 \bibitem{kaplan2020} Kaplan et al.\ (2020). Scaling Laws for Neural Language Models. arXiv:2001.08361.
@@ -1368,15 +1365,16 @@ The author thanks his father for teaching him, long before physics did, that the
 
 \begin{center}
 \rule{0.8\textwidth}{0.4pt}\\[6pt]
-{\Large\textbf{Supplementary Material}}\\[4pt]
+{\Large\textbf{Appendices}}\\[4pt]
 \rule{0.8\textwidth}{0.4pt}
 \end{center}
 
+\noindent\textbf{Appendix~A} develops the condensed matter correspondence (GL free energy, soft-mode collapse, Ginzburg number, phase diagram, adversarial screening) for readers with physics background; ML readers can skip without loss of continuity.
+\textbf{Appendix~B} provides detailed ODE derivations (rank-1 transition operator, gradient flow recovery, algebraic classifier).
+\textbf{Appendix~C} gives a fully worked diagnostic example: three benchmark scores in, regime classification out.
+
 \section{Condensed Matter Correspondence}
 \label{app:physics}
-
-This appendix collects the formal physics correspondences referenced in the main text, for readers with condensed matter background.
-ML readers can skip this appendix without loss of continuity.
 
 \subsection{GL Free Energy Language}
 
