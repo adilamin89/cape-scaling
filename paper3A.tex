@@ -1290,6 +1290,8 @@ Applied to 44 models across 14 families, the central findings are:
 If you had known about the coupling sign flip at 3.5B before training your current generation of models, you would have curated differently below that scale and scaled more aggressively above it.
 The 10$\times$ data-efficiency gain at 1B is not a theoretical curiosity---it is a concrete engineering lever that Phi demonstrated at production scale.
 Deep in the alignment bonus regime ($N \gg N_c$), capability gains are redistributed rather than amplified (spectral weight CV$=27\%$), which explains why frontier models sometimes underperform predecessors on specific tasks despite higher aggregate scores: it is the coupling structure, not a training failure.
+In practice, the entire diagnostic reduces to a single test: if $\text{score}_2 > \sqrt{(a/b)\cdot\text{score}_1}$ for the active benchmark pair, the model is in the cooperative phase; below that boundary, a tax is opening.
+This formula works unchanged at $N_{c,1}$ (HS-TQA), $N_{c,2}$ (SWE-GPQA), and $N_{c,3}$ (GPQA-IFEval); the practical lever shifts from data curation below $N_{c,1}$, to training-recipe monitoring at frontier scale, to balancing reasoning depth against instruction compliance at $N_{c,3}$ (Appendix~C works through a concrete example).
 
 \textbf{What comes next.}
 CAPE is not benchmark-specific: the same framework applies to any capability pair.
@@ -1299,7 +1301,7 @@ Beyond $N_{c,3}$, we predict $N_{c,4}$ at $\sim$200--400B effective parameters, 
 The next concrete test: when $\gamma(\text{IFEval}, \text{HarmBench})$ turns negative across consecutive releases, $N_{c,3}$ will have fully resolved and a new coupling regime will have begun.
 
 Capability coupling, not individual capability scaling, governs alignment.
-CAPE makes this coupling measurable, predictable, and designable---the full protocol requires only published evaluation scores, no model weights, and reduces to a single formula that works unchanged across all three regimes (a worked example taking three scores to a regime diagnosis is in Appendix~C).
+CAPE makes this coupling measurable, predictable, and designable.
 
 \bigskip
 \noindent More is different---and the difference is in the coupling, not the loss.
