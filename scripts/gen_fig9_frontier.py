@@ -1,8 +1,8 @@
 """
 Generate fig9_frontier.png for paper - 3-panel frontier figure
-Panel (a): Cross-family scatter with regression, lab colors, phase shading
+Panel (a): Cross-family scatter with regression, lab colors, phase shading + inset zoom
 Panel (b): Anthropic within-family trajectory
-Panel (c): h-field bar chart for all 19 models
+Panel (c): h-field bar chart for all 20 models
 """
 import numpy as np
 from scipy import stats
@@ -27,9 +27,10 @@ MODELS = [
     ("GPT-5",            74.9, 85.7, "OpenAI"),
     ("GPT-5.1",          76.3, 88.1, "OpenAI"),
     ("GPT-5.2 Pro",      80.0, 93.2, "OpenAI"),
+    ("GPT-5.4",          77.2, 84.2, "OpenAI"),
     ("DeepSeek V3.2",    74.4, 79.9, "DeepSeek"),
     ("Kimi K2.5",        76.8, 87.6, "Moonshot"),
-    ("Qwen 3.5-397B",   73.4, 83.7, "Alibaba"),
+    ("Qwen 3.5-397B",   73.4, 88.4, "Alibaba"),
     ("MiniMax M2.5",     80.2, 85.0, "MiniMax"),
 ]
 
@@ -110,6 +111,7 @@ offsets["Kimi K2.5"] = (2, 3)
 offsets["Qwen 3.5-397B"] = (-12, -5)
 offsets["GPT-5"] = (2, 2)
 offsets["GPT-5.1"] = (-12, 2)
+offsets["GPT-5.4"] = (2, -5)
 
 for name, sv, gv, lab in MODELS:
     ox, oy = offsets.get(name, (2, 2))
@@ -124,6 +126,42 @@ ax.set_xlim(28, 88)
 ax.set_ylim(48, 100)
 ax.grid(True, alpha=0.2, linewidth=0.5)
 ax.legend(fontsize=6, loc='lower right', framealpha=0.8)
+
+# ── Inset zoom: crowded cluster region ──
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
+axins = ax.inset_axes([0.02, 0.55, 0.45, 0.43])  # [x0, y0, width, height] in axes coords
+zoom_swe = (70, 82)
+zoom_gpqa = (70, 96)
+
+# Regression line in inset
+x_z = np.linspace(zoom_swe[0], zoom_swe[1], 100)
+y_z = sl * x_z + ic
+axins.plot(x_z, y_z, 'k--', lw=1, alpha=0.5)
+axins.fill_between(x_z, y_z, 100, alpha=0.04, color='green')
+axins.fill_between(x_z, y_z, 60, alpha=0.04, color='red')
+
+# Plot cluster points in inset
+for i, (name, sv, gv, lab) in enumerate(MODELS):
+    if zoom_swe[0] <= sv <= zoom_swe[1] and zoom_gpqa[0] <= gv <= zoom_gpqa[1]:
+        axins.scatter(sv, gv, c=LAB_COLORS[lab], marker=LAB_MARKERS[lab],
+                      s=50, zorder=5, edgecolors='white', linewidths=0.4)
+        # Label every point in inset
+        ox, oy = offsets.get(name, (2, 2))
+        # Tighter offsets for inset
+        ox_in = 1.5 if ox > 0 else -1.5
+        oy_in = 1.5 if oy > 0 else -1.5
+        axins.annotate(name, (sv, gv), xytext=(ox_in*2, oy_in*2), textcoords='offset points',
+                       fontsize=4.5, color=LAB_COLORS[lab], alpha=0.95,
+                       arrowprops=dict(arrowstyle='-', color='gray', lw=0.2, alpha=0.3))
+
+axins.set_xlim(*zoom_swe)
+axins.set_ylim(*zoom_gpqa)
+axins.set_xticks([72, 76, 80])
+axins.set_yticks([75, 80, 85, 90, 95])
+axins.tick_params(labelsize=5)
+axins.grid(True, alpha=0.15, linewidth=0.3)
+axins.set_title('cluster zoom', fontsize=5.5, pad=2, fontstyle='italic')
+mark_inset(ax, axins, loc1=2, loc2=4, fc='none', ec='gray', lw=0.6, alpha=0.4)
 
 # ── Panel (b): Anthropic trajectory ──
 ax = axes[1]
@@ -196,7 +234,12 @@ for i, (h, name) in enumerate(zip(bar_h, bar_names)):
     ax.text(h + offset, i, f'{h:+.1f}', va='center', ha=side, fontsize=5, alpha=0.7)
 
 plt.tight_layout()
-plt.savefig('/sessions/nice-busy-lamport/cape-staging/fig9_frontier.png', dpi=300, bbox_inches='tight',
-            facecolor='white', edgecolor='none')
-print("Saved fig9_frontier.png")
+import os
+out_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+for dest in [os.path.join(out_dir, 'figures', 'fig9_frontier.png'),
+             os.path.join(out_dir, 'fig9_frontier.png')]:
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    plt.savefig(dest, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
+    print(f"Saved {dest}")
+print("Done — fig9_frontier.png with inset zoom")
 plt.close()
