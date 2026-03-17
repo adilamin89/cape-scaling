@@ -866,6 +866,9 @@ const MODELS=[
   {n:"BLOOM-176B",N:176e9,hs:73.0,tqa:42.4,f:"BLOOM",fc:"#14b8a6"},
 ];
 
+// Global state: user's analyzed model (populated by runAnalysis, read by charts)
+let _userModel=null;
+
 const FRONTIER=[
   // Anthropic (7) — full within-family trajectory
   {n:"Claude 3.5 Sonnet",swe:49.0,gpqa:59.4,h:-4.0,lab:"Anthropic",fc:"#CC785C"},
@@ -1230,6 +1233,13 @@ function runAnalysis(){
   document.getElementById('result-detail').innerHTML=det;
 
   drawResultChart(N, hs, tqa);
+
+  // Store globally so other tabs can show the user's model
+  _userModel={N,hs,tqa,logN,g,reg,deff,hField,swe,gpqa,label:'Your Model'};
+  // Refresh cascade/frontier if they're visible
+  const active=document.querySelector('.tab.on')?.dataset.tab;
+  if(active==='cascade')drawCascadeChart();
+  if(active==='frontier')drawFrontierChart();
 }
 
 function getPhysicsDiagnostic(g, N, logN, deff, chi, hField, benchScores){
@@ -1871,25 +1881,46 @@ function drawFrontierChart(){
     c.setLineDash([]);
   }
 
-  // Smart label positioning to avoid overlaps
-  const labelPts=[];
+  // Only label key models: outliers, trajectory endpoints, anomalies
+  const keyModels=new Set([
+    'GPT-4o','GPT-5.2 Pro','GPT-5.4',
+    'Claude 3.5 Sonnet','Opus 4.6','Sonnet 4.6',
+    'Gemini 3.1 Pro',
+    'DeepSeek V3.2'
+  ]);
+
   FRONTIER.forEach(m=>{
     const x=X(m.swe), y=Y(m.gpqa);
     _fState.pts.push({x,y,m});
+    // Draw dot (larger for key models)
+    const isKey=keyModels.has(m.n);
+    const r=isKey?7:5;
     c.fillStyle=m.fc;
-    c.beginPath(); c.arc(x,y,6,0,Math.PI*2); c.fill();
-    // Compute label position (nudge crowded ones)
-    const short=m.n.replace('Claude ','').replace('Gemini ','G').replace('DeepSeek ','DS ');
-    let lx=x+9, ly=y+3;
-    // Push overlapping labels
-    for(const prev of labelPts){
-      if(Math.abs(lx-prev.x)<60 && Math.abs(ly-prev.y)<10) ly=prev.y+10;
+    c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill();
+    if(isKey){
+      c.strokeStyle='rgba(255,255,255,0.3)'; c.lineWidth=1;
+      c.beginPath(); c.arc(x,y,r+2,0,Math.PI*2); c.stroke();
     }
-    labelPts.push({x:lx,y:ly});
-    c.fillStyle='rgba(200,216,240,0.7)'; c.font='8px Space Mono'; c.textAlign='left';
-    c.fillText(short,lx,ly);
-    if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.fillText('anomaly',lx,ly+10);}
+    // Only label key models to reduce clutter (others visible on hover)
+    if(isKey){
+      const short=m.n.replace('Claude ','').replace('Gemini ','G').replace('DeepSeek ','DS ');
+      c.fillStyle='rgba(200,216,240,0.85)'; c.font='bold 8px Space Mono'; c.textAlign='left';
+      // Position labels away from crowded zones
+      let lx=x+10, ly=y+3;
+      if(m.n==='Sonnet 4.6'){ly=y+3;lx=x+10;}
+      else if(m.n==='GPT-4o'){lx=x+10;ly=y+3;}
+      else if(m.n==='Opus 4.6'){lx=x-50;ly=y-10;c.textAlign='right';}
+      else if(m.n==='GPT-5.2 Pro'){lx=x-6;ly=y-12;c.textAlign='right';}
+      else if(m.n==='Gemini 3.1 Pro'){lx=x-6;ly=y+14;c.textAlign='right';}
+      c.fillText(short,lx,ly);
+      if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.font='bold 8px Space Mono';c.textAlign='left';c.fillText('tax excursion',lx,ly+10);}
+      if(m.n==='GPT-5.4'){c.fillStyle='#ff4d6d';c.font='7px Space Mono';c.textAlign='left';c.fillText('tax',lx,ly+9);}
+    }
   });
+
+  // Hint for hover
+  c.fillStyle='rgba(122,154,191,0.35)'; c.font='9px DM Sans'; c.textAlign='right';
+  c.fillText('hover points for details',W-p.r,H-p.b-8);
 
   // Stats
   c.fillStyle='rgba(6,214,160,0.5)'; c.font='bold 10px Space Mono'; c.textAlign='right';
@@ -1916,6 +1947,26 @@ function drawFrontierChart(){
   c.textAlign='right';
   for(let g=55;g<=95;g+=10){c.fillStyle='#3d5a7a';c.fillText(g+'%',p.l-6,Y(g)+4);}
   c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('GPQA Diamond (%)',0,0);c.restore();
+
+  // ── User's model on frontier (if SWE & GPQA entered) ──
+  if(_userModel && _userModel.swe && _userModel.gpqa){
+    const ux=X(_userModel.swe), uy=Y(_userModel.gpqa);
+    // Pulsing star marker
+    c.fillStyle='#fff'; c.strokeStyle='#ffd166'; c.lineWidth=2;
+    c.beginPath();
+    for(let i=0;i<5;i++){
+      const a=Math.PI/2+i*Math.PI*2/5, r1=10, r2=4.5;
+      c.lineTo(ux+r1*Math.cos(a),uy-r1*Math.sin(a));
+      const a2=a+Math.PI/5;
+      c.lineTo(ux+r2*Math.cos(a2),uy-r2*Math.sin(a2));
+    }
+    c.closePath(); c.fill(); c.stroke();
+    c.fillStyle='#ffd166'; c.font='bold 10px DM Sans'; c.textAlign='left';
+    c.fillText('YOUR MODEL',ux+14,uy-4);
+    const hStr=_userModel.hField!=null?`h=${_userModel.hField>0?'+':''}${_userModel.hField}`:'';
+    c.fillStyle='#c8d8f0'; c.font='9px Space Mono';
+    c.fillText(`SWE=${_userModel.swe}% GPQA=${_userModel.gpqa}% ${hStr}`,ux+14,uy+8);
+  }
 }
 
 // ── Frontier chart hover tooltip ──
@@ -2075,6 +2126,26 @@ function drawCascadeChart(){
   c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('d_eff (effective dimensionality)',0,0);c.restore();
   c.fillStyle='rgba(76,201,240,0.5)'; c.font='10px DM Sans'; c.textAlign='left';
   c.fillText('d_eff = −0.27·log₁₀N + 3.9 (regression)',p.l+8,p.t+14);
+
+  // ── User's model marker (if analyzed) ──
+  if(_userModel && _userModel.logN>=nL && _userModel.logN<=nH){
+    const ux=X(_userModel.logN), ud=_userModel.deff;
+    const uy=Yd(ud);
+    // Pulsing star
+    c.fillStyle='#fff'; c.strokeStyle='#ffd166'; c.lineWidth=2;
+    c.beginPath();
+    for(let i=0;i<5;i++){
+      const a=Math.PI/2+i*Math.PI*2/5, r1=9, r2=4;
+      c.lineTo(ux+r1*Math.cos(a),uy-r1*Math.sin(a));
+      const a2=a+Math.PI/5;
+      c.lineTo(ux+r2*Math.cos(a2),uy-r2*Math.sin(a2));
+    }
+    c.closePath(); c.fill(); c.stroke();
+    c.fillStyle='#ffd166'; c.font='bold 10px DM Sans'; c.textAlign='left';
+    c.fillText('YOUR MODEL',ux+14,uy-4);
+    c.fillStyle='#c8d8f0'; c.font='9px Space Mono';
+    c.fillText(`d_eff=${ud.toFixed(2)}, γ=${_userModel.g.toFixed(2)}`,ux+14,uy+8);
+  }
 }
 
 // ── INIT ─────────────────────────────────────────────────
