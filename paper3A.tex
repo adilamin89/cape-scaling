@@ -514,7 +514,7 @@ The Arrhenius gradient form implies that training dynamics slow exponentially as
 The activation constant $C$ is phase-specific: $C \approx 28$ (tax), $316$ (transition, a $10\times$ spike), $196$ (bonus).
 The spike at transition is why the gradient dips 37\% at 1B---the loss landscape becomes exponentially flat at $N_c$, the Arrhenius saddle point.
 \textbf{Key consequence:} any model at $N_c$ shows minimum gradient norm and maximum susceptibility\footnote{Susceptibility ($\chi$): how strongly the system responds to a small perturbation. $\chi$ peaks at $N_c$ because the ``restoring force'' toward either phase vanishes---the optimal scale for alignment interventions.} to alignment interventions.
-The phase-boundary surface analysis and gradient-scaling derivation are developed in Appendix~A (see especially \S A.5 and \S A.6).
+The phase-boundary surface analysis (Appendix~A, phase diagram) and gradient-scaling derivation (Appendix~A, messenger field) develop these results formally.
 
 The gradient measurements in this section tell us \emph{that} parameters are collectively coupled.
 A complementary view from the ODE: eigenvalues of the tax-phase coefficient matrix are $[-0.416, +0.536]$---one stable mode, one unstable---meaning the alignment tax is a \emph{dynamical instability}, not a static constraint.
@@ -557,11 +557,11 @@ The collapse is driven by self-reinforcing susceptibility feedback: the coupling
 \item \textbf{Scope boundary at $\sim$130B.}
 The determinant $\det(H) = \lambda_1\lambda_2$ extrapolates to zero at $N \approx 130$B---predicting where the two-capability effective theory formally breaks down and a third axis must activate.
 This is not a failure: every effective theory writes its own scope boundary.
-The 88B scale ($d_{\rm eff} \to 1$) and the 130B scale ($\det(H) \to 0$) measure different events; their consistency validates the framework (Appendix~A9).
+The 88B scale ($d_{\rm eff} \to 1$) and the 130B scale ($\det(H) \to 0$) measure different events; their consistency validates the framework (coherence parameter derivation, Appendix~A).
 \textbf{Holdout validation:} the $d_{\rm eff}$ extrapolation trained on Pythia (70M--12B) alone predicts $d_{\rm eff} \to 0.93$ at $\sim$100B---below 1, i.e.\ the two-field scope boundary.
 The frontier measurement (\S\ref{sec:Nc2_section}) gives $d_{\rm eff} = 1.75$: \emph{above} the extrapolation, not below.
 This discrepancy is not a failure---it is the $N_{c,3}$ transition itself.
-The two-field theory correctly predicts its own breakdown ($d_{\rm eff} \to 1$ means the description has collapsed to a single mode), and the \emph{rise} of $d_{\rm eff}$ back to 1.75 at frontier scale is the third axis activating---exactly the event the scope boundary was designed to detect (Appendix~A9; full calculation in Appendix~A11).
+The two-field theory correctly predicts its own breakdown ($d_{\rm eff} \to 1$ means the description has collapsed to a single mode), and the \emph{rise} of $d_{\rm eff}$ back to 1.75 at frontier scale is the third axis activating---exactly the event the scope boundary was designed to detect (Appendix~A, $d_{\rm eff}$ holdout test).
 \end{enumerate}
 
 \textbf{Eigenvector rotation and inverse reconstruction.}
@@ -581,10 +581,10 @@ The coherence parameter $\kappa \equiv \lambda_1/\lambda_2$ grows from 2.2 to 11
 The coupling $\gamma_{12}$ is not built into the training objective---it is emergent.
 LASSO applied to a polynomial library selects zero $\phi_1^2\phi_2^2$ coupling: the bare objective is approximately decoupled ($F \approx a_1\phi_1^2 + a_2\phi_2^2$).
 The coupling arises from self-reinforcing susceptibility feedback: the residual of $\gamma_{12}$ above its linear baseline correlates with $\chi_2 \cdot \gamma_{12}$ at $r = +0.629$ ($p = 0.003$)---the more sensitive benchmarks are to scale changes, the faster the coupling runs.
-The feedback terminates at the phase-locked angle: the SFEE slope $A = 0.629 = \sin(38.8^\circ)$---linking the susceptibility measurement and the eigenvector rotation into a single identity (Appendix~A2).
+The feedback terminates at the phase-locked angle: the SFEE slope $A = 0.629 = \sin(38.8^\circ)$---linking the susceptibility measurement and the eigenvector rotation into a single identity (soft-mode collapse derivation, Appendix~A).
 
 \textbf{Mixed-phase regime.}
-The transition is Type-II ($\lambda/\xi \approx 0.767 > 1/\sqrt{2}$; Appendix~A7): between $N_c$ and $N_{c,2}$, training-recipe perturbations can pin local tax regions inside the cooperative phase.
+The transition is Type-II ($\lambda/\xi \approx 0.767 > 1/\sqrt{2}$; Type-I/II boundary, Appendix~A): between $N_c$ and $N_{c,2}$, training-recipe perturbations can pin local tax regions inside the cooperative phase.
 Haiku~4.5 ($h=-11.6$) and Sonnet~4.6 ($h=-13.4$; \S\ref{sec:Nc2_section}) are such excursions; Opus~4.6's recovery ($\gamma_{12}=+14.3$) is the excursion collapsing.
 A testable prediction: these excursions should show quantised suppression with characteristic core size $\sim\xi$.
 
@@ -1299,7 +1299,7 @@ Beyond $N_{c,3}$, we predict $N_{c,4}$ at $\sim$200--400B effective parameters, 
 The next concrete test: when $\gamma(\text{IFEval}, \text{HarmBench})$ turns negative across consecutive releases, $N_{c,3}$ will have fully resolved and a new coupling regime will have begun.
 
 Capability coupling, not individual capability scaling, governs alignment.
-CAPE makes this coupling measurable, predictable, and designable---the full protocol requires only published evaluation scores, no model weights, and reduces to a single formula that works unchanged across all three regimes (Appendix~C).
+CAPE makes this coupling measurable, predictable, and designable---the full protocol requires only published evaluation scores, no model weights, and reduces to a single formula that works unchanged across all three regimes (a worked example taking three scores to a regime diagnosis is in Appendix~C).
 
 \bigskip
 \noindent More is different---and the difference is in the coupling, not the loss.
