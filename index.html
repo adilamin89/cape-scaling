@@ -311,6 +311,10 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
 <div id="tab-frontier" class="tab-content" style="display:none">
   <div class="card">
     <div class="card-title">Frontier Coupling <span>— SWE-bench vs GPQA Diamond (Feb–Mar 2026)</span></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="btn" id="frontier-zoom-btn" onclick="toggleFrontierZoom()" style="font-size:10px;padding:4px 12px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:4px;cursor:pointer;font-family:var(--font-mono)">🔍 Zoom Cluster (70–82% SWE)</button>
+      <button class="btn" id="frontier-labels-btn" onclick="toggleFrontierLabels()" style="font-size:10px;padding:4px 12px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:4px;cursor:pointer;font-family:var(--font-mono)">◈ Show All Labels</button>
+    </div>
     <canvas id="frontier-chart" height="360"></canvas>
     <div style="margin-top:12px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">
       r = +0.85 (n=20, p&lt;0.00001) — cooperative coupling strongly confirmed. Sonnet 4.6 shows h = −13.4 anomaly (tax excursion). Opus 4.6 recovers h = +2.8. GPT-5.4 shows h = −1.6 (mild coding-specialist).
@@ -1822,6 +1826,25 @@ function drawPhaseChart(){
 // ── CANVAS: FRONTIER CHART ────────────────────────────────
 // Store frontier chart coords for hover
 let _fState={pts:[],X:null,Y:null,p:null,W:0,H:0};
+let _fZoomed=false;
+let _fAllLabels=false;
+
+function toggleFrontierZoom(){
+  _fZoomed=!_fZoomed;
+  const btn=document.getElementById('frontier-zoom-btn');
+  btn.textContent=_fZoomed?'🌐 Show Full Range':'🔍 Zoom Cluster (70–82% SWE)';
+  btn.style.borderColor=_fZoomed?'var(--accent)':'var(--border)';
+  btn.style.color=_fZoomed?'var(--accent)':'var(--text2)';
+  drawFrontierChart();
+}
+function toggleFrontierLabels(){
+  _fAllLabels=!_fAllLabels;
+  const btn=document.getElementById('frontier-labels-btn');
+  btn.textContent=_fAllLabels?'◈ Key Labels Only':'◈ Show All Labels';
+  btn.style.borderColor=_fAllLabels?'var(--accent)':'var(--border)';
+  btn.style.color=_fAllLabels?'var(--accent)':'var(--text2)';
+  drawFrontierChart();
+}
 
 function drawFrontierChart(){
   const cv=document.getElementById('frontier-chart');
@@ -1831,14 +1854,16 @@ function drawFrontierChart(){
   cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+'px'; cv.style.height=H+'px';
   const c=cv.getContext('2d'); c.scale(dpr,dpr);
   const p={l:56,r:20,t:24,b:52};
-  const sL=30,sH=84,gL=50,gH=97;
+  // Zoom: full range vs cluster zoom
+  const sL=_fZoomed?68:30, sH=_fZoomed?83:84, gL=_fZoomed?70:50, gH=_fZoomed?97:97;
   const X=s=>p.l+(s-sL)/(sH-sL)*(W-p.l-p.r);
   const Y=g=>p.t+(gH-g)/(gH-gL)*(H-p.t-p.b);
   _fState={pts:[],X,Y,p,W,H};
   c.clearRect(0,0,W,H);
   c.strokeStyle='rgba(255,255,255,0.03)'; c.lineWidth=1;
-  for(let s=40;s<=80;s+=10){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
-  for(let g=55;g<=95;g+=10){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
+  const gridSStep=_fZoomed?2:10, gridGStep=_fZoomed?5:10;
+  for(let s=_fZoomed?68:40;s<=(_fZoomed?83:80);s+=gridSStep){const sx=X(s);if(sx>=p.l&&sx<=W-p.r){c.beginPath();c.moveTo(sx,p.t);c.lineTo(sx,H-p.b);c.stroke();}}
+  for(let g=_fZoomed?70:55;g<=(_fZoomed?97:95);g+=gridGStep){const gy=Y(g);if(gy>=p.t&&gy<=H-p.b){c.beginPath();c.moveTo(p.l,gy);c.lineTo(W-p.r,gy);c.stroke();}}
 
   // Cooperative/tax zones
   c.fillStyle='rgba(6,214,160,0.03)';
@@ -1881,7 +1906,7 @@ function drawFrontierChart(){
     c.setLineDash([]);
   }
 
-  // Only label key models: outliers, trajectory endpoints, anomalies
+  // Key models: always labeled (unless zoomed + all labels mode)
   const keyModels=new Set([
     'GPT-4o','GPT-5.2 Pro','GPT-5.4',
     'Claude 3.5 Sonnet','Opus 4.6','Sonnet 4.6',
@@ -1889,38 +1914,57 @@ function drawFrontierChart(){
     'DeepSeek V3.2'
   ]);
 
+  // Smart label positioning: use force layout to avoid overlaps
+  const labelPts=[];
+
   FRONTIER.forEach(m=>{
     const x=X(m.swe), y=Y(m.gpqa);
+    // Skip off-screen points in zoom mode
+    if(x<p.l-5 || x>W-p.r+5 || y<p.t-5 || y>H-p.b+5) return;
     _fState.pts.push({x,y,m});
-    // Draw dot (larger for key models)
     const isKey=keyModels.has(m.n);
-    const r=isKey?7:5;
+    const showLabel=_fAllLabels || isKey;
+    // Draw dot
+    const r=showLabel?(_fZoomed?8:7):5;
     c.fillStyle=m.fc;
     c.beginPath(); c.arc(x,y,r,0,Math.PI*2); c.fill();
-    if(isKey){
-      c.strokeStyle='rgba(255,255,255,0.3)'; c.lineWidth=1;
+    if(showLabel){
+      c.strokeStyle='rgba(255,255,255,0.25)'; c.lineWidth=1;
       c.beginPath(); c.arc(x,y,r+2,0,Math.PI*2); c.stroke();
     }
-    // Only label key models to reduce clutter (others visible on hover)
-    if(isKey){
+    if(showLabel){
       const short=m.n.replace('Claude ','').replace('Gemini ','G').replace('DeepSeek ','DS ');
-      c.fillStyle='rgba(200,216,240,0.85)'; c.font='bold 8px Space Mono'; c.textAlign='left';
-      // Position labels away from crowded zones
-      let lx=x+10, ly=y+3;
-      if(m.n==='Sonnet 4.6'){ly=y+3;lx=x+10;}
-      else if(m.n==='GPT-4o'){lx=x+10;ly=y+3;}
-      else if(m.n==='Opus 4.6'){lx=x-50;ly=y-10;c.textAlign='right';}
-      else if(m.n==='GPT-5.2 Pro'){lx=x-6;ly=y-12;c.textAlign='right';}
-      else if(m.n==='Gemini 3.1 Pro'){lx=x-6;ly=y+14;c.textAlign='right';}
+      const fontSize=_fZoomed?10:8;
+      c.font=`bold ${fontSize}px Space Mono`;
+      // Find non-overlapping label position
+      let lx=x+r+4, ly=y+3, align='left';
+      // Try right side, then left, then above, then below
+      const tryPos=[
+        {x:x+r+4,y:y+3,a:'left'},
+        {x:x-r-4,y:y+3,a:'right'},
+        {x:x,y:y-r-6,a:'center'},
+        {x:x,y:y+r+12,a:'center'}
+      ];
+      for(const tp of tryPos){
+        let overlap=false;
+        for(const prev of labelPts){
+          if(Math.abs(tp.x-prev.x)<(_fZoomed?70:55) && Math.abs(tp.y-prev.y)<(_fZoomed?14:11)){overlap=true;break;}
+        }
+        if(!overlap){lx=tp.x;ly=tp.y;align=tp.a;break;}
+      }
+      labelPts.push({x:lx,y:ly});
+      c.fillStyle='rgba(200,216,240,0.85)'; c.textAlign=align;
       c.fillText(short,lx,ly);
-      if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.font='bold 8px Space Mono';c.textAlign='left';c.fillText('tax excursion',lx,ly+10);}
-      if(m.n==='GPT-5.4'){c.fillStyle='#ff4d6d';c.font='7px Space Mono';c.textAlign='left';c.fillText('tax',lx,ly+9);}
+      if(m.n==='Sonnet 4.6'){c.fillStyle='#ff4d6d';c.font=`bold ${fontSize}px Space Mono`;c.textAlign=align;c.fillText('tax excursion',lx,ly+fontSize+2);}
+      if(m.n==='GPT-5.4'){c.fillStyle='#ff4d6d';c.font=`${fontSize-1}px Space Mono`;c.textAlign=align;c.fillText('tax',lx,ly+fontSize+1);}
     }
   });
 
   // Hint for hover
-  c.fillStyle='rgba(122,154,191,0.35)'; c.font='9px DM Sans'; c.textAlign='right';
-  c.fillText('hover points for details',W-p.r,H-p.b-8);
+  if(!_fAllLabels){
+    c.fillStyle='rgba(122,154,191,0.35)'; c.font='9px DM Sans'; c.textAlign='right';
+    c.fillText('hover points for details · click zoom/labels above',W-p.r,H-p.b-8);
+  }
 
   // Stats
   c.fillStyle='rgba(6,214,160,0.5)'; c.font='bold 10px Space Mono'; c.textAlign='right';
@@ -1941,11 +1985,21 @@ function drawFrontierChart(){
   });
 
   // Axes
+  // Axes — adapt to zoom range
   c.fillStyle='#3d5a7a'; c.font='10px DM Sans'; c.textAlign='center';
-  for(let s=40;s<=80;s+=10) c.fillText(s+'%',X(s),H-p.b+16);
+  const sStep=_fZoomed?2:10, gStep=_fZoomed?5:10;
+  const sStart=_fZoomed?70:40, sEnd=_fZoomed?82:80;
+  const gStart=_fZoomed?75:55, gEnd=_fZoomed?95:95;
+  for(let s=sStart;s<=sEnd;s+=sStep){
+    const sx=X(s);
+    if(sx>=p.l && sx<=W-p.r) c.fillText(s+'%',sx,H-p.b+16);
+  }
   c.fillText('SWE-bench Verified (%)',W/2,H-6);
   c.textAlign='right';
-  for(let g=55;g<=95;g+=10){c.fillStyle='#3d5a7a';c.fillText(g+'%',p.l-6,Y(g)+4);}
+  for(let g=gStart;g<=gEnd;g+=gStep){
+    const gy=Y(g);
+    if(gy>=p.t && gy<=H-p.b){c.fillStyle='#3d5a7a';c.fillText(g+'%',p.l-6,gy+4);}
+  }
   c.save();c.translate(14,H/2);c.rotate(-Math.PI/2);c.fillStyle='#4a6b8a';c.textAlign='center';c.font='10px DM Sans';c.fillText('GPQA Diamond (%)',0,0);c.restore();
 
   // ── User's model on frontier (if SWE & GPQA entered) ──
