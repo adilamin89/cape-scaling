@@ -141,13 +141,8 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   <div class="header-stats">
     <div class="hstat"><span class="hstat-val">3.5B</span><span class="hstat-lbl">Critical Scale N<sub>c</sub></span></div>
     <div class="hstat"><span class="hstat-val">−0.989</span><span class="hstat-lbl">Pre-transition r</span></div>
-<<<<<<< Updated upstream
-    <div class="hstat"><span class="hstat-val">44 + 20</span><span class="hstat-lbl">Base + Frontier Models</span></div>
-    <div class="hstat"><span class="hstat-val">14</span><span class="hstat-lbl">Families</span></div>
-=======
     <div class="hstat"><span class="hstat-val">63 + 31</span><span class="hstat-lbl">Base + Frontier Models</span></div>
     <div class="hstat"><span class="hstat-val">16</span><span class="hstat-lbl">Families</span></div>
->>>>>>> Stashed changes
   </div>
   <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap">
     <a href="https://github.com/adilamin89/cape-scaling" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);padding:4px 12px;border-radius:3px;letter-spacing:0.5px">GitHub Repo</a>
@@ -1876,22 +1871,21 @@ function drawFrontierChart(){
   _fState={pts:[],X,Y,p,W,H};
   c.clearRect(0,0,W,H);
   c.strokeStyle='rgba(255,255,255,0.03)'; c.lineWidth=1;
-<<<<<<< Updated upstream
   const gridSStep=_fZoomed?2:10, gridGStep=_fZoomed?5:10;
   for(let s=_fZoomed?68:40;s<=(_fZoomed?83:80);s+=gridSStep){const sx=X(s);if(sx>=p.l&&sx<=W-p.r){c.beginPath();c.moveTo(sx,p.t);c.lineTo(sx,H-p.b);c.stroke();}}
   for(let g=_fZoomed?70:55;g<=(_fZoomed?97:95);g+=gridGStep){const gy=Y(g);if(gy>=p.t&&gy<=H-p.b){c.beginPath();c.moveTo(p.l,gy);c.lineTo(W-p.r,gy);c.stroke();}}
 
   // Cooperative/tax zones
   c.fillStyle='rgba(6,214,160,0.03)';
-  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7));
-  c.lineTo(X(84),Y(0.79*84+24.7)); c.lineTo(X(84),Y(gH)); c.lineTo(X(30),Y(gH)); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7));
+  c.lineTo(X(84),Y(0.52*84+45.7)); c.lineTo(X(84),Y(gH)); c.lineTo(X(30),Y(gH)); c.closePath(); c.fill();
   c.fillStyle='rgba(239,71,111,0.03)';
-  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7));
-  c.lineTo(X(84),Y(0.79*84+24.7)); c.lineTo(X(84),Y(gL)); c.lineTo(X(30),Y(gL)); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7));
+  c.lineTo(X(84),Y(0.52*84+45.7)); c.lineTo(X(84),Y(gL)); c.lineTo(X(30),Y(gL)); c.closePath(); c.fill();
 
-  // Regression line
+  // Regression line: GPQA = 0.52*SWE + 45.7
   c.strokeStyle='rgba(76,201,240,0.25)'; c.lineWidth=1.5; c.setLineDash([4,4]);
-  c.beginPath(); c.moveTo(X(30),Y(0.79*30+24.7)); c.lineTo(X(84),Y(0.79*84+24.7)); c.stroke(); c.setLineDash([]);
+  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7)); c.lineTo(X(84),Y(0.52*84+45.7)); c.stroke(); c.setLineDash([]);
 
   // Zone labels
   c.save(); c.globalAlpha=0.2; c.font='bold 11px Space Mono';
@@ -1900,14 +1894,6 @@ function drawFrontierChart(){
   c.restore();
 
   // Within-family trajectory lines
-=======
-  for(let s=40;s<=80;s+=10){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
-  for(let g=55;g<=95;g+=10){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
-  // Regression line: GPQA = 0.52*SWE + 45.7
-  c.strokeStyle='rgba(76,201,240,0.25)'; c.lineWidth=1.5; c.setLineDash([4,4]);
-  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7)); c.lineTo(X(84),Y(0.52*84+45.7)); c.stroke(); c.setLineDash([]);
-  // Draw within-family trajectory lines first (behind dots)
->>>>>>> Stashed changes
   const labs={Anthropic:[],Google:[],OpenAI:[]};
   FRONTIER.forEach(m=>{if(labs[m.lab])labs[m.lab].push(m);});
   Object.entries(labs).forEach(([lab,models])=>{
