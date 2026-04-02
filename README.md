@@ -9,6 +9,7 @@ Adil Amin · Independent Researcher · [adilamin@uwm.edu](mailto:adilamin@uwm.ed
 [![Paper 3A](https://img.shields.io/badge/Paper_3A-Nature-blue)](paper3a_nature.pdf)
 [![Paper 3B](https://img.shields.io/badge/Paper_3B-NeurIPS_2026-orange)](paper3b_neurips.pdf)
 [![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen)](https://adilamin89.github.io/cape-scaling)
+[![Interactive](https://img.shields.io/badge/Interactive_Dashboard-HuggingFace-yellow)](https://huggingface.co/spaces/adil89aminx/cape-dashboard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -60,7 +61,7 @@ The frontier measurement paper. 31 models, 8 labs. h-field diagnostic, per-lab t
 
 ## Interactive Dashboard
 
-**[adilamin89.github.io/cape-scaling](https://adilamin89.github.io/cape-scaling)**
+**[Static Dashboard](https://adilamin89.github.io/cape-scaling)** | **[Interactive Dashboard (HuggingFace)](https://huggingface.co/spaces/adil89aminx/cape-dashboard)**
 
 - **Analyze Model**: Enter params + benchmarks → phase classification + recommendations
 - **Phase Map**: 63 models across coupling space
