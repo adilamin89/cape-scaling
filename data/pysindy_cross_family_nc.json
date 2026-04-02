@@ -1,0 +1,40 @@
+{
+  "Pythia": {
+    "gammas": [
+      -0.505,
+      -0.206,
+      -0.245,
+      -0.463,
+      -0.333,
+      -1.115,
+      25.0
+    ],
+    "early_gamma": -0.319,
+    "late_gamma": 5.772,
+    "sign_flip": true,
+    "hs_saturating": true
+  },
+  "OPT": {
+    "gammas": [
+      -0.183,
+      -0.197,
+      0.327,
+      0.273,
+      3.0
+    ],
+    "early_gamma": -0.19,
+    "late_gamma": 1.2,
+    "sign_flip": true,
+    "hs_saturating": true
+  },
+  "Llama-2": {
+    "gammas": [
+      -0.357,
+      1.442
+    ],
+    "early_gamma": -0.357,
+    "late_gamma": 1.442,
+    "sign_flip": true,
+    "hs_saturating": false
+  }
+}
