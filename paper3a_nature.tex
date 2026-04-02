@@ -38,7 +38,7 @@ curated training removed the coupling dip entirely
 (Qwen2.5 at 1.5B: 3\% cooperative; Qwen3 at same scale: 100\%).
 Normalizing by model width eliminates the apparent anticorrelation across all tested families,
 consistent with an output-projection bottleneck rather than a fundamental limit.
-Internally, 38 of 40 models show zero competing attention heads;
+Internally, 40 of 43 models show zero competing attention heads;
 the tax originates at the output, not inside the model.
 An ODE discovered by sparse regression reproduces five benchmark trajectories
 and cross-predicts held-out Llama-2 at 5.6\% error.
@@ -102,7 +102,7 @@ above it, they cooperate. The threshold is engineerable.
 (1)~The sign flip is confirmed across 16 independent families with architecture-dependent thresholds.
 (2)~The anticorrelation is eliminable: curated training removes it entirely (Qwen3 vs.\ Qwen2.5).
 (3)~Width normalization eliminates it: capabilities are cooperative across all tested families in the full parameter space.
-(4)~Internally, 38/40 models show zero competing heads---the bottleneck is at the output projection
+(4)~Internally, 40/43 models show zero competing heads---the bottleneck is at the output projection
 (the final linear layer that maps representations to vocabulary), not inside the model.
 (5)~A dynamical model (ODE) that cross-predicts held-out families at 5.6\% error.
 (6)~Extension to frontier ($r = +0.73$, 31 models, 8 labs).
@@ -328,8 +328,8 @@ effective scale advantage for alignment.
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.9\columnwidth]{pub_fig4_zero_competing_heads.png}
-\caption{\textbf{Internal coupling: zero competing heads across 40 models.}
-38 of 40 models from 9 families show 100\% cooperative attention heads.
+\caption{\textbf{Internal coupling: zero competing heads across 43 models.}
+40 of 43 models from 9 families show 100\% cooperative attention heads.
 The two exceptions are Qwen2.5 at 1.5B (the known dip, 3\% cooperative)
 and Qwen2.5 at 7B (mild last-layer dip, 99.7\%).
 The alignment tax does not originate from internal head-level competition.}
@@ -341,9 +341,9 @@ The alignment tax does not originate from internal head-level competition.}
 \label{sec:mechanism}
 
 The alignment tax does not originate inside the model.
-Across 40 models from 9 families
+Across 43 models from 10 families
 (Pythia, OPT, BLOOM, GPT-Neo, Phi, Gemma, Mistral, Qwen2.5, Qwen3)
-38 of 40 models (95\%; Wilson 95\% CI: 84--99\%) have zero attention heads
+40 of 43 models (93\%; Wilson 95\% CI: 81--98\%) have zero attention heads
 where reasoning and truthfulness representations compete
 (Fig.~\ref{fig:mechanism}).
 Heads are universally cooperative;
@@ -382,7 +382,7 @@ producing external anticorrelation---the same cooperative signal,
 squeezed through a bottleneck, becomes an apparent conflict.
 
 The output-projection bottleneck is the mechanism most consistent with all three internal observations:
-(i)~zero competing heads in 38/40 models,
+(i)~zero competing heads in 40/43 models,
 (ii)~late-layer coupling reversal at Pythia-1B,
 (iii)~monotonic internal coupling increase in families with different architectures.
 Direct confirmation would require intervention on the output projection---widening
