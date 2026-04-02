@@ -382,7 +382,13 @@ across Pythia sizes) is compressed through a narrow output projection,
 producing external anticorrelation---the same cooperative signal,
 squeezed through a bottleneck, becomes an apparent conflict.
 
-The output-projection bottleneck is the mechanism most consistent with all three internal observations:
+TransformerLens analysis across 7 models from 3 families confirms that attention
+patterns are universally cooperative (${\sim}0.97$, 100\% cooperative heads at every layer)
+regardless of model size or phase.
+The coupling differences arise from hidden-state representations,
+not attention---the bottleneck is in how information is encoded, not how heads attend.
+
+The output-projection bottleneck is the mechanism most consistent with all four internal observations:
 (i)~zero competing heads in 40/43 models,
 (ii)~late-layer coupling reversal at Pythia-1B,
 (iii)~monotonic internal coupling increase in families with different architectures.
