@@ -365,11 +365,13 @@ from $0.514$ (125M) to $0.876$ (13B).
 But at 30B, cooperation drops sharply to $0.356$, and 75 competing units appear
 where previously there were none---the same late-layer bottleneck pattern
 that characterizes Nc1 in Pythia, now emerging at a higher scale.
-At 66B, coupling shows partial recovery ($0.396$), mirroring the Nc1 pattern
-where Pythia drops at 1B and recovers by 2.8B.
-This is the first internal evidence of the cascade:
-cooperation peaks, weakens at a new bottleneck, and begins to recover---the
-same sequence that governs the base-scale transition, repeating at higher scale.
+At 66B, OPT coupling partially recovers ($0.396$).
+Llama-2-70B independently confirms the pattern: net coupling $0.205$
+with 292 competing units---even weaker than OPT at the same scale.
+Two families, trained by different labs on different data,
+both show cooperation weakening at 30--70B.
+This cross-family Nc2 evidence mirrors the cross-family Nc1 evidence:
+the cascade is not architecture-specific but structural.
 
 This resolves an apparent paradox: how can capabilities anticorrelate externally
 when heads are internally cooperative?
