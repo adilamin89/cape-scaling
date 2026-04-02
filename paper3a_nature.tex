@@ -366,10 +366,11 @@ But at 30B, cooperation drops sharply to $0.356$, and 75 competing units appear
 where previously there were none---the same late-layer bottleneck pattern
 that characterizes Nc1 in Pythia, now emerging at a higher scale.
 At 66B, OPT coupling partially recovers ($0.396$).
-Llama-2-70B independently confirms the pattern: net coupling $0.205$
-with 292 competing units---even weaker than OPT at the same scale.
+The Llama-2 family shows the same trajectory:
+fully cooperative at 7B (net $= 0.965$, 100\% cooperative heads)
+but dropping to $0.205$ with 292 competing units at 70B.
 Two families, trained by different labs on different data,
-both show cooperation weakening at 30--70B.
+both show cooperation peaking then weakening at 30--70B.
 This cross-family Nc2 evidence mirrors the cross-family Nc1 evidence:
 the cascade is not architecture-specific but structural.
 
