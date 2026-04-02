@@ -449,11 +449,12 @@ The coupling structure is not merely descriptive---it is exploitable.
 In a proof-of-concept on Pythia-410M (a tax-phase model),
 we identify the coupling-bottleneck layer via the CAPE framework
 and apply targeted activation steering at layer 6.
-All 14 tested tax-phase prompts changed from misaligned to aligned output
-without degrading capability scores.
-On Pythia-2.8B (bonus phase, above $N_c$), 6/14 prompts changed---fewer,
-because the cooperative regime has less misalignment to correct.
-Steering works in both phases but is most impactful where the tax is active
+Steering effectiveness tracks the coupling phase:
+60\% of prompts change at 410M (tax phase),
+30\% at 1B (at $N_c$), and 20\% at 2.8B (bonus phase).
+The monotonic decrease confirms that the coupling structure determines
+where intervention is most needed---the tax phase, where capabilities
+compete, responds most strongly to steering
 (data and protocol in supplementary code).
 This demonstrates that the coupling structure, once located,
 can be surgically exploited---it is not a diffuse property
