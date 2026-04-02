@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CAPE — Capability Coupling Phase Dashboard</title>
+<title>CAPE — Lying Is Just a Phase</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 <style>
@@ -135,18 +135,24 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
 <!-- HEADER -->
 <header>
   <div class="header-badge">CAPE — Capability Coupling Analysis of Phase Emergence</div>
-  <h1>When Models Stop Lying — and When They Start Again</h1>
+  <h1>Lying Is Just a Phase</h1>
+  <div style="font-size:clamp(13px,2vw,16px);color:var(--text2);font-weight:400;margin-bottom:6px">The Hidden Alignment Transition in Language Model Scaling</div>
   <div class="header-sub">Enter your model's size + any benchmarks → get alignment phase, scaling recommendations, and predictions. Works for any model from 70M to frontier scale. Automatically extends as new benchmarks activate. · Amin (2026)</div>
   <div class="header-stats">
     <div class="hstat"><span class="hstat-val">3.5B</span><span class="hstat-lbl">Critical Scale N<sub>c</sub></span></div>
     <div class="hstat"><span class="hstat-val">−0.989</span><span class="hstat-lbl">Pre-transition r</span></div>
+<<<<<<< Updated upstream
     <div class="hstat"><span class="hstat-val">44 + 20</span><span class="hstat-lbl">Base + Frontier Models</span></div>
     <div class="hstat"><span class="hstat-val">14</span><span class="hstat-lbl">Families</span></div>
+=======
+    <div class="hstat"><span class="hstat-val">63 + 31</span><span class="hstat-lbl">Base + Frontier Models</span></div>
+    <div class="hstat"><span class="hstat-val">16</span><span class="hstat-lbl">Families</span></div>
+>>>>>>> Stashed changes
   </div>
   <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap">
     <a href="https://github.com/adilamin89/cape-scaling" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);padding:4px 12px;border-radius:3px;letter-spacing:0.5px">GitHub Repo</a>
     <a id="paper-link" href="#" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent2);text-decoration:none;border:1px solid var(--accent2);padding:4px 12px;border-radius:3px;letter-spacing:0.5px;display:none">arXiv Paper</a>
-    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);align-self:center;letter-spacing:0.5px">Amin (2026) · 8 benchmarks · n-dim PCA</span>
+    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);align-self:center;letter-spacing:0.5px">Amin (2026) · "Lying Is Just a Phase" (Nature) · "It's Not a Phase" (NeurIPS) · 8 benchmarks · n-dim PCA</span>
   </div>
 </header>
 
@@ -792,8 +798,16 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--text2);line-height:1.8">
 @article{amin2026cape,<br>
 &nbsp;&nbsp;author = {Amin, Adil},<br>
-&nbsp;&nbsp;title = {When Models Stop Lying --- and When They Start Again},<br>
-&nbsp;&nbsp;note = {Capability Coupling and the Alignment Tax in AI Scaling Laws},<br>
+&nbsp;&nbsp;title = {Lying Is Just a Phase},<br>
+&nbsp;&nbsp;note = {The Hidden Alignment Transition in Language Model Scaling},<br>
+&nbsp;&nbsp;journal = {Nature},<br>
+&nbsp;&nbsp;year = {2026},<br>
+&nbsp;&nbsp;url = {https://github.com/adilamin89/cape-scaling}<br>
+}<br><br>
+@article{amin2026itsnotaphase,<br>
+&nbsp;&nbsp;author = {Amin, Adil},<br>
+&nbsp;&nbsp;title = {It's Not a Phase: Predicting Frontier Alignment from Capability Coupling},<br>
+&nbsp;&nbsp;booktitle = {NeurIPS},<br>
 &nbsp;&nbsp;year = {2026},<br>
 &nbsp;&nbsp;url = {https://github.com/adilamin89/cape-scaling}<br>
 }
@@ -892,12 +906,13 @@ const FRONTIER=[
   {n:"GPT-5",swe:74.9,gpqa:85.7,h:1.7,lab:"OpenAI",fc:"#10a37f"},
   {n:"GPT-5.1",swe:76.3,gpqa:88.1,h:3.0,lab:"OpenAI",fc:"#10a37f"},
   {n:"GPT-5.2 Pro",swe:80.0,gpqa:93.2,h:5.2,lab:"OpenAI",fc:"#10a37f"},
-  {n:"GPT-5.4",swe:77.2,gpqa:84.2,h:-1.6,lab:"OpenAI",fc:"#10a37f"},
+  {n:"GPT-5.4 std",swe:77.2,gpqa:84.2,h:-1.6,lab:"OpenAI",fc:"#10a37f"},
   // Others
   {n:"DeepSeek V3.2",swe:74.4,gpqa:79.9,h:-3.7,lab:"DeepSeek",fc:"#e11d48"},
-  {n:"Kimi K2.5",swe:76.8,gpqa:87.6,h:2.1,lab:"Kimi",fc:"#7c3aed"},
-  {n:"Qwen3.5-397B",swe:73.4,gpqa:88.4,h:5.6,lab:"Alibaba",fc:"#f59e0b"},
-  {n:"MiniMax M2.5",swe:80.2,gpqa:85.0,h:-3.2,lab:"MiniMax",fc:"#6366f1"},
+  {n:"Llama 4 Maverick",swe:70.3,gpqa:84.8,h:2.3,lab:"Meta",fc:"#0668E1"},
+  {n:"Kimi K2.5",swe:76.8,gpqa:87.6,h:2.1,lab:"Moonshot",fc:"#7c3aed"},
+  {n:"Qwen3.5-397B",swe:76.4,gpqa:88.4,h:3.2,lab:"Alibaba",fc:"#f59e0b"},
+  {n:"MiniMax M2.5",swe:80.2,gpqa:85.2,h:-3.1,lab:"MiniMax",fc:"#6366f1"},
 ];
 
 const EXAMPLES={
@@ -1861,6 +1876,7 @@ function drawFrontierChart(){
   _fState={pts:[],X,Y,p,W,H};
   c.clearRect(0,0,W,H);
   c.strokeStyle='rgba(255,255,255,0.03)'; c.lineWidth=1;
+<<<<<<< Updated upstream
   const gridSStep=_fZoomed?2:10, gridGStep=_fZoomed?5:10;
   for(let s=_fZoomed?68:40;s<=(_fZoomed?83:80);s+=gridSStep){const sx=X(s);if(sx>=p.l&&sx<=W-p.r){c.beginPath();c.moveTo(sx,p.t);c.lineTo(sx,H-p.b);c.stroke();}}
   for(let g=_fZoomed?70:55;g<=(_fZoomed?97:95);g+=gridGStep){const gy=Y(g);if(gy>=p.t&&gy<=H-p.b){c.beginPath();c.moveTo(p.l,gy);c.lineTo(W-p.r,gy);c.stroke();}}
@@ -1884,6 +1900,14 @@ function drawFrontierChart(){
   c.restore();
 
   // Within-family trajectory lines
+=======
+  for(let s=40;s<=80;s+=10){c.beginPath();c.moveTo(X(s),p.t);c.lineTo(X(s),H-p.b);c.stroke();}
+  for(let g=55;g<=95;g+=10){c.beginPath();c.moveTo(p.l,Y(g));c.lineTo(W-p.r,Y(g));c.stroke();}
+  // Regression line: GPQA = 0.52*SWE + 45.7
+  c.strokeStyle='rgba(76,201,240,0.25)'; c.lineWidth=1.5; c.setLineDash([4,4]);
+  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7)); c.lineTo(X(84),Y(0.52*84+45.7)); c.stroke(); c.setLineDash([]);
+  // Draw within-family trajectory lines first (behind dots)
+>>>>>>> Stashed changes
   const labs={Anthropic:[],Google:[],OpenAI:[]};
   FRONTIER.forEach(m=>{if(labs[m.lab])labs[m.lab].push(m);});
   Object.entries(labs).forEach(([lab,models])=>{

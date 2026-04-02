@@ -1,0 +1,269 @@
+{
+  "total_models": 31,
+  "r_all": 0.7294142090425955,
+  "p_all": 3.2388070812895497e-06,
+  "slope": 0.5192906843819869,
+  "intercept": 45.661201796897174,
+  "gpt54_compute_delta_h": 7.799999999999997,
+  "per_lab_h_mean": {
+    "Anthropic": -9.053494934207958,
+    "Google": 2.213727064476174,
+    "OpenAI": 3.7187403056387387,
+    "DeepSeek": 4.631327282323513,
+    "Moonshot": 2.05727364256623,
+    "Alibaba": 3.0649899163190355,
+    "MiniMax": -2.1083146843325125,
+    "Meta": 2.632663091049139
+  },
+  "n_labs": 8,
+  "models": [
+    {
+      "name": "Claude 3.5 Sonnet",
+      "swe": 49.0,
+      "gpqa": 59.4,
+      "lab": "Anthropic",
+      "date": "2024-06",
+      "h": -11.706445331614539
+    },
+    {
+      "name": "Claude 3.7 Sonnet",
+      "swe": 62.3,
+      "gpqa": 68.0,
+      "lab": "Anthropic",
+      "date": "2025-02",
+      "h": -10.013011433894945
+    },
+    {
+      "name": "Claude Haiku 4.5",
+      "swe": 73.3,
+      "gpqa": 71.0,
+      "lab": "Anthropic",
+      "date": "2025",
+      "h": -12.725208962096815
+    },
+    {
+      "name": "Claude Sonnet 4.5",
+      "swe": 77.2,
+      "gpqa": 83.4,
+      "lab": "Anthropic",
+      "date": "2025",
+      "h": -2.350442631186553
+    },
+    {
+      "name": "Claude Opus 4.5",
+      "swe": 80.9,
+      "gpqa": 87.0,
+      "lab": "Anthropic",
+      "date": "2025",
+      "h": -0.6718181633999194
+    },
+    {
+      "name": "Claude Sonnet 4.6",
+      "swe": 79.6,
+      "gpqa": 74.1,
+      "lab": "Anthropic",
+      "date": "2026-02",
+      "h": -12.89674027370333
+    },
+    {
+      "name": "Claude Opus 4.6",
+      "swe": 80.8,
+      "gpqa": 91.3,
+      "lab": "Anthropic",
+      "date": "2026-02",
+      "h": 3.6801109050382905
+    },
+    {
+      "name": "Gemini 2.0 Flash",
+      "swe": 60.4,
+      "gpqa": 65.2,
+      "lab": "Google",
+      "date": "2024-12",
+      "h": -11.82635913356917
+    },
+    {
+      "name": "Gemini 2.5 Pro",
+      "swe": 63.8,
+      "gpqa": 84.0,
+      "lab": "Google",
+      "date": "2025",
+      "h": 5.208052539532062
+    },
+    {
+      "name": "Gemini 3 Flash",
+      "swe": 78.0,
+      "gpqa": 90.4,
+      "lab": "Google",
+      "date": "2025",
+      "h": 4.234124821307859
+    },
+    {
+      "name": "Gemini 3 Pro",
+      "swe": 76.2,
+      "gpqa": 91.9,
+      "lab": "Google",
+      "date": "2025-12",
+      "h": 6.668848053195433
+    },
+    {
+      "name": "Gemini 3.1 Pro",
+      "swe": 80.6,
+      "gpqa": 94.3,
+      "lab": "Google",
+      "date": "2026-02",
+      "h": 6.783969041914688
+    },
+    {
+      "name": "GPT-4o",
+      "swe": 33.2,
+      "gpqa": 53.6,
+      "lab": "OpenAI",
+      "date": "2024-05",
+      "h": -9.301652518379136
+    },
+    {
+      "name": "GPT-5",
+      "swe": 74.9,
+      "gpqa": 85.7,
+      "lab": "OpenAI",
+      "date": "2025-08",
+      "h": 1.143925942892011
+    },
+    {
+      "name": "GPT-5.1",
+      "swe": 76.3,
+      "gpqa": 88.1,
+      "lab": "OpenAI",
+      "date": "2025",
+      "h": 2.8169189847572227
+    },
+    {
+      "name": "GPT-5.2 Pro",
+      "swe": 80.0,
+      "gpqa": 93.2,
+      "lab": "OpenAI",
+      "date": "2025-12",
+      "h": 5.995543452543885
+    },
+    {
+      "name": "GPT-5.4 std",
+      "swe": 77.2,
+      "gpqa": 84.2,
+      "lab": "OpenAI",
+      "date": "2026-03",
+      "h": -1.5504426311865558
+    },
+    {
+      "name": "GPT-5.4 xhigh",
+      "swe": 77.2,
+      "gpqa": 92.0,
+      "lab": "OpenAI",
+      "date": "2026-03",
+      "h": 6.249557368813441
+    },
+    {
+      "name": "DeepSeek V3.2",
+      "swe": 74.4,
+      "gpqa": 79.9,
+      "lab": "DeepSeek",
+      "date": "2025-12",
+      "h": -4.396428714916993
+    },
+    {
+      "name": "Kimi K2.5",
+      "swe": 76.8,
+      "gpqa": 87.6,
+      "lab": "Moonshot",
+      "date": "2026-01",
+      "h": 2.05727364256623
+    },
+    {
+      "name": "Qwen3.5-397B",
+      "swe": 76.4,
+      "gpqa": 88.4,
+      "lab": "Alibaba",
+      "date": "2026-02",
+      "h": 3.0649899163190355
+    },
+    {
+      "name": "MiniMax M2.5",
+      "swe": 80.2,
+      "gpqa": 85.2,
+      "lab": "MiniMax",
+      "date": "2026-02",
+      "h": -2.1083146843325125
+    },
+    {
+      "name": "Llama 4 Maverick",
+      "swe": 70.3,
+      "gpqa": 84.8,
+      "lab": "Meta",
+      "date": "2025-04",
+      "h": 2.632663091049139
+    },
+    {
+      "name": "o1-preview",
+      "swe": 41.3,
+      "gpqa": 73.3,
+      "lab": "OpenAI",
+      "date": "2024-09",
+      "h": 6.192092938126763
+    },
+    {
+      "name": "o1",
+      "swe": 41.0,
+      "gpqa": 78.0,
+      "lab": "OpenAI",
+      "date": "2024-12",
+      "h": 11.047880143441361
+    },
+    {
+      "name": "o3-mini",
+      "swe": 49.3,
+      "gpqa": 79.7,
+      "lab": "OpenAI",
+      "date": "2025-01",
+      "h": 8.43776746307087
+    },
+    {
+      "name": "o3",
+      "swe": 69.1,
+      "gpqa": 87.7,
+      "lab": "OpenAI",
+      "date": "2025-04",
+      "h": 6.155811912307527
+    },
+    {
+      "name": "Claude 3.5 Haiku",
+      "swe": 40.6,
+      "gpqa": 41.0,
+      "lab": "Anthropic",
+      "date": "2024-10",
+      "h": -25.744403582805845
+    },
+    {
+      "name": "DeepSeek-V2.5",
+      "swe": 16.8,
+      "gpqa": 66.2,
+      "lab": "DeepSeek",
+      "date": "2024-09",
+      "h": 11.81471470548545
+    },
+    {
+      "name": "DeepSeek-V3",
+      "swe": 42.0,
+      "gpqa": 75.9,
+      "lab": "DeepSeek",
+      "date": "2024-12",
+      "h": 8.428589459059381
+    },
+    {
+      "name": "DeepSeek-R1",
+      "swe": 44.6,
+      "gpqa": 71.5,
+      "lab": "DeepSeek",
+      "date": "2025-01",
+      "h": 2.678433679666213
+    }
+  ]
+}

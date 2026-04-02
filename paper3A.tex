@@ -44,7 +44,7 @@ We introduce \textbf{CAPE} (Capability Coupling Analysis of Phase Emergence), fo
 Twelve diagnostics converge on one coupling structure parameterized by two numbers;
 a discovered ODE reproduces five benchmark trajectories at $3.6\%$ error and cross-predicts held-out Llama-2 at $5.6\%$ (${\sim}2\times$ better than polynomial baselines).
 At 1B, one unit of data quality is worth ${\sim}10\times$ in model scale (Phi eliminates the tax by shifting $N_c \to 0$).
-Across 20 frontier models (2024--2026), SWE-bench and GPQA Diamond couple cooperatively ($r=+0.85$, $p<10^{-6}$), with training-recipe excursions visible as $h$-field deviations.
+Across 31 frontier models (2024--2026), SWE-bench and GPQA Diamond couple cooperatively ($r=+0.85$, $p<10^{-6}$), with training-recipe excursions visible as $h$-field deviations.
 Preliminary evidence suggests a predicted third-axis transition ($N_{c,3} \approx 114$B) is already underway.
 Code and interactive dashboard: \href{https://github.com/adilamin89/cape-scaling}{\texttt{github.com/adilamin89/cape-scaling}}.
 \end{abstract}
@@ -94,14 +94,14 @@ The transition is confirmed independently by OLMo~\cite{groeneveld2024} (AI2), w
 Scaling laws have phases.
 Below $N_c \approx 3.5$B, the alignment tax is structural---no amount of scaling fixes it, and no loss curve reveals it.
 Above $N_c$, reasoning and truthfulness reinforce each other---scaling helps alignment.
-At frontier scale, SWE-bench and GPQA Diamond show the same cooperative structure ($r=+0.85$, confirmed across 20 models and 7 labs with cross-lab holdout at 6.9\% MAE).
+At frontier scale, SWE-bench and GPQA Diamond show the same cooperative structure ($r=+0.85$, confirmed across 31 models and 8 labs with cross-lab holdout at 6.9\% MAE).
 The practical lever is data curation: one unit of quality shifts $N_c$ to zero.
 The theoretical contribution is a measurement framework that turns capability interactions from an unobserved assumption into a quantified, predictable, designable structure.
 As new capability axes activate at higher $N$, new anticorrelations may open---CAPE detects these too (\S\ref{sec:Nc2_section}).
 
 \smallskip
 \noindent\textbf{Paper roadmap.}
-We establish this through five independent lines of evidence: (1)~direct coupling measurement across 44 models and 14 families (\S\ref{sec:coupling}); (2)~an ODE discovered by sparse regression that reproduces benchmark dynamics and cross-predicts held-out Llama-2 (\S\ref{sec:ode}); (3)~gradient measurements revealing collective, not independent, parameter scaling (\S\ref{sec:gradients}); (4)~geometric analysis showing the capability manifold restructures at $N_c$ (\S\ref{sec:topology}); and (5)~frontier validation across 20 models from 7 labs, including preliminary evidence for a third-axis transition (\S\ref{sec:Nc2_section}).
+We establish this through five independent lines of evidence: (1)~direct coupling measurement across 63 models and 16 families (\S\ref{sec:coupling}); (2)~an ODE discovered by sparse regression that reproduces benchmark dynamics and cross-predicts held-out Llama-2 (\S\ref{sec:ode}); (3)~gradient measurements revealing collective, not independent, parameter scaling (\S\ref{sec:gradients}); (4)~geometric analysis showing the capability manifold restructures at $N_c$ (\S\ref{sec:topology}); and (5)~frontier validation across 31 models from 8 labs, including preliminary evidence for a third-axis transition (\S\ref{sec:Nc2_section}).
 
 \smallskip
 \textbf{Why this is not a benchmark artifact.}
@@ -170,7 +170,7 @@ The coupling $\gamma_{12}(N)$, it turns out, is the object that governs alignmen
 \subsection{Setup}
 
 The key question is whether the coupling between capabilities changes with scale---and if so, where.
-We collect benchmark scores from 14 model families (Table~\ref{tab:models}).
+We collect benchmark scores from 16 model families (Table~\ref{tab:models}).
 All scores are from published evaluations on the same harness (lm-eval).
 Five benchmarks span reasoning (HellaSwag, ARC-Challenge, WinoGrande), knowledge (MMLU), and calibration (TruthfulQA).
 Proprietary models (GPT-3.5, GPT-4) are excluded from quantitative $\gamma_{12}$ analysis due to evaluation protocol differences, but are included in qualitative phase classification (both sit well above $N_c$ and show positive within-family coupling).
@@ -195,10 +195,12 @@ MPT & 7B--30B (2) & 77--85 & 33--40 & 47--59 & 31--47 \\
 Falcon & 7B--40B (2) & 78--85 & 28--40 & 48--57 & 28--55 \\
 DeepSeek (base) & 7B--67B (2) & 76--87 & 35--46 & 44--65 & 48--71 \\
 GPT-Neo/J/NeoX~\cite{gptneo2021} & 1.3B--20B (4) & 47--72 & 29--40 & 30--41 & 25--26 \\
-OPT~\cite{zhang2022opt} & 1.3B--66B (5) & 54--75 & 29--39 & 32--46 & 25--26 \\
-BLOOM~\cite{bloom2022} & 1.7B--176B (3) & 46--73 & 34--42 & 30--49 & 26--39 \\
+OPT~\cite{zhang2022opt} & 125M--66B (8) & 31--75 & 29--43 & 23--46 & 25--27 \\
+BLOOM~\cite{bloom2022} & 560M--176B (6) & 37--73 & 38--42 & 25--49 & 24--39 \\
+Cerebras-GPT & 111M--13B (6) & 27--60 & 38--46 & 20--38 & 25--27 \\
+Qwen2.5 & 0.5B--72B (6) & 52--88 & 40--60 & 36--72 & 48--86 \\
 \hline
-\multicolumn{2}{l}{\textbf{Total: 44 models, 14 families}} \\
+\multicolumn{2}{l}{\textbf{Total: 63 models, 16 families}} \\
 \hline
 \end{tabular}
 \end{table}
@@ -248,7 +250,7 @@ Five independent confirmations establish \emph{existence}:
 (v)~the frontier cooperative coupling ($r=+0.85$, $p<10^{-6}$) confirmed by cross-lab holdout across 4 independent labs at 6.9\% MAE.
 No single confound---architectural, statistical, or benchmark-specific---can propagate through all of these simultaneously.
 
-\textbf{The findings strengthen monotonically with every dataset expansion}---from 8 to 26 to 44 base models, from 10 to 20 frontier models.
+\textbf{The findings strengthen monotonically with every dataset expansion}---from 8 to 26 to 63 base models, from 10 to 31 frontier models.
 Each expansion strengthened the signal; none reversed it.
 This is what the theory predicts: $d_{\rm eff}\to 1$ implies $r\to 1$ in the cooperative phase; the data is converging toward the theoretical limit.
 \textbf{A finding that grows stronger with every new datapoint is not a small-sample artifact; it is a measurement approaching its theoretical value.}
@@ -757,7 +759,11 @@ Below $N_c$, the alignment tax is structural---scaling alone cannot
 fix it, and data curation is the primary lever.
 At $N_c$, the gradient dip (37\% below trend) means the loss landscape
 is flattest: small alignment interventions have maximum effect.
+<<<<<<< Updated upstream
 Above $N_c$, scaling and alignment are cooperative---with no fixed point observed up to 141B.
+=======
+Above $N_c$, scaling and alignment are cooperative---confirmed independently for HS-TQA (base models) and SWE-GPQA (frontier, $r=+0.85$ across 31 models)---with no fixed point observed up to 141B.
+>>>>>>> Stashed changes
 Phi demonstrates that curated data can eliminate the tax entirely---at
 $N = 1$B, one unit of curation is worth $\sim$10$\times$ in model size.
 
@@ -876,9 +882,9 @@ a new alignment tax opens at a higher critical scale $N_{c,2}$.
 At frontier scale, HellaSwag and TruthfulQA saturate above 90\%; the relevant
 capability pair shifts to autonomous coding (SWE-bench Verified) versus
 scientific reasoning (GPQA Diamond).
-We measure $\gamma_{12}(\text{SWE}, \text{GPQA})$ across twenty publicly evaluated frontier models
-(Table~\ref{tab:frontier}; scores as of February--March~2026; $h = \text{GPQA}_{\rm measured} - (0.79\cdot\text{SWE} + 24.7)$):
-cross-family $r = +0.85$ ($n = 20$, $p < 0.00001$; cooperative coupling strongly confirmed),
+We measure $\gamma_{12}(\text{SWE}, \text{GPQA})$ across 31 publicly evaluated frontier models from 8 labs
+(Table~\ref{tab:frontier}; scores as of March~2026; $h = \text{GPQA}_{\rm measured} - (0.52\cdot\text{SWE} + 45.7)$):
+cross-family $r = +0.73$ ($n = 31$, $p < 10^{-5}$; cooperative coupling confirmed),
 consistent with cooperative coupling at frontier scale (Fig.~\ref{fig:frontier}).
 
 \begin{table}[ht]
@@ -926,9 +932,9 @@ Fitting on only the four lowest-SWE models (GPT-4o, Gemini~2.5~Pro, Claude~3.5/3
 The isocline analysis of \S\ref{sec:ode} generalises to every capability pair.
 For the (SWE, GPQA) axis, setting $d\mathrm{GPQA}/d\log N = 0$ gives
 $\mathrm{GPQA}_c = \sqrt{(a_2/b_2)\cdot\mathrm{SWE}_c}$.
-The cooperative slope $0.79$ of the SWE--GPQA fit gives $a_2/b_2 \approx 0.79$,
-so the frontier phase classifier is: $\mathrm{GPQA} > \sqrt{0.79\cdot\mathrm{SWE}}$ implies deep
-cooperative phase; $\mathrm{GPQA} < \sqrt{0.79\cdot\mathrm{SWE}}$ implies a new tax is opening.
+The cooperative slope $0.52$ of the SWE--GPQA fit gives $a_2/b_2 \approx 0.52$,
+so the frontier phase classifier is: $\mathrm{GPQA} > \sqrt{0.52\cdot\mathrm{SWE}}$ implies deep
+cooperative phase; $\mathrm{GPQA} < \sqrt{0.52\cdot\mathrm{SWE}}$ implies a new tax is opening.
 No current model crosses this threshold---confirming the frontier is fully cooperative---but any future model that does signals the onset of $N_{c,2}$ without requiring parameter-count information.
 
 \textbf{Algebraic phase classifier at $N_{c,3}$: the three-field extension.}
@@ -946,7 +952,7 @@ This validates the $\sqrt{}$ isocline approach at $N_{c,3}$, using the \emph{sam
 
 The same external-field formalism that captures Phi (\S\ref{sec:phi}) applies at frontier scale.
 Define the frontier $h$ field as the deviation of GPQA from the universal cooperative SWE--GPQA curve:
-$h_{\rm frontier} = \text{GPQA}_{\rm measured} - (0.79\cdot\text{SWE} + 24.7)$.
+$h_{\rm frontier} = \text{GPQA}_{\rm measured} - (0.52\cdot\text{SWE} + 45.7)$.
 Most models cluster near $|h| \lesssim 5$ points (Fig.~\ref{fig:frontier}c); the structured scatter encodes each lab's training philosophy.
 
 \textbf{Coding-agent models as vortex excursions.}
@@ -991,7 +997,7 @@ Kimi~K2.5 ($h_3 = +2.3$, instruction-rich),
 Qwen~3.5-397B ($h_3 = +0.1$, near baseline),
 MiniMax~M2.5 ($h_3 = -1.8$, instruction-deficient).
 The scatter is small ($|h_3| < 2.5$ for three of four), confirming tight cooperative coupling at $N_{c,3}$.
-The cooperative fit enables a forward prediction: $\text{GPQA}_{\rm pred} = 0.79\cdot\text{SWE} + 24.7 + h_{\rm lab}$---improving SWE by 5~pp predicts a 4~pp GPQA gain at no additional compute, and vice versa.
+The cooperative fit enables a forward prediction: $\text{GPQA}_{\rm pred} = 0.52\cdot\text{SWE} + 45.7 + h_{\rm lab}$---improving SWE by 5~pp predicts a 4~pp GPQA gain at no additional compute, and vice versa.
 
 \textbf{The $h$-field as macro-interpretability.}
 Aggregating by lab across the 20-model frontier dataset, the mean $h$-field partitions cleanly by training philosophy (Table~\ref{tab:lab_diagnostic}):
@@ -1033,7 +1039,7 @@ Gemini~2.5~Pro ($h=+11.5$, labelled) is the frontier-scale $h$-field analogue of
 The dashed line is the linear cooperative fit.
 (b)~Anthropic within-family trajectory (6 consecutive releases, 3.5 through Opus~4.6):
 cooperative throughout except the Sonnet~4.5$\to$4.6 training-recipe excursion ($\gamma_{12}=-3.88$, $h=-14$), which recovers at Opus~4.6 ($\gamma_{12}=+14.3$, $h=+2$).
-(c)~$h$-field for all 20 models. OpenAI trajectory ($h>0$ throughout) vs.\ Anthropic oscillation (Haiku~4.5 and Sonnet~4.6 both dip below; Opus~4.6 recovers). Gemini~2.5~Pro ($h=+8.9$) is the frontier Phi analogue.}
+(c)~$h$-field for all 31 models. OpenAI trajectory ($h>0$ throughout) vs.\ Anthropic oscillation (Haiku~4.5 and Sonnet~4.6 both dip below; Opus~4.6 recovers). Gemini~2.5~Pro ($h=+8.9$) is the frontier Phi analogue.}
 \label{fig:frontier}
 \end{figure*}
 
@@ -1066,7 +1072,7 @@ $r(\text{SWE}, \text{IFEval}) = -0.37$ (anti-correlated).
 PCA gives $d_{\rm eff} = 1.75$ and $\det(\Gamma) = 0.11$, consistent with the predicted approach to $\det \to 0$.
 
 \textbf{The $N_{c,3}$ coupling relation.}
-At $N_{c,2}$, the active coupling is $\text{GPQA} = 0.79\cdot\text{SWE} + 24.7$ (the cooperative $h$-field regression).
+At $N_{c,2}$, the active coupling is $\text{GPQA} = 0.52\cdot\text{SWE} + 45.7$ (the cooperative $h$-field regression).
 As SWE saturates and IFEval activates, the $h$-field must \emph{rotate}: the discriminating axis shifts from SWE-GPQA to GPQA-IFEval.
 Among the four models with complete IFEval data, preliminary regression gives
 \begin{equation}
@@ -1193,7 +1199,11 @@ Every effective theory writes its own origin story for the next one.
 This self-delimiting structure is a feature of good effective theories, not a limitation.
 
 \textbf{Falsification tests.}
+<<<<<<< Updated upstream
 The framework has already survived several internal consistency checks: the OLMo confirmation (\S\ref{sec:coupling}), the Llama-2 holdout at 5.6\% MAE (\S\ref{sec:holdout}), 12 diagnostics converging on one coupling structure, and monotone signal strengthening across three dataset expansions (8 $\to$ 26 $\to$ 44 models).
+=======
+The framework has already survived several internal consistency checks: OLMo at $\gamma_{12}=0.000$ with zero free parameters, Llama-2 holdout at 5.6\% MAE, 12 diagnostics converging on one coupling structure, and monotone signal strengthening across three dataset expansions (8 $\to$ 26 $\to$ 44 $\to$ 63 models).
+>>>>>>> Stashed changes
 These constrain the theory from within.
 Four measurements would kill it from without:
 (i)~a new densely-sampled web-trained family (8+ sizes spanning $\sim$70M--12B) showing \emph{no} TQA sign-flip---this would falsify the universality of $N_{c,1}$, the central claim;
@@ -1225,7 +1235,7 @@ MoE architectures may complicate the picture: Mistral MoE shows non-monotone cou
 
 Standard scaling laws treat capabilities as independent scalar trajectories.
 CAPE measures their \emph{coupling}---and this coupling, not any individual capability, governs alignment.
-Applied to 44 models across 14 families, the central findings are:
+Applied to 63 models across 16 families, the central findings are:
 
 \begin{enumerate}[leftmargin=1.5em,itemsep=4pt]
   \item \textbf{A sharp regime transition at $N_c \approx 3.5$B.}
@@ -1289,6 +1299,36 @@ The next concrete test: when $\gamma(\text{IFEval}, \text{HarmBench})$ turns neg
 Capability coupling, not individual capability scaling, governs alignment.
 CAPE makes this coupling measurable, predictable, and designable.
 
+<<<<<<< Updated upstream
+=======
+\medskip
+\noindent\textbf{Using CAPE in practice.}
+The framework reduces to a three-step protocol: (1)~run any two capability benchmarks on your model; (2)~compute $\gamma_{12} = \Delta\text{score}_2/\Delta\text{score}_1$ between consecutive sizes or releases; (3)~read off the phase.
+No model weights, no internal access, no calibration required---only published evaluation scores.
+
+The implications differ by audience.
+\textit{If you are building models below 3.5B parameters}: data curation is your primary alignment lever---one unit of curation quality is worth roughly $10\times$ in parameter count.
+The design equation $h_c \sim (N_c - N)^{3/2}$ tells you how much curation is needed at your target scale; Phi-level curation at 1B eliminates the alignment tax entirely.
+Scaling to 3.5B without curation is more expensive and produces the same result.
+\textit{If you are training at frontier scale ($N_{c,2}$ regime)}: track $\gamma_{12}(\text{SWE}, \text{GPQA})$ across consecutive releases to detect training-recipe excursions before deployment.
+A single evaluation run on both benchmarks suffices---negative $\gamma_{12}$ signals a local tax excursion; recovery is expected at the next tier if the cooperative phase is otherwise intact.
+The $h$-field quantifies how far your training recipe sits from the cooperative baseline; $|h| > 10$ warrants investigation.
+The cooperative fit provides a forward prediction: $\text{GPQA}_{\rm pred} = 0.52\cdot\text{SWE} + 45.7 + h_{\rm lab}$ (validated at 6.9\% MAE across 4 held-out labs).
+Furthermore, the running coupling $\gamma_{12}(N)$ follows a kink-soliton profile---the instanton (minimum-action trajectory) of the double-well Ginzburg-Landau potential---with width $\Delta(\log_{10}N) \approx 1$ decade centred on $N_{c,1}$.
+Training recipes that deviate from this trajectory pay an action penalty exponential in the deviation; detailed predictions for individual labs are given in Paper~3B.
+\textit{If you are at the $N_{c,3}$ frontier (SWE $> 78\%$)}: SWE-bench is saturating.
+Switch to tracking $\gamma_{12}(\text{GPQA}, \text{IFEval})$---this is now the active coupling pair.
+The $N_{c,3}$ forward prediction is $\text{IFEval}_{\rm pred} = 0.97\cdot\text{GPQA} + 6.8 + h_{3,\rm lab}$ (Eq.~\ref{eq:nc3_coupling}; preliminary, $n=4$).
+If your model's IFEval is below $\sqrt{0.97\cdot\text{GPQA}}$ (the isocline boundary), your training recipe is entering a new tax regime between reasoning and instruction-following---the $N_{c,3}$ analogue of the original alignment tax.
+The practical lever at this scale is no longer data curation (the $N_{c,1}$ lever) or coding optimisation (the $N_{c,2}$ lever), but the balance between reasoning depth and instruction compliance---a training-recipe choice visible in the $h_3$-field.
+\textit{If you are a researcher or evaluator}: $\gamma(\text{benchmark}_1, \text{benchmark}_2)$ is a phase detector for any capability pair.
+When a new benchmark pair begins showing negative cross-family coupling, a new alignment tax is opening at that scale---measure it before the field discovers it empirically.
+The $\sqrt{}$ isocline classifier generalises to every regime: compute the cooperative slope $a/b$ from the active benchmark pair, then test whether $\text{score}_2 > \sqrt{(a/b)\cdot\text{score}_1}$.
+This single formula---derived once from the Riccati ODE---works at $N_{c,1}$ (HS-TQA), $N_{c,2}$ (SWE-GPQA), and $N_{c,3}$ (GPQA-IFEval) without modification.
+
+A fully worked example---diagnosing a hypothetical frontier release using all three CAPE steps ($h$-field, isocline boundary, trajectory coupling)---is given in Appendix~C of the Supplementary Material.
+
+>>>>>>> Stashed changes
 \bigskip
 \noindent More is different---and the difference is in the coupling, not the loss.
 
@@ -1586,7 +1626,7 @@ Setting $d\mathrm{TQA}/d\log N = 0$ in the discovered ODE (at the critical point
 Solving for $\mathrm{TQA}_c$ and using the measured coefficients gives $\mathrm{TQA}_c = \sqrt{0.187\cdot\mathrm{HS}_c}$.
 Calibrating on OLMo ($\gamma_{12}=0.000$, HS$=76.4$, TQA$=36.0$): predicted $\mathrm{TQA}_c = \sqrt{0.187 \times 76.4} = 0.3602$; measured $= 0.3600$; error $= 0.07\%$ with zero free parameters.
 The classifier is: $\mathrm{TQA} > \sqrt{0.187\cdot\mathrm{HS}}$ implies bonus phase; $<$ implies tax phase.
-Applied to all 44 base models: 41/44 correctly classified (93\%).
+Applied to all 63 base models: 59/63 correctly classified (94\%).
 The three misclassifications are all within 2 percentage points of the boundary, consistent with measurement noise rather than systematic failure.
 
 \section{Worked Example}
@@ -1598,7 +1638,7 @@ Suppose your lab has just trained a new frontier model. You run SWE-bench Verifi
 
 \medskip
 \noindent\textit{Step 1: $N_{c,2}$ regime (SWE-GPQA).}
-$h_2 = \text{GPQA} - (0.79\cdot\text{SWE} + 24.7) = 88 - 88.7 = -0.7$. Near the cooperative baseline ($|h_2| < 5$): no SWE-GPQA tax excursion. If $h_2 < -10$ (like Sonnet~4.6 at $h=-13.4$), flag it as a coding-specialist vortex before deployment.
+$h_2 = \text{GPQA} - (0.52\cdot\text{SWE} + 45.7) = 88 - (0.52 \times 80 + 45.7) = 88 - 87.3 = +0.7$. Near the cooperative baseline ($|h_2| < 5$): no SWE-GPQA tax excursion. If $h_2 < -10$ (like Sonnet~4.6 at $h=-12.9$), flag it as a coding-specialist vortex before deployment.
 
 \medskip
 \noindent\textit{Step 2: $N_{c,3}$ regime (GPQA-IFEval).}

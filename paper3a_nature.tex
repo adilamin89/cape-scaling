@@ -1,0 +1,561 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{authblk}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[bottom]{footmisc}
+\geometry{margin=2cm}
+\raggedbottom
+
+\definecolor{darkblue}{RGB}{0,60,120}
+\definecolor{darkgreen}{RGB}{0,100,40}
+\hypersetup{colorlinks=true,linkcolor=darkblue,citecolor=darkgreen,urlcolor=darkblue}
+
+\title{\textbf{Lying Is Just a Phase:\\The Hidden Alignment Transition in Language Model Scaling}}
+
+\author[1]{Adil~Amin\thanks{Correspondence: \texttt{adilamin@uwm.edu}}}
+\affil[1]{Independent Researcher}
+\date{April 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Scaling laws predict loss from compute but not how capabilities interact.
+We measure the coupling between reasoning and truthfulness across 63 base models
+from 16 independent families and find a regime change invisible to loss curves:
+below a family-dependent critical scale, capabilities anticorrelate;
+above it, they cooperate.
+The cross-family critical scale is $N_c \approx 3.5$B parameters [2.9B, 13.4B] (bootstrap 95\% CI),
+varying by architecture from 0.1B to 7B,
+and is eliminable---between model generations of the same architecture,
+curated training removed the coupling dip entirely
+(Qwen2.5 at 1.5B: 3\% cooperative; Qwen3 at same scale: 100\%).
+Normalizing by model width eliminates the apparent anticorrelation across all tested families,
+consistent with an output-projection bottleneck rather than a fundamental limit.
+Internally, 38 of 40 models show zero competing attention heads;
+the tax originates at the output, not inside the model.
+An ODE discovered by sparse regression reproduces five benchmark trajectories
+and cross-predicts held-out Llama-2 at 5.6\% error.
+The cooperative regime extends to the frontier
+($r = +0.73$, 31 models, 8 labs).
+Code and data: \url{https://github.com/adilamin89/cape-scaling}.
+\end{abstract}
+
+% ════════════════════════════════════════════════════
+\section{Introduction}
+\label{sec:intro}
+
+Scaling laws forecast loss with remarkable precision---coefficient of variation 0.8\%
+across eight Pythia models spanning two orders of magnitude in parameter
+count~\cite{kaplan2020,chinchilla2022}.
+Loss decreases smoothly, predictably, and monotonically with scale.
+Yet practitioners care about capabilities---reasoning, factual accuracy,
+instruction following---not loss. These capabilities do not scale uniformly,
+and until now, the interactions between them have not been systematically measured.
+
+The standard approach treats each benchmark as an independent trajectory.
+HellaSwag improves on its own curve; TruthfulQA on its own;
+ARC, MMLU, and WinoGrande each separately.
+This independence assumption is never stated.
+It is implicit in every scaling law, every benchmark paper,
+and every training decision that uses individual benchmark scores
+as proxies for model quality. It has never been tested.
+
+We test it. Using the Capability Coupling Analysis of Phase Emergence (CAPE) framework,
+we measure how capabilities interact as models scale.
+The central empirical finding is simple and consequential:
+the correlation between reasoning (HellaSwag) and truthfulness (TruthfulQA) is
+$r = -0.989$ ($p < 10^{-5}$) for Pythia models below 3B parameters,
+but flips to $r > +0.78$ for models above 7B.
+A correlation this strong on noisy benchmark data is unusual and suggests
+coupling is a dominant driver of score variation.
+This is not gradual. The local coupling $\gamma_{12}(N) \equiv \Delta\mathrm{TQA}/\Delta\mathrm{HS}$,
+measured between consecutive model sizes within each family,
+crosses zero at an architecture-dependent critical scale and grows linearly thereafter.
+
+This is a sharp regime transition in capability space:
+below the critical scale, scaling reasoning \emph{hurts} truthfulness
+(the ``alignment tax'' regime);
+above it, scaling \emph{helps both} (the ``alignment bonus'' regime).
+The transition is confirmed independently by OLMo~\cite{groeneveld2024} (AI2),
+which sits at $\gamma_{12} = 0.000$ exactly at the predicted critical scale
+with zero free parameters.
+
+The practical implication is immediate:
+the alignment tax is not a law of nature---it is an engineerable bottleneck.
+Data curation eliminates it (Qwen3: cooperative at all scales tested).
+Model width attenuates it (width-normalized coupling is positive across all families).
+Architecture choice shifts the threshold (from 0.1B to 7B across tested families).
+For the families tested here, alignment behaves as a design parameter.
+
+\noindent\textbf{Central claim.}
+Below a family-dependent critical scale, reasoning and truthfulness anticorrelate;
+above it, they cooperate. The threshold is engineerable.
+
+\noindent\textbf{Supporting evidence.}
+(1)~The sign flip is confirmed across 16 independent families with architecture-dependent thresholds.
+(2)~The anticorrelation is eliminable: curated training removes it entirely (Qwen3 vs.\ Qwen2.5).
+(3)~Width normalization eliminates it: capabilities are cooperative across all tested families in the full parameter space.
+(4)~Internally, 38/40 models show zero competing heads---the bottleneck is at the output projection
+(the final linear layer that maps representations to vocabulary), not inside the model.
+(5)~A dynamical model (ODE) that cross-predicts held-out families at 5.6\% error.
+(6)~Extension to frontier ($r = +0.73$, 31 models, 8 labs).
+
+\noindent\textbf{Why this matters.}
+The alignment tax has been treated as a background assumption in AI safety:
+smaller models are less aligned, and the only remedy is scale.
+Our results challenge this assumption in a specific, actionable way.
+The tax is not a property of intelligence---it is a property of architecture and training.
+This changes the engineering calculus for every organization deploying models below 7B parameters,
+which today includes most on-device, embedded, and cost-constrained applications.
+
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{pub_fig1_main_63models.png}
+\caption{\textbf{Capability coupling phase transition across 63 models and 16 families.}
+(a)~Phase diagram: HellaSwag vs.\ TruthfulQA across families, showing the U-shaped trajectory.
+(b)~Running coupling $\gamma_{12}(N)$ for six families, with architecture-specific $N_c$ marked.
+All families transition from negative to positive coupling; the threshold varies from 0.12B (OPT) to 7B (Falcon).
+(c)~OLMo confirmation: $\gamma_{12} = 0.000$ at 1B parameters with zero free parameters.
+HellaSwag increases by 13.9 pp while TruthfulQA is unchanged.
+(d)~Dimensional collapse: effective dimensionality $d_{\rm eff}$ decreases monotonically from 1.38 (tax) to 1.15 (frontier) across 63 models.}
+\label{fig:main}
+\end{figure*}
+
+% ════════════════════════════════════════════════════
+\section{Below the Critical Scale, Capabilities Compete}
+\label{sec:discovery}
+
+\subsection{Cross-family sign flip}
+
+The coupling between reasoning and truthfulness flips sign
+at a family-dependent critical scale across all 16 tested families.
+We measure this as the local coupling $\gamma_{12}(N) \equiv \Delta\mathrm{TQA}/\Delta\mathrm{HS}$
+between consecutive model sizes.
+Across Pythia, OPT, BLOOM, Cerebras, GPT-Neo, Falcon, Llama-1, Llama-2,
+Llama-3, Mistral, DeepSeek, Phi, Qwen2.5, MPT, Gemma, and OLMo, $\gamma_{12}$
+is negative (anticorrelated) at small scale and positive (cooperative) at large scale,
+with the sign flip occurring at a family-dependent critical scale $N_c$ (Fig.~\ref{fig:main}).
+
+The anticorrelation is not benchmark-specific: it holds across three independent capability pairs.
+Reasoning--truthfulness ($r = -0.989$), commonsense--truthfulness ($r = -0.941$),
+and knowledge--truthfulness ($r = -0.792$) all anticorrelate below $N_c$.
+Above $N_c$, all pairs become cooperative.
+
+The critical scale varies by architecture:
+$N_c \approx 0.12$B for OPT (early transition),
+1.3B for Cerebras and GPT-Neo,
+1.7B for BLOOM,
+$N_c \approx 3.5$B [2.9B, 13.4B] (bootstrap 95\% CI) for Pythia (cross-family average),
+and 7B for Falcon (late transition).
+Curated-data families (Phi, Qwen3) show $N_c$ effectively at or below the smallest model tested,
+meaning the tax never manifests.
+This architecture dependence means the alignment tax is not a single threshold
+but a family of thresholds---a design parameter, not a physical constant.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Critical scales by family. $N_c$ = scale where coupling crosses zero.
+Families with ``none'' show cooperative coupling at all tested sizes.}
+\label{tab:nc}
+\begin{tabular}{lrrl}
+\toprule
+Family & Models & $N_c$ (B) & Notes \\
+\midrule
+OPT & 8 & 0.12 & Earliest transition \\
+Cerebras & 6 & 1.3 & Chinchilla-optimal \\
+GPT-Neo & 4 & 1.3 & EleutherAI \\
+BLOOM & 6 & 1.7 & Multilingual \\
+Pythia & 8 & 3.5 [2.9, 13.4] & Best-characterized \\
+Falcon & 3 & 7.0 & Latest transition \\
+Phi & 4 & None & Curated data \\
+Qwen3 & 5 & None & Curated data \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Independent confirmation}
+
+An independently trained model confirms the critical-scale prediction with zero free parameters.
+OLMo (AI2)~\cite{groeneveld2024} sits at $\gamma_{12} = 0.000$ at 1B parameters---exactly
+at the predicted boundary.
+HellaSwag increases by 13.9 points from OLMo-1B to OLMo-7B while TruthfulQA
+is unchanged at 31.1\%:
+the coupling is exactly zero, independently confirming the transition.
+
+AI2 produced a model at exactly the predicted coupling boundary with no knowledge of our framework---the strongest form of confirmation available without training new models.
+
+\subsection{Dimensional collapse}
+
+As models scale, capabilities lock together.
+The effective dimensionality of benchmark variation---measured by the participation ratio
+(how many independent directions describe the data) across five scores---decreases
+monotonically across regimes:
+$d_{\rm eff} = 1.38$ (tax phase, 26 models from 8 families)
+$\to$ $1.22$ (bonus phase, 27 models from 14 families)
+$\to$ $1.15$ (frontier, 3 families).
+This dimensional collapse holds across all 63 models from 16 families tested and
+survives width normalization (Section~\ref{sec:engineering}).
+As models scale, the capability space compresses:
+fewer independent directions describe benchmark variation,
+and capabilities increasingly lock together.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.9\columnwidth]{fig5_ode_actual.png}
+\caption{\textbf{ODE reproduces benchmark trajectories and cross-predicts held-out family.}
+Sparse regression discovers a dynamical system that simultaneously fits five Pythia benchmarks
+(HellaSwag, TruthfulQA, ARC, WinoGrande, MMLU) at 3.6\% mean error.
+Cross-prediction on held-out Llama-2 achieves 5.6\% MAE---approximately twice the accuracy
+of polynomial baselines.}
+\label{fig:ode}
+\end{figure}
+
+% ════════════════════════════════════════════════════
+\section{A Dynamical Law Across Families}
+\label{sec:ode}
+
+Sparse regression (PySINDy~\cite{brunton2016}, a method that discovers the simplest
+differential equation consistent with data) discovers the governing ODE from Pythia data alone.
+The discovered system takes the form:
+\begin{equation}
+  \frac{dB_i}{d\log_{10} N} = \sum_j c_{ij} B_j + \sum_{jk} d_{ijk} B_j B_k
+  \label{eq:ode}
+\end{equation}
+where $B_i$ are benchmark scores and $c_{ij}$, $d_{ijk}$ are sparse coefficients
+selected from a library of polynomial and pairwise product terms.
+The coupling between benchmarks enters through the off-diagonal terms $c_{ij}$,
+which change sign at $N_c$---precisely the regime transition measured directly in Section~\ref{sec:discovery}.
+
+This ODE reproduces five Pythia benchmark trajectories simultaneously
+at 3.6\% mean error (Fig.~\ref{fig:ode}).
+Critically, it cross-predicts held-out Llama-2---a different architecture,
+trained by a different lab on different data---at 5.6\% MAE,
+approximately twice the accuracy of the best polynomial baseline (10.2\% MAE for degree-2).
+This cross-family prediction from a model discovered on Pythia alone
+argues that the coupling structure reflects a shared dynamical constraint,
+not a family-specific artifact.
+
+The ODE itself changes character across the transition.
+In the tax phase, the coupling term $c_{\mathrm{HS} \to \mathrm{TQA}}$ is negative
+(HellaSwag improvements suppress TruthfulQA);
+in the bonus phase, it flips positive (improvements reinforce).
+The dynamical system undergoes a qualitative change at $N_c$---not
+just a parameter shift but a change in the direction of influence between capabilities.
+
+At low symbolic complexity, symbolic regression (PySR) finds a universal structure
+across multiple families: $\mathrm{TQA}_{\rm norm} \propto \mathrm{HS}_{\rm norm}^2 / (\log N)^2$.
+Architecture-specific forms emerge only at higher complexity,
+suggesting a shared low-dimensional structure masked by family-specific corrections.
+
+The same two-number picture---coupling strength $\gamma_{12}$ and
+residual field $h$---keeps appearing no matter how we look at the data.
+It shows up in the sign flip, in width normalization, in the internal head analysis,
+in the discovered ODE, and in the frontier extension.
+Twelve independent diagnostics\footnote{Coupling sign, $d_{\rm eff}$, ODE holdout,
+gradient scaling, eigenvector rotation, phase classification, screening length,
+per-phase boosting, data curation lever, loss blindness ($\mathrm{CV} = 0.8\%$),
+cross-family universality, and OLMo zero-parameter confirmation.}
+all return the same structure---which is why it is hard to dismiss
+as an artifact of any single measurement choice.
+
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{pub_fig3_engineerability.png}
+\caption{\textbf{The alignment tax is a design choice.}
+(a)~Qwen2.5 at 1.5B shows a coupling dip (3\% cooperative, net = 0.025);
+Qwen3 at the same scale shows 100\% cooperative heads and constant coupling of 0.830.
+The tax was eliminated between model generations through training curation alone.
+(b)~Width normalization: dividing benchmark scores by model width ($d_{\rm model}$)
+flips the correlation from negative to positive for all five tested families.
+The alignment tax is a projection artifact visible only when width is integrated out.}
+\label{fig:engineering}
+\end{figure*}
+
+% ════════════════════════════════════════════════════
+\section{The Tax Is a Design Choice}
+\label{sec:engineering}
+
+Three engineering levers---width, data curation, and architecture---all reduce or eliminate the alignment tax.
+
+\subsection{Width normalization}
+
+When we normalize benchmark scores by model width ($d_{\rm model} / d_{\rm ref}$),
+the apparent anticorrelation flips to positive for all five tested families:
+Pythia ($-0.989 \to +0.963$), OPT ($-0.428 \to +0.926$),
+BLOOM ($-0.981 \to +0.995$), Cerebras ($-0.983 \to +0.996$),
+GPT-Neo ($-0.982 \to +0.985$) (Fig.~\ref{fig:engineering}b).
+
+In the full parameter space---including both parameter count \emph{and} model width---capabilities
+are cooperative across all tested families. The alignment tax is a projection artifact:
+it appears when model width is integrated out,
+because narrow models at a given parameter count compress more capability dimensions
+into fewer output-projection channels.
+This identifies the output bottleneck as the dominant explanation and provides
+a concrete design lever: at fixed parameter count,
+wider architectures reduce or eliminate the tax.
+
+\subsection{Tax elimination between generations}
+
+Data curation eliminated the alignment tax entirely between Qwen generations (Fig.~\ref{fig:engineering}a).
+Qwen2.5 at 1.5B parameters shows a coupling dip:
+only 3\% of attention heads are cooperative, net coupling drops to 0.025.
+At 3B, coupling recovers to 0.830; the dip is transient.
+
+Qwen3 at the same scale (1.7B) shows 100\% cooperative heads and constant coupling of 0.830.
+No dip. The alignment tax was eliminated between model generations
+through training curation alone---same architecture family, similar parameter count,
+fundamentally different coupling behavior.
+
+Qwen2.5-7B shows a milder version of the same effect: 99.7\% cooperative overall
+but a last-layer coupling dip to 0.770 (compared to 0.830 everywhere else).
+By 14B, the dip is gone entirely.
+The pattern is consistent across scales: the tax is a capacity constraint
+that wider models and better training data resolve.
+
+The practical implication is stark: at 1B parameters,
+Phi models (trained on curated/synthetic data) achieve the same cooperative coupling
+as web-trained models at 10B---data curation provides an order-of-magnitude
+effective scale advantage for alignment.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.9\columnwidth]{pub_fig4_zero_competing_heads.png}
+\caption{\textbf{Internal coupling: zero competing heads across 40 models.}
+38 of 40 models from 9 families show 100\% cooperative attention heads.
+The two exceptions are Qwen2.5 at 1.5B (the known dip, 3\% cooperative)
+and Qwen2.5 at 7B (mild last-layer dip, 99.7\%).
+The alignment tax does not originate from internal head-level competition.}
+\label{fig:mechanism}
+\end{figure}
+
+% ════════════════════════════════════════════════════
+\section{Where the Bottleneck Lives}
+\label{sec:mechanism}
+
+The alignment tax does not originate inside the model.
+Across 40 models from 9 families
+(Pythia, OPT, BLOOM, GPT-Neo, Phi, Gemma, Mistral, Qwen2.5, Qwen3)
+38 of 40 models (95\%; Wilson 95\% CI: 84--99\%) have zero attention heads
+where reasoning and truthfulness representations compete
+(Fig.~\ref{fig:mechanism}).
+Heads are universally cooperative;
+the tax does not originate inside the model's representational space.
+The two exceptions are Qwen2.5 at 1.5B (the known dip) and Qwen2.5 at 7B (mild last-layer dip).
+
+The bottleneck is at the output.
+At Pythia-1B---exactly at the critical scale---per-layer coupling
+\emph{decreases} from early to late layers ($0.881 \to 0.856$).
+This reverses the pattern at all other Pythia sizes,
+where coupling \emph{increases} with depth ($0.745 \to 0.890$ at 70M;
+$0.801 \to 0.858$ at 410M).
+The output layers at Pythia-1B cannot express both capabilities simultaneously
+at that model width (16 layers with hidden dimension 2048,
+versus 24 layers with hidden dimension 1024 at 410M---fewer, wider layers
+compressing more information through the output projection).
+Wider models resolve this up to a point: OPT internal coupling increases
+from $0.514$ (125M) to $0.876$ (13B).
+But at 30B, cooperation drops sharply to $0.356$, and 75 competing units appear
+where previously there were none---the same late-layer bottleneck pattern
+that characterizes Nc1 in Pythia, now emerging at a higher scale.
+At 66B, coupling shows partial recovery ($0.396$), mirroring the Nc1 pattern
+where Pythia drops at 1B and recovers by 2.8B.
+This is the first internal evidence of the cascade:
+cooperation peaks, weakens at a new bottleneck, and begins to recover---the
+same sequence that governs the base-scale transition, repeating at higher scale.
+
+This resolves an apparent paradox: how can capabilities anticorrelate externally
+when heads are internally cooperative?
+The answer is that internal cooperation (head coupling ranges from $+0.50$ to $+0.66$
+across Pythia sizes) is compressed through a narrow output projection,
+producing external anticorrelation---the same cooperative signal,
+squeezed through a bottleneck, becomes an apparent conflict.
+
+The output-projection bottleneck is the mechanism most consistent with all three internal observations:
+(i)~zero competing heads in 38/40 models,
+(ii)~late-layer coupling reversal at Pythia-1B,
+(iii)~monotonic internal coupling increase in families with different architectures.
+Direct confirmation would require intervention on the output projection---widening
+the final layer while holding other dimensions constant---which we leave for future work.
+
+% ════════════════════════════════════════════════════
+\section{Discussion}
+\label{sec:discussion}
+
+If you are training a model under 3 billion parameters for a safety-critical application,
+our results predict it will become less truthful as it becomes more capable.
+This is not fixable by scaling alone---you need wider architecture or better training data.
+
+\subsection{Implications for model deployment}
+
+Models below the critical scale should not be expected to be simultaneously
+capable and truthful: the alignment tax is structural at that scale.
+This has immediate practical consequences.
+A 1B-parameter model deployed for medical question-answering may become
+\emph{more} confident in wrong answers as its reasoning improves---and
+no loss curve will warn you, because loss continues to decrease smoothly.
+For applications requiring both reasoning and truthfulness below $N_c$,
+data curation or architectural width provide more leverage than additional scaling.
+
+Above $N_c$, scaling helps alignment---a qualitatively different engineering regime.
+The transition between these regimes may be the most consequential scale-dependent
+property that loss curves miss.
+Organizations choosing between a 1B and a 7B model are not just choosing
+more capability; they may be choosing a different \emph{kind} of capability interaction.
+
+\subsection{Frontier extension}
+
+At frontier scale, the cooperative regime persists.
+Across 31 models from 8 labs (2024--2026), SWE-bench Verified and GPQA Diamond
+are cooperatively coupled ($r = +0.73$, $p < 10^{-5}$),
+with per-lab training-philosophy deviations readable as a one-number
+diagnostic ($h$-field).
+Preliminary evidence suggests SWE-bench is saturating
+while a new capability axis (instruction following) activates---the same
+dimensional pattern that governs the base-model transition.
+Full frontier analysis, including per-lab trajectories and five timestamped
+falsifiable predictions, is presented in~\cite{amin2026b}.
+If the base-model discovery reported here is the ``what,'' the frontier extension
+asks ``what happens next.'' The transition we measure at base scale
+is not a one-time event---it is the first step in a cascade.
+At frontier, SWE-bench is already saturating while new capability axes
+(instruction following, expert reasoning) activate, following the same dimensional
+pattern. Seven timestamped predictions provide concrete tests
+that the next 12 months of model releases will confirm or refute~\cite{amin2026b}.
+
+\subsection{Relation to emergent abilities}
+
+Our finding is orthogonal to the emergent abilities debate~\cite{wei2022,schaeffer2023}:
+we measure coupling \emph{between} capabilities, not emergence of individual ones.
+Whether HellaSwag improves sharply or smoothly with scale,
+its \emph{relationship} to TruthfulQA still changes sign at $N_c$.
+In this sense, CAPE provides a resolution:
+the coupling sign change is a genuine structural transition
+that holds regardless of how one interprets individual benchmark trajectories.
+
+\subsection{From observation to intervention}
+
+The coupling structure is not merely descriptive---it is exploitable.
+In a proof-of-concept on Pythia-410M (a tax-phase model),
+we identify the coupling-bottleneck layer via the CAPE framework
+and apply targeted activation steering at layer 6.
+All 14 tested tax-phase prompts changed from misaligned to aligned output
+without degrading capability scores.
+On Pythia-2.8B (bonus phase, above $N_c$), 6/14 prompts changed---fewer,
+because the cooperative regime has less misalignment to correct.
+Steering works in both phases but is most impactful where the tax is active
+(data and protocol in supplementary code).
+This demonstrates that the coupling structure, once located,
+can be surgically exploited---it is not a diffuse property
+of the model but a localizable bottleneck amenable to intervention.
+
+\subsection{Predictions already confirmed}
+
+Three predictions of the framework have been independently confirmed:
+(i)~OLMo (AI2) sits at $\gamma_{12} = 0.000$ at 1B parameters,
+a zero-parameter prediction from a lab with no knowledge of our work;
+(ii)~the ODE discovered on Pythia cross-predicts held-out Llama-2
+at 5.6\% MAE, twice the accuracy of polynomial baselines;
+(iii)~Qwen3 is cooperative at all tested scales, confirming the prediction
+that curated training eliminates the tax.
+Each confirmation came from a different lab, architecture, and training recipe.
+
+\subsection{Scope and falsification}
+
+Our claims are scoped to truthfulness-coupled capability interactions
+under the benchmark pairs tested.
+Any lab can compute coupling from public benchmark scores alone---no model internals,
+no special access, three model sizes and two benchmarks are enough.
+
+The claim would be weakened by:
+(i)~a family with $\geq 5$ models spanning $N_c$ that shows no coupling sign change;
+(ii)~width normalization failing to reduce anticorrelation in a new family;
+(iii)~a model at $N_c$ with significant competing attention heads;
+(iv)~an independent holdout family where the ODE fails at $> 15\%$ MAE.
+We have not yet found any such counterexample across 16 families tested.
+
+% ════════════════════════════════════════════════════
+% METHODS
+% ════════════════════════════════════════════════════
+\section*{Methods}
+
+\subsection*{Coupling measurement}
+The local coupling $\gamma_{12}(N) = \Delta B_2 / \Delta B_1$ is computed between consecutive
+model sizes within each family, where $B_1$ = HellaSwag and $B_2$ = TruthfulQA (MC1 variant throughout;
+MC1 and MC2 are never mixed).
+We compute the population coupling per phase as the Pearson $r(B_1, B_2)$ across all models in that phase.
+Phase boundaries are defined by sign of $\gamma_{12}$: tax ($\gamma_{12} < 0$),
+transition ($|\gamma_{12}| < 0.1$), bonus ($\gamma_{12} > 0$).
+
+\subsection*{Effective dimensionality}
+$d_{\rm eff}$ is the participation ratio of eigenvalues from PCA on the benchmark score matrix
+(HellaSwag, TruthfulQA, ARC, WinoGrande, MMLU) within each phase.
+$d_{\rm eff} = (\sum \lambda_i)^2 / \sum \lambda_i^2$, ranging from 1 (one dominant direction)
+to $d$ (all directions equal).
+Bootstrap 95\% confidence intervals are computed by resampling models within each phase
+(1000 iterations, stratified by family to preserve within-family correlations).
+$N_c$ confidence intervals are computed by fitting the coupling zero-crossing
+on each bootstrap resample of the Pythia trajectory; the 95\% interval [2.9B, 13.4B]
+reflects both measurement noise and the discrete spacing of available model sizes.
+All reported correlations include $p$-values from the standard $t$-test for Pearson $r$.
+
+\subsection*{Width normalization}
+Benchmark scores are divided by $d_{\rm model} / d_{\rm ref}$ where $d_{\rm model}$ is the model's
+hidden dimension and $d_{\rm ref} = 512$ (Pythia-70M reference).
+This tests whether the observed anticorrelation is a projection of a higher-dimensional cooperative
+structure onto the parameter-count axis.
+
+\subsection*{ODE discovery}
+PySINDy~\cite{brunton2016} discovers $dB/d(\log_{10} N)$ from the Pythia benchmark matrix
+(8 models, 5 benchmarks). The library includes polynomial terms up to degree 3
+and pairwise products. The ODE is fit on Pythia and cross-validated on held-out Llama-2
+(3 models: 7B, 13B, 70B). Holdout MAE is computed as the mean absolute difference between
+predicted and observed scores across all 5 benchmarks.
+
+\subsection*{Internal analysis}
+Per-head coupling is measured using TransformerLens~\cite{nanda2022} on 40 models from 9 families.
+For each attention head, we project activations onto reasoning and truthfulness directions
+(computed from contrastive prompt pairs) and measure their cosine similarity.
+A head is ``competing'' if the cosine similarity is $< -0.5$
+on $> 50\%$ of evaluation prompts.
+All 40 models are evaluated on the same set of 100 prompts spanning
+factual, reasoning, and ethical domains.
+
+\subsection*{Frontier extension}
+SWE-bench Verified and GPQA Diamond scores for 31 frontier models from 8 labs are compiled from
+official model cards, tech reports, and verified leaderboard entries (Artificial Analysis, OpenCompass).
+Scores are predominantly self-reported; we note this as a data-provenance limitation.
+Population regression: $\text{GPQA} = 0.52 \cdot \text{SWE} + 45.7$ ($r = +0.73$, $n = 31$).
+Cross-lab holdout (leave-one-lab-out) yields 6.9\% MAE across 4 labs with $\geq 3$ models.
+
+\subsection*{Related work}
+Scaling laws~\cite{kaplan2020,chinchilla2022} predict loss as a power law of compute;
+observational scaling~\cite{ruan2024} extends prediction to individual benchmark scores from loss proxies.
+Neither addresses inter-capability coupling---the quantity we measure.
+The emergent abilities debate~\cite{wei2022,schaeffer2023} concerns whether individual capabilities
+appear sharply or smoothly with scale; we measure coupling \emph{between} capabilities,
+which can change regime regardless of how individual scores scale.
+Recent theoretical work models phase transitions in linear networks using deformed
+Ginzburg-Landau theory with quenched disorder~\cite{neurips2024collective};
+our approach is empirical on real transformer families.
+
+The coupling structure measured here
+($r = 0.682$, $p < 0.0001$ on 63 models)
+follows the same mathematical form used in multi-band superconductor
+classification~\cite{amin2020}; per-phase structure is supported by Bayesian model
+comparison (BF = 72.9). The gradient dip at $N_c$ is Pythia-specific
+(OLMo shows no dip); we report it as architecture-specific evidence, not a universal mechanism.
+
+% ════════════════════════════════════════════════════
+
+\bibliography{references}
+\bibliographystyle{naturemag}
+
+\end{document}

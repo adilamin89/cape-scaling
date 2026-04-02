@@ -1,0 +1,35 @@
+{
+  "full_31": {
+    "slope": 0.5193,
+    "intercept": 45.66,
+    "r": 0.7294,
+    "n": 31
+  },
+  "core_subset": {
+    "slope": 0.4912,
+    "intercept": 47.85,
+    "r": 0.7254,
+    "n": 25,
+    "excluded": [
+      "Gemini 2.0 Flash",
+      "Claude 3.5 Haiku",
+      "o1-preview",
+      "GPT-5.4 xhigh",
+      "DeepSeek-V2.5",
+      "GPT-5.2 Pro",
+      "GPT-5.4 standard"
+    ]
+  },
+  "swe_ge40": {
+    "slope": 0.5667,
+    "intercept": 42.38,
+    "r": 0.6985,
+    "n": 29
+  },
+  "old_session13": {
+    "slope": 0.79,
+    "intercept": 24.7,
+    "note": "PySR on ~20 models, Session 13"
+  },
+  "recommendation": "Use full-31 regression for 3B primary. Report core subset for robustness. Old 0.79 is obsolete."
+}
