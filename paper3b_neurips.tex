@@ -360,10 +360,13 @@ then drops at 30B ($0.356$, 75 competing units) before partially recovering
 at 66B ($0.396$, 150 competing units).
 This mirrors the Nc1 sequence exactly: Pythia drops at 1B and recovers by 2.8B;
 OPT drops at 30B and begins recovering at 66B.
-Llama-2-70B independently confirms this: net coupling $0.205$
-with 292 competing units---two families, same scale, same weakening.
-The cascade is not just a prediction---the internal signature
-of the next transition is visible across architectures.
+Six architectures independently confirm the Nc2 drop:
+Llama-2-70B ($0.205$), Llama-3.1-70B ($0.195$), Qwen2.5-72B ($0.181$),
+and OLMo-2-32B ($0.222$) all weaken at the same scale as OPT.
+The cascade is not a prediction---it is measured across
+every open-weight architecture tested, with three distinct
+layer-profile patterns (output bottleneck, representation saturation,
+and input bottleneck) converging on the same net effect.
 The framework predicts where to look for the next transition
 by tracking which axes are losing discriminatory power.
 
