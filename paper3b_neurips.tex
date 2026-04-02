@@ -452,6 +452,26 @@ old axes lock together, new ones emerge.
 The framework does not just describe the current frontier---it predicts
 where the frontier will fracture next.
 
+\textbf{What the eigenvectors predict.}
+At Nc1, the principal capability axis rotates: TQA loading flips from negative to positive.
+At the current frontier, the coupling matrix eigenvectors predict
+which benchmark will activate next:
+the axis orthogonal to the saturating SWE-GPQA cooperative direction
+is where discriminatory power will migrate.
+HLE ($r = +0.715$ with GPQA, $r = -0.251$ with SWE) already lies
+along this predicted orthogonal direction---not by construction
+but as a measured consequence of asymmetric saturation.
+
+\textbf{Practical guidance per model.}
+Any practitioner can compute $h$ from two public scores
+and determine: (a)~whether their model is coding-heavy or reasoning-heavy
+relative to the frontier trend,
+(b)~which capability investment has the highest marginal return,
+and (c)~whether the current benchmark pair is losing discriminatory power
+for their model class.
+These three diagnostics require no model internals, no training data access,
+and no proprietary information---only two public benchmark scores.
+
 % ════════════════════════════════════════════════════
 \section{Related Work}
 \label{sec:related}
