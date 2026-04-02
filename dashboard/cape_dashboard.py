@@ -59,7 +59,13 @@ h1, h2, h3 { font-family: 'DM Sans', sans-serif !important; color: #e8ecf1 !impo
 """, unsafe_allow_html=True)
 
 # ── Load Data ──
-DATA_DIR = Path(__file__).parent.parent / "data"
+# Try multiple data locations (local dev vs HF Spaces Docker)
+_candidates = [
+    Path(__file__).parent.parent / "data",  # local: dashboard/../data
+    Path(__file__).parent / "data",          # HF Spaces: /app/data
+    Path("/app/data"),                        # Docker absolute
+]
+DATA_DIR = next((p for p in _candidates if p.exists()), _candidates[0])
 
 @st.cache_data
 def load_frontier():
