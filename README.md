@@ -114,6 +114,11 @@ cape steer --model EleutherAI/pythia-410m-deduped \
            --prompt "The flat earth theory makes sense because"
 ```
 
+> **Note**: Self-aligning requires **open-weight models** (Pythia, OPT, Llama, Qwen, Gemma).
+> It hooks into internal transformer layers to steer activations — this is impossible with
+> API-only models (GPT, Claude, Gemini). However, the **h-field diagnostic works for ANY model**
+> from just two public benchmark scores. Open weights enable intervention; public scores enable diagnosis.
+
 ---
 
 ## Repository Structure
