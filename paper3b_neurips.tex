@@ -452,6 +452,23 @@ old axes lock together, new ones emerge.
 The framework does not just describe the current frontier---it predicts
 where the frontier will fracture next.
 
+\textbf{Benchmark rotation: the ODE changes variables, not just parameters.}
+At each $N_c$, the governing equation changes coordinates.
+At Nc1, the axes stay the same (HS, TQA) but coupling flips sign.
+At Nc3, the axes themselves rotate: SWE saturates out (spread/GPQA spread $= 0.14 < 0.2$)
+and HLE enters as an independent axis.
+The saturation ratio $\sigma = \text{spread}(\text{old}) / \text{spread}(\text{new})$
+predicts when each transition occurs: $\sigma < 0.2$ signals axis replacement.
+Currently $\sigma(\text{GPQA}/\text{HLE}) = 0.34$---Nc4 has not yet begun.
+
+At Nc4, we predict IFEval saturates (already at 87--94\%)
+and the next discriminating axis will be one of:
+AgentBench (multi-step tool use), ARC-AGI-2 (abstract reasoning),
+or HarmBench (safety evaluation)---whichever first shows $r > +0.5$
+with the currently active axis.
+Labs can track this by computing $r(\text{active}, \text{candidate})$
+across their release sequence; when $r$ crosses $+0.5$, co-activation has begun.
+
 \textbf{What the eigenvectors predict.}
 At Nc1, the principal capability axis rotates: TQA loading flips from negative to positive.
 At the current frontier, the coupling matrix eigenvectors predict
