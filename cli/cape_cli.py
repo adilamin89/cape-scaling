@@ -11,11 +11,11 @@ import argparse
 import json
 import sys
 
-SLOPE, INTERCEPT = 0.52, 45.7
+SLOPE, INTERCEPT = 0.513, 46.4
 
 LAB_H = {
-    "Google": 5.7, "OpenAI": 3.4, "Alibaba": 3.1, "Meta": 2.6,
-    "DeepSeek": 2.2, "Moonshot": 2.1, "MiniMax": -2.1, "Anthropic": -6.7
+    "Google": 5.5, "xAI": 5.1, "OpenAI": 3.1, "Alibaba": 2.8, "Meta": 2.4,
+    "DeepSeek": 1.9, "Moonshot": 1.8, "Zhipu": -0.3, "MiniMax": -2.3, "Anthropic": -6.9
 }
 
 OPT_LADDER = {
@@ -109,7 +109,7 @@ def cmd_predict(args):
         ("SWE-HLE decoupling", "Dec 2026", "Pending"),
     ]
     confirmed = [
-        ("OLMo γ₁₂ = 0.000", "Confirmed", "Zero-parameter, independent lab"),
+        ("OLMo γ₁₂ = 0.000", "Confirmed", "Independent lab, independent training"),
         ("Llama-2 holdout 5.6% MAE", "Confirmed", "Cross-family, 2× polynomial"),
         ("Qwen3 cooperative all scales", "Confirmed", "Tax eliminated by curation"),
     ]
@@ -127,22 +127,32 @@ def cmd_predict(args):
 
 
 def cmd_steer(args):
-    """Self-aligning steering demo info."""
-    print(f"\n  CAPE Self-Aligning Demo")
-    print(f"  {'='*45}")
-    print(f"  Model: {args.model}")
-    print(f"  Prompt: \"{args.prompt}\"")
+    """Run live activation-level steering on any HuggingFace model."""
+    try:
+        from cape_steer import CAPESteerer
+    except ImportError:
+        print("  Install dependencies: pip install torch transformers")
+        print("  Then run from the cli/ directory.")
+        return
+
+    steerer = CAPESteerer(args.model, device=getattr(args, 'device', 'auto'))
+    result = steerer.steer(args.prompt, max_new_tokens=getattr(args, 'max_tokens', 50))
+
+    print(f"\n  CAPE Self-Steering — Live Activation Intervention")
+    print(f"  {'='*55}")
+    print(f"  Model: {result.model_name}")
+    print(f"  Probe layer: {result.probe_layer}/{result.num_layers} (quarter-depth)")
+    print(f"  Phase: {result.phase} (cos_truth={result.cos_truth:.4f})")
+    print(f"  Correction strength: {result.correction_strength}")
     print()
-    print(f"  Results from experiments:")
-    print(f"  ┌─────────────────┬────────┬───────────────────────┐")
-    print(f"  │ Model           │ Changed│ Interpretation        │")
-    print(f"  ├─────────────────┼────────┼───────────────────────┤")
-    print(f"  │ Pythia-410M     │ 14/14  │ Tax phase: high effect│")
-    print(f"  │ Pythia-2.8B     │  6/14  │ Bonus: less to fix    │")
-    print(f"  └─────────────────┴────────┴───────────────────────┘")
+    print(f"  WITHOUT steering:")
+    prompt_len = len(result.prompt)
+    print(f"    {result.normal_text[prompt_len:][:200]}")
     print()
-    print(f"  To run live steering:")
-    print(f"  modal run scripts/modal_self_aligning_v2.py --model {args.model}")
+    print(f"  WITH steering (layer {result.probe_layer}):")
+    print(f"    {result.steered_text[prompt_len:][:200]}")
+    print()
+    print(f"  Changed: {'YES' if result.changed else 'NO'}")
     print()
 
 
