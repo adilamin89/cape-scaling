@@ -2,7 +2,7 @@
 
 **The alignment tax is not a law of nature -- it is an engineerable phase transition.**
 
-Adil Amin | ZEHEN Labs LLC | [adil@zehenlabs.com](mailto:adil@zehenlabs.com)
+Adil Amin | ZEHEN Labs | [adil@zehenlabs.com](mailto:adil@zehenlabs.com)
 
 [![Paper 3A](https://img.shields.io/badge/Paper_3A-NeurIPS_2026-orange)](lying_is_just_a_phase.pdf)
 [![Paper 3B](https://img.shields.io/badge/Paper_3B-NeurIPS_2026-orange)](growing_pains_frontier.pdf)
@@ -231,8 +231,10 @@ cape-scaling/
   title={Lying Is Just a Phase: The Hidden Alignment Transition
          in Language Model Scaling},
   author={Amin, Adil},
+  institution={ZEHEN Labs},
   booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
   year={2026},
+  url={https://zehenlabs.com},
   note={Under review}
 }
 
@@ -240,8 +242,10 @@ cape-scaling/
   title={The Growing Pains of Frontier Models: When Leaderboards
          Stop Separating and What to Measure Next},
   author={Amin, Adil},
+  institution={ZEHEN Labs},
   booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
   year={2026},
+  url={https://zehenlabs.com},
   note={Under review}
 }
 ```
