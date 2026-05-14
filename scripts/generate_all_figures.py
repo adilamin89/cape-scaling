@@ -105,7 +105,7 @@ for d in phi:
 ax.text(1.2e8,68,'Curated data\n$h(\\mathcal{D})>0$\nshifts $N_c\\to 0$',fontsize=10,color=CR,
        bbox=dict(boxstyle='round,pad=0.3',facecolor='#FEE2E2',edgecolor=CR,alpha=0.8))
 ax.set_xscale('log'); ax.set_xlabel('Parameters $N$'); ax.set_ylabel('TruthfulQA (%)'); ax.set_title('(d) Curated data eliminates alignment tax'); ax.set_ylim(25,80)
-plt.tight_layout(rect=[0,0,1,0.96]); plt.savefig(figpath('fig1_main.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 1")
+plt.tight_layout(rect=[0,0,1,0.96]); plt.savefig(figpath('fig1_main.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 1")
 
 # FIG 2
 fig,axes=plt.subplots(1,3,figsize=(14,4.5)); fig.suptitle('Figure 2: Loss is Exact — the Transition Lives in the Coupling',fontsize=14,fontweight='bold',y=1.03)
@@ -132,7 +132,7 @@ l2p=[tqa_pred(d['N']) for d in llama2]
 ax.scatter([d['N'] for d in llama2],l2p,c=CP,marker='D',s=60,alpha=0.3,facecolors='none',edgecolors=CP,lw=1.5,label='Llama-2 (predicted)')
 ax.plot(Ncv,np.polyval(ucoef,np.log10(Ncv)),'--',color=CGR,alpha=0.4,lw=1)
 ax.set_xscale('log'); ax.set_xlabel('Parameters $N$'); ax.set_ylabel('TruthfulQA (%)'); ax.set_title('(c) Hold-out: 5.6% error'); ax.legend(fontsize=8)
-plt.tight_layout(); plt.savefig(figpath('fig2_loss_boost.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 2")
+plt.tight_layout(); plt.savefig(figpath('fig2_loss_boost.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 2")
 
 # FIG 3 gradient
 gd=[(7e7,107.3,3.64),(1.6e8,84.1,3.23),(4.1e8,56.8,2.91),(1e9,23.0,2.66),(1.4e9,37.1,2.57),(2.8e9,27.3,2.40)]
@@ -152,7 +152,7 @@ ax.plot(np.linspace(7.5,9.7,100),np.log10(Ag)-0.40*np.linspace(7.5,9.7,100),'--'
 ax.axvspan(9.04,9.73,alpha=0.12,color=CO,label='$N_c$ 90% CI')
 ax.annotate('1B: 37% below\npower-law trend',xy=(lN[3],lG[3]),xytext=(7.7,1.9),fontsize=10,color=CR,fontweight='bold',arrowprops=dict(arrowstyle='->',color=CR,lw=1.5))
 ax.set_xlabel('$\\log_{10}(N)$'); ax.set_ylabel('$\\log_{10}(||\\nabla L||)$'); ax.set_title('(c) Gradient dip near $N_c$'); ax.legend(fontsize=9)
-plt.tight_layout(); plt.savefig(figpath('fig4_gradient.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 3")
+plt.tight_layout(); plt.savefig(figpath('fig4_gradient.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 3")
 
 # FIG 4 ODE
 lNp=[np.log10(d['N']) for d in pythia]
@@ -167,7 +167,7 @@ for i,(nm,(act,ode,col,err)) in enumerate(bdata.items()):
     ax.axvspan(9.04,9.73,alpha=0.06,color=CO); ax.set_xlabel('$\\log_{10}(N)$',fontsize=9)
     ax.set_title(nm,fontsize=11,fontweight='bold',color=col); ax.tick_params(labelsize=8)
     ax.text(0.95,0.05,f'{err:.1f}%',transform=ax.transAxes,fontsize=9,ha='right',va='bottom',color=col,fontweight='bold',bbox=dict(facecolor='white',alpha=0.8,edgecolor=col,boxstyle='round,pad=0.2'))
-plt.tight_layout(); plt.savefig(figpath('fig5_ode_actual.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 4")
+plt.tight_layout(); plt.savefig(figpath('fig5_ode_actual.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 4")
 
 # FIG 5 PySINDy
 fig,axes=plt.subplots(1,2,figsize=(12,4.5)); fig.suptitle('Figure 5: Dynamical Confirmation — Coupling Jumps 6×',fontsize=13,fontweight='bold',y=1.03)
@@ -179,8 +179,8 @@ ax.set_ylabel('HS→TQA coupling',fontsize=11); ax.set_title('(a) Coupling jumps
 ax=axes[1]; bn=['TQA','HS','WG','ARC','MMLU']; ev=[1.2,2.2,3.8,4.0,7.0]; bc=[CR,CB,CP,CG,CO]
 ax.barh(bn,ev,color=bc,alpha=0.85,edgecolor='white',height=0.5)
 for i,(b,e) in enumerate(zip(bn,ev)): ax.text(e+0.3,i,f'{e}%',va='center',fontsize=11,fontweight='bold')
-ax.axvline(10,color=CGR,ls='--',alpha=0.4); ax.set_xlabel('ODE prediction error (%)',fontsize=11); ax.set_title('(b) Nonlinear ODE: 3.6% avg')
-plt.tight_layout(); plt.savefig(figpath('fig6_coupling_jump.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 5")
+ax.axvline(10,color=CGR,ls='--',alpha=0.4); ax.set_xlabel('ODE prediction error (%)',fontsize=11); ax.set_title('(b) Nonlinear ODE: 2.6% avg')
+plt.tight_layout(); plt.savefig(figpath('fig6_coupling_jump.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 5")
 
 # FIG 6 topology
 sc=[410e6,1e9,1.4e9,2.8e9,6.9e9,12e9]; lS=np.log10(sc); lb=['410M','1B','1.4B','2.8B','6.9B','12B']
@@ -210,7 +210,7 @@ Nz=-zdt[1]/zdt[0]; ax.plot(Nz,0,'*',color=CR,markersize=14,zorder=6)
 ax.annotate('$N\\approx 130$B',xy=(Nz,0),xytext=(10.3,1.2),fontsize=10,color=CR,fontweight='bold',arrowprops=dict(arrowstyle='->',color=CR,lw=1.2))
 ax.axhline(0,color='black',lw=0.5); ax.fill_between(xe,-1,0,where=np.polyval(zdt,xe)<0,alpha=0.06,color=CR)
 ax.set_xlabel('$\\log_{10}(N)$'); ax.set_ylabel('$\\det(H)$'); ax.set_title('(e) Theory breaks at 130B',fontweight='bold')
-plt.savefig(figpath('fig8_topology.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 6")
+plt.savefig(figpath('fig8_topology.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 6")
 
 # FIG 7 predictions
 fig,axes=plt.subplots(1,3,figsize=(14,4.5)); fig.suptitle('Figure 7: Predictions',fontsize=14,fontweight='bold',y=1.03)
@@ -232,7 +232,7 @@ for Np,la in [(1e8,'100M'),(1e9,'1B'),(2e9,'2B'),(3e9,'3B')]:
     ax.annotate(f'{la}\n$h_c$={h:.0f}',xy=(Np/1e9,h),fontsize=8,ha='center',xytext=(0,10),textcoords='offset points')
 ax.axvline(3.5,color=CG,ls='--',alpha=0.5); ax.text(3.55,20,'$N_c$',fontsize=10,color=CG,fontweight='bold')
 ax.set_xlabel('$N$ (billions)'); ax.set_ylabel('$h_c$'); ax.set_title('(c) Design eq: $h_c\\sim(N_c-N)^{3/2}$')
-plt.tight_layout(); plt.savefig(figpath('fig3_thermo.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 7")
+plt.tight_layout(); plt.savefig(figpath('fig3_thermo.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 7")
 
 # FIG 8 multi-pair
 fig,axes=plt.subplots(1,3,figsize=(14,4.5)); fig.suptitle('Figure 8: Multi-Pair Coupling and Frontier Extension',fontsize=14,fontweight='bold',y=1.03)
@@ -260,7 +260,7 @@ for la,vl,cl in [('HS-TQA',tp,CR),('HS-ARC',ap,CB),('HS-WG',wp,CG),('HS-MMLU',mp
 ax.axhline(0,color='black',lw=0.5); ax.set_xscale('log'); ax.set_xlabel('Parameters $N$'); ax.set_ylabel('Coupling $\\gamma$')
 ax.set_title('(c) Only HS-TQA goes negative'); ax.legend(fontsize=9,loc='lower left')
 ax.annotate('Only HS-TQA\ngoes negative',xy=(2e8,-1.7),fontsize=10,color=CR,fontweight='bold',ha='center')
-plt.tight_layout(); plt.savefig(figpath('fig7_perphase_coupling.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 8")
+plt.tight_layout(); plt.savefig(figpath('fig7_perphase_coupling.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 8")
 
 # ── FIG 9: Frontier SWE-bench vs GPQA Diamond ──────────────────────────────
 fig,ax = plt.subplots(figsize=(7,5))
@@ -294,6 +294,6 @@ ax.set_xlabel('SWE-bench Verified (%)', fontsize=11)
 ax.set_ylabel('GPQA Diamond (%)', fontsize=11)
 ax.set_title('Fig 9: Frontier Capability Coupling — SWE vs GPQA (Feb–Mar 2026)', fontsize=11)
 ax.legend(fontsize=9); ax.grid(True, alpha=0.15)
-plt.tight_layout(); plt.savefig(figpath('fig9_frontier.png'),dpi=200,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 9")
+plt.tight_layout(); plt.savefig(figpath('fig9_frontier.png'),dpi=300,bbox_inches='tight',facecolor='white'); plt.close(); print("✓ Fig 9")
 
 print("\n✓✓✓ ALL 9 FIGURES DONE ✓✓✓")

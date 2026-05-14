@@ -1,0 +1,353 @@
+[
+  {
+    "name": "Claude 3.5 Sonnet",
+    "swe": 49.0,
+    "gpqa": 59.4,
+    "lab": "Anthropic",
+    "date": "2024-06",
+    "h": -12.1,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude 3.7 Sonnet",
+    "swe": 62.3,
+    "gpqa": 68.0,
+    "lab": "Anthropic",
+    "date": "2025-02",
+    "h": -10.4,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude Haiku 4.5",
+    "swe": 73.3,
+    "gpqa": 71.0,
+    "lab": "Anthropic",
+    "date": "2025",
+    "h": -13.0,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude Sonnet 4.5",
+    "swe": 77.2,
+    "gpqa": 83.4,
+    "lab": "Anthropic",
+    "date": "2025",
+    "h": -2.6,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude Opus 4.5",
+    "swe": 80.9,
+    "gpqa": 87.0,
+    "lab": "Anthropic",
+    "date": "2025",
+    "h": -0.9,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude Sonnet 4.6",
+    "swe": 79.6,
+    "gpqa": 74.1,
+    "lab": "Anthropic",
+    "date": "2026-02",
+    "h": -13.1,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude Opus 4.6",
+    "swe": 80.8,
+    "gpqa": 91.3,
+    "lab": "Anthropic",
+    "date": "2026-02",
+    "h": 3.4,
+    "subset": "frozen"
+  },
+  {
+    "name": "Gemini 2.0 Flash",
+    "swe": 60.4,
+    "gpqa": 65.2,
+    "lab": "Google",
+    "date": "2024-12",
+    "h": -12.2,
+    "subset": "frozen"
+  },
+  {
+    "name": "Gemini 2.5 Pro",
+    "swe": 63.8,
+    "gpqa": 84.0,
+    "lab": "Google",
+    "date": "2025",
+    "h": 4.9,
+    "subset": "frozen"
+  },
+  {
+    "name": "Gemini 3 Flash",
+    "swe": 78.0,
+    "gpqa": 90.4,
+    "lab": "Google",
+    "date": "2025",
+    "h": 4.0,
+    "subset": "frozen"
+  },
+  {
+    "name": "Gemini 3 Pro",
+    "swe": 76.2,
+    "gpqa": 91.9,
+    "lab": "Google",
+    "date": "2025-12",
+    "h": 6.4,
+    "subset": "frozen"
+  },
+  {
+    "name": "Gemini 3.1 Pro",
+    "swe": 80.6,
+    "gpqa": 94.3,
+    "lab": "Google",
+    "date": "2026-02",
+    "h": 6.6,
+    "subset": "frozen"
+  },
+  {
+    "name": "GPT-4o",
+    "swe": 33.2,
+    "gpqa": 53.6,
+    "lab": "OpenAI",
+    "date": "2024-05",
+    "h": -9.8,
+    "subset": "frozen"
+  },
+  {
+    "name": "GPT-5",
+    "swe": 74.9,
+    "gpqa": 85.7,
+    "lab": "OpenAI",
+    "date": "2025-08",
+    "h": 0.9,
+    "subset": "frozen"
+  },
+  {
+    "name": "GPT-5.1",
+    "swe": 76.3,
+    "gpqa": 88.1,
+    "lab": "OpenAI",
+    "date": "2025",
+    "h": 2.6,
+    "subset": "frozen"
+  },
+  {
+    "name": "GPT-5.2 Pro",
+    "swe": 80.0,
+    "gpqa": 93.2,
+    "lab": "OpenAI",
+    "date": "2025-12",
+    "h": 5.8,
+    "subset": "frozen"
+  },
+  {
+    "name": "GPT-5.4 std",
+    "swe": 77.2,
+    "gpqa": 84.2,
+    "lab": "OpenAI",
+    "date": "2026-03",
+    "h": -1.8,
+    "subset": "frozen"
+  },
+  {
+    "name": "GPT-5.4 xhigh",
+    "swe": 77.2,
+    "gpqa": 92.0,
+    "lab": "OpenAI",
+    "date": "2026-03",
+    "h": 6.0,
+    "subset": "frozen"
+  },
+  {
+    "name": "DeepSeek V3.2",
+    "swe": 74.4,
+    "gpqa": 79.9,
+    "lab": "DeepSeek",
+    "date": "2025-12",
+    "h": -4.7,
+    "subset": "frozen"
+  },
+  {
+    "name": "Kimi K2.5",
+    "swe": 76.8,
+    "gpqa": 87.6,
+    "lab": "Moonshot",
+    "date": "2026-01",
+    "h": 1.8,
+    "subset": "frozen"
+  },
+  {
+    "name": "Qwen3.5-397B",
+    "swe": 76.4,
+    "gpqa": 88.4,
+    "lab": "Alibaba",
+    "date": "2026-02",
+    "h": 2.8,
+    "subset": "frozen"
+  },
+  {
+    "name": "MiniMax M2.5",
+    "swe": 80.2,
+    "gpqa": 85.2,
+    "lab": "MiniMax",
+    "date": "2026-02",
+    "h": -2.3,
+    "subset": "frozen"
+  },
+  {
+    "name": "Llama 4 Maverick",
+    "swe": 70.3,
+    "gpqa": 84.8,
+    "lab": "Meta",
+    "date": "2025-04",
+    "h": 2.3,
+    "subset": "frozen"
+  },
+  {
+    "name": "o1-preview",
+    "swe": 41.3,
+    "gpqa": 73.3,
+    "lab": "OpenAI",
+    "date": "2024-09",
+    "h": 5.7,
+    "subset": "frozen"
+  },
+  {
+    "name": "o1",
+    "swe": 41.0,
+    "gpqa": 78.0,
+    "lab": "OpenAI",
+    "date": "2024-12",
+    "h": 10.6,
+    "subset": "frozen"
+  },
+  {
+    "name": "o3-mini",
+    "swe": 49.3,
+    "gpqa": 79.7,
+    "lab": "OpenAI",
+    "date": "2025-01",
+    "h": 8.0,
+    "subset": "frozen"
+  },
+  {
+    "name": "o3",
+    "swe": 69.1,
+    "gpqa": 87.7,
+    "lab": "OpenAI",
+    "date": "2025-04",
+    "h": 5.9,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude 3.5 Haiku",
+    "swe": 40.6,
+    "gpqa": 41.0,
+    "lab": "Anthropic",
+    "date": "2024-10",
+    "h": -26.2,
+    "subset": "frozen"
+  },
+  {
+    "name": "DeepSeek-V2.5",
+    "swe": 16.8,
+    "gpqa": 66.2,
+    "lab": "DeepSeek",
+    "date": "2024-09",
+    "h": 11.2,
+    "subset": "frozen"
+  },
+  {
+    "name": "DeepSeek-V3",
+    "swe": 42.0,
+    "gpqa": 75.9,
+    "lab": "DeepSeek",
+    "date": "2024-12",
+    "h": 8.0,
+    "subset": "frozen"
+  },
+  {
+    "name": "DeepSeek-R1",
+    "swe": 44.6,
+    "gpqa": 71.5,
+    "lab": "DeepSeek",
+    "date": "2025-01",
+    "h": 2.2,
+    "subset": "frozen"
+  },
+  {
+    "name": "Grok 3",
+    "swe": 57.6,
+    "gpqa": 84.6,
+    "lab": "xAI",
+    "date": "2025-02",
+    "h": 8.7,
+    "subset": "frozen"
+  },
+  {
+    "name": "Grok 4",
+    "swe": 69.1,
+    "gpqa": 83.3,
+    "lab": "xAI",
+    "date": "2026-02",
+    "h": 1.5,
+    "subset": "frozen"
+  },
+  {
+    "name": "GLM-5",
+    "swe": 77.8,
+    "gpqa": 86.0,
+    "lab": "Zhipu",
+    "date": "2026-02",
+    "h": -0.3,
+    "subset": "frozen"
+  },
+  {
+    "name": "Claude Opus 4.7",
+    "lab": "Anthropic",
+    "swe": 87.6,
+    "gpqa": 94.2,
+    "h": 2.9,
+    "date": "2026-04-16",
+    "subset": "post_cutoff"
+  },
+  {
+    "name": "Kimi K2.6",
+    "lab": "Moonshot",
+    "swe": 80.2,
+    "gpqa": 90.5,
+    "h": 3.0,
+    "date": "2026-04-20",
+    "subset": "post_cutoff"
+  },
+  {
+    "name": "DeepSeek V4 Pro",
+    "lab": "DeepSeek",
+    "swe": 80.6,
+    "gpqa": 90.1,
+    "h": 2.4,
+    "date": "2026-04-24",
+    "subset": "post_cutoff"
+  },
+  {
+    "name": "Qwen3.6-27B",
+    "lab": "Alibaba",
+    "swe": 77.2,
+    "gpqa": 87.8,
+    "h": 1.8,
+    "date": "2026-04",
+    "subset": "post_cutoff"
+  },
+  {
+    "name": "GLM-5.1",
+    "lab": "Zhipu",
+    "swe": 77.8,
+    "gpqa": 86.0,
+    "h": -0.3,
+    "date": "2026-03-26",
+    "subset": "post_cutoff"
+  }
+]

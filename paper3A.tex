@@ -759,11 +759,7 @@ Below $N_c$, the alignment tax is structural---scaling alone cannot
 fix it, and data curation is the primary lever.
 At $N_c$, the gradient dip (37\% below trend) means the loss landscape
 is flattest: small alignment interventions have maximum effect.
-<<<<<<< Updated upstream
-Above $N_c$, scaling and alignment are cooperative---with no fixed point observed up to 141B.
-=======
 Above $N_c$, scaling and alignment are cooperative---confirmed independently for HS-TQA (base models) and SWE-GPQA (frontier, $r=+0.85$ across 31 models)---with no fixed point observed up to 141B.
->>>>>>> Stashed changes
 Phi demonstrates that curated data can eliminate the tax entirely---at
 $N = 1$B, one unit of curation is worth $\sim$10$\times$ in model size.
 
@@ -1199,11 +1195,7 @@ Every effective theory writes its own origin story for the next one.
 This self-delimiting structure is a feature of good effective theories, not a limitation.
 
 \textbf{Falsification tests.}
-<<<<<<< Updated upstream
-The framework has already survived several internal consistency checks: the OLMo confirmation (\S\ref{sec:coupling}), the Llama-2 holdout at 5.6\% MAE (\S\ref{sec:holdout}), 12 diagnostics converging on one coupling structure, and monotone signal strengthening across three dataset expansions (8 $\to$ 26 $\to$ 44 models).
-=======
 The framework has already survived several internal consistency checks: OLMo at $\gamma_{12}=0.000$ with zero free parameters, Llama-2 holdout at 5.6\% MAE, 12 diagnostics converging on one coupling structure, and monotone signal strengthening across three dataset expansions (8 $\to$ 26 $\to$ 44 $\to$ 63 models).
->>>>>>> Stashed changes
 These constrain the theory from within.
 Four measurements would kill it from without:
 (i)~a new densely-sampled web-trained family (8+ sizes spanning $\sim$70M--12B) showing \emph{no} TQA sign-flip---this would falsify the universality of $N_{c,1}$, the central claim;
@@ -1299,8 +1291,6 @@ The next concrete test: when $\gamma(\text{IFEval}, \text{HarmBench})$ turns neg
 Capability coupling, not individual capability scaling, governs alignment.
 CAPE makes this coupling measurable, predictable, and designable.
 
-<<<<<<< Updated upstream
-=======
 \medskip
 \noindent\textbf{Using CAPE in practice.}
 The framework reduces to a three-step protocol: (1)~run any two capability benchmarks on your model; (2)~compute $\gamma_{12} = \Delta\text{score}_2/\Delta\text{score}_1$ between consecutive sizes or releases; (3)~read off the phase.
@@ -1314,21 +1304,16 @@ Scaling to 3.5B without curation is more expensive and produces the same result.
 A single evaluation run on both benchmarks suffices---negative $\gamma_{12}$ signals a local tax excursion; recovery is expected at the next tier if the cooperative phase is otherwise intact.
 The $h$-field quantifies how far your training recipe sits from the cooperative baseline; $|h| > 10$ warrants investigation.
 The cooperative fit provides a forward prediction: $\text{GPQA}_{\rm pred} = 0.52\cdot\text{SWE} + 45.7 + h_{\rm lab}$ (validated at 6.9\% MAE across 4 held-out labs).
-Furthermore, the running coupling $\gamma_{12}(N)$ follows a kink-soliton profile---the instanton (minimum-action trajectory) of the double-well Ginzburg-Landau potential---with width $\Delta(\log_{10}N) \approx 1$ decade centred on $N_{c,1}$.
-Training recipes that deviate from this trajectory pay an action penalty exponential in the deviation; detailed predictions for individual labs are given in Paper~3B.
 \textit{If you are at the $N_{c,3}$ frontier (SWE $> 78\%$)}: SWE-bench is saturating.
 Switch to tracking $\gamma_{12}(\text{GPQA}, \text{IFEval})$---this is now the active coupling pair.
 The $N_{c,3}$ forward prediction is $\text{IFEval}_{\rm pred} = 0.97\cdot\text{GPQA} + 6.8 + h_{3,\rm lab}$ (Eq.~\ref{eq:nc3_coupling}; preliminary, $n=4$).
 If your model's IFEval is below $\sqrt{0.97\cdot\text{GPQA}}$ (the isocline boundary), your training recipe is entering a new tax regime between reasoning and instruction-following---the $N_{c,3}$ analogue of the original alignment tax.
-The practical lever at this scale is no longer data curation (the $N_{c,1}$ lever) or coding optimisation (the $N_{c,2}$ lever), but the balance between reasoning depth and instruction compliance---a training-recipe choice visible in the $h_3$-field.
 \textit{If you are a researcher or evaluator}: $\gamma(\text{benchmark}_1, \text{benchmark}_2)$ is a phase detector for any capability pair.
 When a new benchmark pair begins showing negative cross-family coupling, a new alignment tax is opening at that scale---measure it before the field discovers it empirically.
 The $\sqrt{}$ isocline classifier generalises to every regime: compute the cooperative slope $a/b$ from the active benchmark pair, then test whether $\text{score}_2 > \sqrt{(a/b)\cdot\text{score}_1}$.
 This single formula---derived once from the Riccati ODE---works at $N_{c,1}$ (HS-TQA), $N_{c,2}$ (SWE-GPQA), and $N_{c,3}$ (GPQA-IFEval) without modification.
 
 A fully worked example---diagnosing a hypothetical frontier release using all three CAPE steps ($h$-field, isocline boundary, trajectory coupling)---is given in Appendix~C of the Supplementary Material.
-
->>>>>>> Stashed changes
 \bigskip
 \noindent More is different---and the difference is in the coupling, not the loss.
 

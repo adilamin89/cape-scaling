@@ -1,0 +1,82 @@
+[
+  {
+    "Model": "GPT-4-Turbo",
+    "Provider": "OpenAI",
+    "MMLU": 86.5,
+    "GPQA_Diamond": 35.7,
+    "SWE_Verified": 12.0,
+    "Source": "OpenAI/3rd-party-evals"
+  },
+  {
+    "Model": "Claude-3-Opus",
+    "Provider": "Anthropic",
+    "MMLU": 86.8,
+    "GPQA_Diamond": 50.4,
+    "SWE_Verified": null,
+    "Source": "Anthropic-ModelCard"
+  },
+  {
+    "Model": "Gemini-1.5-Pro",
+    "Provider": "Google",
+    "MMLU": 85.9,
+    "GPQA_Diamond": null,
+    "SWE_Verified": null,
+    "Source": "Google-TechReport"
+  },
+  {
+    "Model": "Grok-1(base)",
+    "Provider": "xAI",
+    "MMLU": 73.0,
+    "GPQA_Diamond": null,
+    "SWE_Verified": null,
+    "Source": "xAI-blog"
+  },
+  {
+    "Model": "Grok-3",
+    "Provider": "xAI",
+    "MMLU_Pro": 90.8,
+    "GPQA_Diamond": 84.6,
+    "SWE_Verified": 57.6,
+    "Source": "xAI-Feb2025"
+  },
+  {
+    "Model": "Grok-4",
+    "Provider": "xAI",
+    "MMLU": null,
+    "GPQA_Diamond": 87.0,
+    "SWE_Verified": null,
+    "Source": "Epoch+LMCouncil"
+  },
+  {
+    "Model": "Claude-Opus-4.6",
+    "Provider": "Anthropic",
+    "MMLU": 91.1,
+    "GPQA_Diamond": 90.5,
+    "SWE_Verified": 78.7,
+    "Source": "LMCouncil-Mar2026"
+  },
+  {
+    "Model": "GPT-5.2",
+    "Provider": "OpenAI",
+    "MMLU": null,
+    "GPQA_Diamond": 91.4,
+    "SWE_Verified": 80.0,
+    "Source": "LMCouncil+llm-stats"
+  },
+  {
+    "Model": "GPT-5.4",
+    "Provider": "OpenAI",
+    "MMLU": null,
+    "GPQA_Diamond": 92.0,
+    "SWE_Verified": 76.9,
+    "Source": "LMCouncil-Mar2026"
+  },
+  {
+    "Model": "Gemini-3.1-Pro",
+    "Provider": "Google",
+    "MMLU": null,
+    "GPQA_Diamond": 94.1,
+    "SWE_Verified": 75.6,
+    "Source": "ArtificialAnalysis+LMCouncil"
+  }
+]

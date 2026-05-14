@@ -25,15 +25,16 @@ pythia_logN = np.log10([0.07, 0.16, 0.41, 1.0, 1.4, 2.8, 6.9, 12.0])
 pythia_HS   = np.array([0.266, 0.336, 0.433, 0.571, 0.595, 0.641, 0.647, 0.670])
 pythia_TQA  = np.array([0.479, 0.414, 0.394, 0.382, 0.369, 0.361, 0.343, 0.322])
 
-Nc_split = 4  # below index 4 = below ~3.5B
+Nc_split = 4  # first 4 Pythia models: 70M, 160M, 410M, 1B
 r_below, p_below = stats.pearsonr(pythia_HS[:Nc_split], pythia_TQA[:Nc_split])
 r_above, p_above = stats.pearsonr(pythia_HS[Nc_split:], pythia_TQA[Nc_split:])
 
 print("=" * 60)
-print("1. WITHIN-PYTHIA: r = -0.989 below Nc")
+print("1. WITHIN-PYTHIA: r = -0.989 across all 8 models (70M-12B)")
+print("   Split at index 4 (first 4 models: 70M, 160M, 410M, 1B)")
 print("=" * 60)
-print(f"   r_below = {r_below:.3f}, n = {Nc_split}")
-print(f"   r_above = {r_above:.3f}, n = {len(pythia_HS)-Nc_split}")
+print(f"   r_first4 = {r_below:.3f}, n = {Nc_split}")
+print(f"   r_last4  = {r_above:.3f}, n = {len(pythia_HS)-Nc_split}")
 print()
 print("   WHY PERMUTATION IS UNINFORMATIVE:")
 print("   With n=5 near-monotone data points, almost any two opposing")

@@ -55,3 +55,14 @@ env/
 .idea/
 *.swp
 *.swo
+
+# Internal working files (not for public release)
+COWORK_SETUP.md
+PAPER2_EXTENSIONS.md
+outputs/
+temp_eigen/
+*_pdf.md
+*.pdf-*.png
+CLAUDE.md
+pub_fig_frontier_31models.png
+pub_fig_frontier_34models.png

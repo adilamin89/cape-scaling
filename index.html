@@ -1877,15 +1877,15 @@ function drawFrontierChart(){
 
   // Cooperative/tax zones
   c.fillStyle='rgba(6,214,160,0.03)';
-  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7));
-  c.lineTo(X(84),Y(0.52*84+45.7)); c.lineTo(X(84),Y(gH)); c.lineTo(X(30),Y(gH)); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(X(30),Y(0.513*30+46.4));
+  c.lineTo(X(84),Y(0.513*84+46.4)); c.lineTo(X(84),Y(gH)); c.lineTo(X(30),Y(gH)); c.closePath(); c.fill();
   c.fillStyle='rgba(239,71,111,0.03)';
-  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7));
-  c.lineTo(X(84),Y(0.52*84+45.7)); c.lineTo(X(84),Y(gL)); c.lineTo(X(30),Y(gL)); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(X(30),Y(0.513*30+46.4));
+  c.lineTo(X(84),Y(0.513*84+46.4)); c.lineTo(X(84),Y(gL)); c.lineTo(X(30),Y(gL)); c.closePath(); c.fill();
 
-  // Regression line: GPQA = 0.52*SWE + 45.7
+  // Regression line: GPQA = 0.513*SWE + 46.4
   c.strokeStyle='rgba(76,201,240,0.25)'; c.lineWidth=1.5; c.setLineDash([4,4]);
-  c.beginPath(); c.moveTo(X(30),Y(0.52*30+45.7)); c.lineTo(X(84),Y(0.52*84+45.7)); c.stroke(); c.setLineDash([]);
+  c.beginPath(); c.moveTo(X(30),Y(0.513*30+46.4)); c.lineTo(X(84),Y(0.513*84+46.4)); c.stroke(); c.setLineDash([]);
 
   // Zone labels
   c.save(); c.globalAlpha=0.2; c.font='bold 11px Space Mono';

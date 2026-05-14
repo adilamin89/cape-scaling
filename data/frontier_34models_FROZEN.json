@@ -1,0 +1,455 @@
+{
+  "total_models": 34,
+  "n_labs": 10,
+  "labs": [
+    "Alibaba",
+    "Anthropic",
+    "DeepSeek",
+    "Google",
+    "Meta",
+    "MiniMax",
+    "Moonshot",
+    "OpenAI",
+    "Zhipu",
+    "xAI"
+  ],
+  "r_all": 0.7235,
+  "r_core": 0.6535,
+  "n_core": 23,
+  "slope": 0.5131,
+  "intercept": 46.4,
+  "holdout_mae_mean": 9.2,
+  "holdout_mae_std": 2.4,
+  "holdout_labs_3plus": {
+    "Anthropic": {
+      "n_test": 8,
+      "mae_pp": 12.39
+    },
+    "DeepSeek": {
+      "n_test": 4,
+      "mae_pp": 10.56
+    },
+    "Google": {
+      "n_test": 5,
+      "mae_pp": 7.31
+    },
+    "OpenAI": {
+      "n_test": 10,
+      "mae_pp": 6.55
+    }
+  },
+  "holdout_all": {
+    "Alibaba": {
+      "n_test": 1,
+      "mae_pp": 2.95
+    },
+    "Anthropic": {
+      "n_test": 8,
+      "mae_pp": 12.39
+    },
+    "DeepSeek": {
+      "n_test": 4,
+      "mae_pp": 10.56
+    },
+    "Google": {
+      "n_test": 5,
+      "mae_pp": 7.31
+    },
+    "Meta": {
+      "n_test": 1,
+      "mae_pp": 2.43
+    },
+    "MiniMax": {
+      "n_test": 1,
+      "mae_pp": 2.46
+    },
+    "Moonshot": {
+      "n_test": 1,
+      "mae_pp": 1.9
+    },
+    "OpenAI": {
+      "n_test": 10,
+      "mae_pp": 6.55
+    },
+    "Zhipu": {
+      "n_test": 1,
+      "mae_pp": 0.31
+    },
+    "xAI": {
+      "n_test": 2,
+      "mae_pp": 5.39
+    }
+  },
+  "per_lab": {
+    "Alibaba": {
+      "n_total": 1,
+      "n_core": 1,
+      "mean_h_all": 2.820786133398059,
+      "mean_h_core": 2.820786133398059,
+      "std_h": null
+    },
+    "Anthropic": {
+      "n_total": 8,
+      "n_core": 7,
+      "mean_h_all": -9.350103111641932,
+      "mean_h_core": -6.941409660341921,
+      "std_h": 8.67399119743048
+    },
+    "DeepSeek": {
+      "n_total": 4,
+      "n_core": 3,
+      "mean_h_all": 4.188685525513289,
+      "mean_h_core": 1.8514667650335166,
+      "std_h": 6.030209578517402
+    },
+    "Google": {
+      "n_total": 5,
+      "n_core": 4,
+      "mean_h_all": 1.9409531820281132,
+      "mean_h_core": 5.468675771463843,
+      "std_h": 7.120523024490142
+    },
+    "Meta": {
+      "n_total": 1,
+      "n_core": 1,
+      "mean_h_all": 2.350572871798775,
+      "mean_h_core": 2.350572871798775,
+      "std_h": null
+    },
+    "MiniMax": {
+      "n_total": 1,
+      "n_core": 1,
+      "mean_h_all": -2.3289170806876314,
+      "mean_h_core": -2.3289170806876314,
+      "std_h": null
+    },
+    "Moonshot": {
+      "n_total": 1,
+      "n_core": 1,
+      "mean_h_all": 1.815554216125875,
+      "mean_h_core": 1.815554216125875,
+      "std_h": null
+    },
+    "OpenAI": {
+      "n_total": 10,
+      "n_core": 5,
+      "mean_h_all": 3.3847891448554983,
+      "mean_h_core": 3.112867877388399,
+      "std_h": 5.527090379681006
+    },
+    "Zhipu": {
+      "n_total": 1,
+      "n_core": 0,
+      "mean_h_all": -0.2975255770545573,
+      "mean_h_core": null,
+      "std_h": null
+    },
+    "xAI": {
+      "n_total": 2,
+      "n_core": 0,
+      "mean_h_all": 5.066477434402863,
+      "mean_h_core": null,
+      "std_h": 3.6002088107875565
+    }
+  },
+  "subset_correlations": {
+    "full_panel": {
+      "r": 0.7234905559664709,
+      "n": 34
+    },
+    "core": {
+      "r": 0.6535205907379529,
+      "n": 23
+    },
+    "swe_ge40": {
+      "r": 0.6866292601541156,
+      "n": 32
+    },
+    "no_compute_tier": {
+      "r": 0.7166886133667421,
+      "n": 32
+    }
+  },
+  "deepseek_swing_pp": 15.9,
+  "models": [
+    {
+      "name": "Claude 3.5 Sonnet",
+      "lab": "Anthropic",
+      "swe": 49.0,
+      "gpqa": 59.4,
+      "h": -12.1,
+      "subset": "Core"
+    },
+    {
+      "name": "Claude 3.7 Sonnet",
+      "lab": "Anthropic",
+      "swe": 62.3,
+      "gpqa": 68.0,
+      "h": -10.3,
+      "subset": "Core"
+    },
+    {
+      "name": "Claude Haiku 4.5",
+      "lab": "Anthropic",
+      "swe": 73.3,
+      "gpqa": 71.0,
+      "h": -13.0,
+      "subset": "Core"
+    },
+    {
+      "name": "Claude Sonnet 4.5",
+      "lab": "Anthropic",
+      "swe": 77.2,
+      "gpqa": 83.4,
+      "h": -2.6,
+      "subset": "Core"
+    },
+    {
+      "name": "Claude Opus 4.5",
+      "lab": "Anthropic",
+      "swe": 80.9,
+      "gpqa": 87.0,
+      "h": -0.9,
+      "subset": "Core"
+    },
+    {
+      "name": "Claude Sonnet 4.6",
+      "lab": "Anthropic",
+      "swe": 79.6,
+      "gpqa": 74.1,
+      "h": -13.1,
+      "subset": "Core"
+    },
+    {
+      "name": "Claude Opus 4.6",
+      "lab": "Anthropic",
+      "swe": 80.8,
+      "gpqa": 91.3,
+      "h": 3.5,
+      "subset": "Core"
+    },
+    {
+      "name": "Gemini 2.0 Flash",
+      "lab": "Google",
+      "swe": 60.4,
+      "gpqa": 65.2,
+      "h": -12.2,
+      "subset": "Extended"
+    },
+    {
+      "name": "Gemini 2.5 Pro",
+      "lab": "Google",
+      "swe": 63.8,
+      "gpqa": 84.0,
+      "h": 4.9,
+      "subset": "Core"
+    },
+    {
+      "name": "Gemini 3 Flash",
+      "lab": "Google",
+      "swe": 78.0,
+      "gpqa": 90.4,
+      "h": 4.0,
+      "subset": "Core"
+    },
+    {
+      "name": "Gemini 3 Pro",
+      "lab": "Google",
+      "swe": 76.2,
+      "gpqa": 91.9,
+      "h": 6.4,
+      "subset": "Core"
+    },
+    {
+      "name": "Gemini 3.1 Pro",
+      "lab": "Google",
+      "swe": 80.6,
+      "gpqa": 94.3,
+      "h": 6.6,
+      "subset": "Core"
+    },
+    {
+      "name": "GPT-4o",
+      "lab": "OpenAI",
+      "swe": 33.2,
+      "gpqa": 53.6,
+      "h": -9.8,
+      "subset": "Extended"
+    },
+    {
+      "name": "GPT-5",
+      "lab": "OpenAI",
+      "swe": 74.9,
+      "gpqa": 85.7,
+      "h": 0.9,
+      "subset": "Core"
+    },
+    {
+      "name": "GPT-5.1",
+      "lab": "OpenAI",
+      "swe": 76.3,
+      "gpqa": 88.1,
+      "h": 2.6,
+      "subset": "Core"
+    },
+    {
+      "name": "GPT-5.2 Pro",
+      "lab": "OpenAI",
+      "swe": 80.0,
+      "gpqa": 93.2,
+      "h": 5.8,
+      "subset": "Extended"
+    },
+    {
+      "name": "GPT-5.4 std",
+      "lab": "OpenAI",
+      "swe": 77.2,
+      "gpqa": 84.2,
+      "h": -1.8,
+      "subset": "Core"
+    },
+    {
+      "name": "GPT-5.4 xhigh",
+      "lab": "OpenAI",
+      "swe": 77.2,
+      "gpqa": 92.0,
+      "h": 6.0,
+      "subset": "Extended"
+    },
+    {
+      "name": "DeepSeek V3.2",
+      "lab": "DeepSeek",
+      "swe": 74.4,
+      "gpqa": 79.9,
+      "h": -4.7,
+      "subset": "Core"
+    },
+    {
+      "name": "Kimi K2.5",
+      "lab": "Moonshot",
+      "swe": 76.8,
+      "gpqa": 87.6,
+      "h": 1.8,
+      "subset": "Core"
+    },
+    {
+      "name": "Qwen3.5-397B",
+      "lab": "Alibaba",
+      "swe": 76.4,
+      "gpqa": 88.4,
+      "h": 2.8,
+      "subset": "Core"
+    },
+    {
+      "name": "MiniMax M2.5",
+      "lab": "MiniMax",
+      "swe": 80.2,
+      "gpqa": 85.2,
+      "h": -2.3,
+      "subset": "Core"
+    },
+    {
+      "name": "Llama 4 Maverick",
+      "lab": "Meta",
+      "swe": 70.3,
+      "gpqa": 84.8,
+      "h": 2.4,
+      "subset": "Core"
+    },
+    {
+      "name": "o1-preview",
+      "lab": "OpenAI",
+      "swe": 41.3,
+      "gpqa": 73.3,
+      "h": 5.7,
+      "subset": "Extended"
+    },
+    {
+      "name": "o1",
+      "lab": "OpenAI",
+      "swe": 41.0,
+      "gpqa": 78.0,
+      "h": 10.6,
+      "subset": "Extended"
+    },
+    {
+      "name": "o3-mini",
+      "lab": "OpenAI",
+      "swe": 49.3,
+      "gpqa": 79.7,
+      "h": 8.0,
+      "subset": "Core"
+    },
+    {
+      "name": "o3",
+      "lab": "OpenAI",
+      "swe": 69.1,
+      "gpqa": 87.7,
+      "h": 5.9,
+      "subset": "Core"
+    },
+    {
+      "name": "Claude 3.5 Haiku",
+      "lab": "Anthropic",
+      "swe": 40.6,
+      "gpqa": 41.0,
+      "h": -26.2,
+      "subset": "Extended"
+    },
+    {
+      "name": "DeepSeek-V2.5",
+      "lab": "DeepSeek",
+      "swe": 16.8,
+      "gpqa": 66.2,
+      "h": 11.2,
+      "subset": "Extended"
+    },
+    {
+      "name": "DeepSeek-V3",
+      "lab": "DeepSeek",
+      "swe": 42.0,
+      "gpqa": 75.9,
+      "h": 8.0,
+      "subset": "Core"
+    },
+    {
+      "name": "DeepSeek-R1",
+      "lab": "DeepSeek",
+      "swe": 44.6,
+      "gpqa": 71.5,
+      "h": 2.2,
+      "subset": "Core"
+    },
+    {
+      "name": "Grok 3",
+      "lab": "xAI",
+      "swe": 57.6,
+      "gpqa": 84.6,
+      "h": 8.7,
+      "subset": "Extended"
+    },
+    {
+      "name": "Grok 4",
+      "lab": "xAI",
+      "swe": 69.1,
+      "gpqa": 83.3,
+      "h": 1.5,
+      "subset": "Extended"
+    },
+    {
+      "name": "GLM-5",
+      "lab": "Zhipu",
+      "swe": 77.8,
+      "gpqa": 86.0,
+      "h": -0.3,
+      "subset": "Extended"
+    }
+  ],
+  "regression_equation": "GPQA = 0.513 * SWE + 46.4",
+  "generated": "2026-05-04 regenerate_frontier_stats.py",
+  "NOTES": {
+    "r_0.854_deprecated": "Paper previously claimed core r=+0.854 (n=20). This is not reproducible from current data. It was from an early Session 16 computation on a different subset. The reconciled core (n=25, excluding 7 models with unverified/mismatched scores) gives r=0.725. Full 34-panel gives r=0.723. Both are strongly cooperative (p<10^-6). Use r=+0.72 as headline.",
+    "core_extended_purpose": "Core/extended split is for DATA PROVENANCE (verified vs unverified scores), not for different correlation claims. Both subsets show cooperative coupling.",
+    "regression_frozen": "2026-05-04 via regenerate_frontier_stats.py"
+  }
+}

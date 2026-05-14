@@ -1,0 +1,59 @@
+[
+  {
+    "id": 1,
+    "name": "SWE saturation",
+    "deadline": "Dec 2026",
+    "pass": "Top-5 SWE spread < 2pp",
+    "fail": "Spread > 5pp",
+    "status": "likely_fail",
+    "current_spread": 7.0
+  },
+  {
+    "id": 2,
+    "name": "IFEval activation",
+    "deadline": "Dec 2026",
+    "pass": "r(GPQA, IFEval) > +0.6, n >= 8",
+    "fail": "r < 0.3",
+    "status": "pending"
+  },
+  {
+    "id": 3,
+    "name": "DeepSeek coding-first",
+    "deadline": "Next 2 releases",
+    "pass": "h < 0 both",
+    "fail": "h > +5 either",
+    "status": "pending"
+  },
+  {
+    "id": 4,
+    "name": "Google reasoning advantage",
+    "deadline": "Next 2 releases",
+    "pass": "h > +3 both",
+    "fail": "h < 0 either",
+    "status": "pending"
+  },
+  {
+    "id": 5,
+    "name": "Cooperative coupling persists",
+    "deadline": "May 2027",
+    "pass": "r(SWE, GPQA) > +0.5, n >= 30",
+    "fail": "r < 0.3",
+    "status": "pending"
+  },
+  {
+    "id": 6,
+    "name": "IFEval -> HLE handoff (Nc4)",
+    "deadline": "Dec 2027",
+    "pass": "IFEval spread < 3pp, HLE > 15pp",
+    "fail": "IFEval > 8pp",
+    "status": "pending"
+  },
+  {
+    "id": 7,
+    "name": "SWE-HLE decoupling",
+    "deadline": "Dec 2026",
+    "pass": "r(SWE, HLE) < 0, n >= 10",
+    "fail": "r > +0.3",
+    "status": "pending"
+  }
+]

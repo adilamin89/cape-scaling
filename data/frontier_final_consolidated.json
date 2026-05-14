@@ -1,9 +1,9 @@
 {
-  "total_models": 31,
-  "r_all": 0.7294142090425955,
+  "total_models": 34,
+  "r_all": 0.7235,
   "p_all": 3.2388070812895497e-06,
-  "slope": 0.5192906843819869,
-  "intercept": 45.661201796897174,
+  "slope": 0.5131,
+  "intercept": 46.4,
   "gpt54_compute_delta_h": 7.799999999999997,
   "per_lab_h_mean": {
     "Anthropic": -9.053494934207958,
@@ -15,7 +15,7 @@
     "MiniMax": -2.1083146843325125,
     "Meta": 2.632663091049139
   },
-  "n_labs": 8,
+  "n_labs": 10,
   "models": [
     {
       "name": "Claude 3.5 Sonnet",
@@ -264,6 +264,30 @@
       "lab": "DeepSeek",
       "date": "2025-01",
       "h": 2.678433679666213
+    },
+    {
+      "name": "Grok 3",
+      "swe": 57.6,
+      "gpqa": 84.6,
+      "lab": "xAI",
+      "date": "2025-02",
+      "h": 8.95
+    },
+    {
+      "name": "Grok 4",
+      "swe": 69.1,
+      "gpqa": 83.3,
+      "lab": "xAI",
+      "date": "2026-02",
+      "h": 1.67
+    },
+    {
+      "name": "GLM-5",
+      "swe": 77.8,
+      "gpqa": 86.0,
+      "lab": "Zhipu",
+      "date": "2026-02",
+      "h": -0.16
     }
   ]
 }

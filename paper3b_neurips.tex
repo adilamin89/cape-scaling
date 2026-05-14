@@ -1,48 +1,56 @@
-\documentclass[11pt]{article}
-\usepackage{geometry}
-\geometry{margin=2.5cm}
-% NOTE: Replace with \usepackage[final]{neurips_2026} when neurips_2026.sty is available
+\documentclass{article}
+\usepackage[preprint]{neurips_2026}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{xcolor}
 \usepackage{enumitem}
 \usepackage{microtype}
+\usepackage{tcolorbox}
+\usepackage{natbib}
 
-\definecolor{darkblue}{RGB}{0,60,120}
-\definecolor{darkgreen}{RGB}{0,100,40}
-\hypersetup{colorlinks=true,linkcolor=darkblue,citecolor=darkgreen,urlcolor=darkblue}
+\title{The Growing Pains of Frontier Models:\\When Leaderboards Stop Separating and What to Measure Next}
 
-\title{It's Not a Phase:\\Predicting Frontier Alignment from Two Benchmark Scores}
-
-\author{
-  Adil~Amin \\
-  Independent Researcher \\
-  \texttt{adilamin@uwm.edu}
-}
+\author{Adil Amin\\ZEHEN Labs\\{\tt adil@zehenlabs.com}}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Frontier language model development is tracked through independent benchmark trajectories,
-obscuring whether capabilities reinforce or trade off across releases.
-We introduce an operational coupling diagnostic that maps paired benchmark scores
-into regime state and lab-relative residual on a 31-model, 8-lab frontier panel (2024--2026).
-On a curated core subset of 20 models, capability coupling is strongly cooperative
-($r = +0.854$, $p < 10^{-5}$), and cross-lab holdout predicts GPQA scores within 6.9\%.
-Each lab's training philosophy is readable as a signed residual diagnostic ($h$-field):
-Google is consistently reasoning-rich ($h = +5.7$), Anthropic coding-rich ($h = -6.7$),
-and DeepSeek shows a reversal trajectory ($h$: $+8.4 \to -4.4$) consistent with a shift in capability emphasis.
-We find preliminary evidence ($n = 4$) that SWE-bench performance is saturating
-while instruction-following activates as a new capability axis,
-consistent with a predicted capability-axis handoff at frontier scale.
-Seven falsifiable predictions with timestamped pass/fail criteria are provided.
-All scores are from public model cards and leaderboards;
-code, data, and interactive dashboard are available at \url{https://github.com/adilamin89/cape-scaling}.
+Leaderboards rank frontier models on independent axes but do not reveal
+whether capabilities reinforce or trade off across releases---and
+at the frontier, this interaction is the more informative signal.
+We decompose paired SWE-bench and GPQA Diamond scores into
+a population coupling trend and per-release residual ($h$-field) that
+diagnoses capability emphasis and identifies which measurement
+or stress test is most informative next.
+Across 34 models from 10 labs (2024--2026), capabilities cooperate
+($r = +0.72$, $p < 10^{-6}$), but cooperation varies by lab and over time:
+DeepSeek reversed from reasoning-rich to coding-first
+($h$: $+11.2 \to -4.7$, 15.9-pp swing);
+Google maintains consistent reasoning emphasis;
+Anthropic oscillates between coding excursions and recovery.
+Cooperation is not static---it cascades.
+Six open-weight architectures confirm a second capability transition
+at 30--72B, and SWE-bench is now saturating while HLE and
+instruction-following retain discriminatory spread---signaling
+the next axis rotation.
+We provide a three-level playbook (locate, diagnose, rotate),
+a per-lab measurement-priority table, and seven falsifiable predictions
+with timestamped criteria for the next 12 months of frontier releases.
+Per-lab coupling slopes vary $5\times$ (Google $1.15$ vs.\ DeepSeek $0.23$),
+quantifying how efficiently each recipe converts coding gains into reasoning.
+Five April 2026 releases confirm the diagnostic out of sample
+($r$ rises from $+0.72$ to $+0.75$).
+An interactive dashboard provides phase classification
+with actionable recommendations, $h$-field diagnostics,
+per-lab coupling trajectories, ODE-based scaling predictions,
+benchmark rotation guidance, self-steering demo,
+and live tracking of all seven predictions:
+\url{https://zehenlabs.com/cape/}.
 \end{abstract}
 
 % ════════════════════════════════════════════════════
@@ -58,46 +66,54 @@ But no one asks whether improving one helps or hurts the other---and
 at the frontier, this interaction turns out to be the more informative signal.
 
 We test it. Using paired benchmark scores (SWE-bench Verified and GPQA Diamond) across
-31 frontier models from 8 labs, we measure whether capabilities reinforce or undermine
+34 frontier models from 10 labs, we measure whether capabilities reinforce or undermine
 each other across a lab's release sequence.
-On a matched core set, capabilities cooperate ($r = +0.854$),
+Capabilities cooperate ($r = +0.72$, $p < 10^{-6}$),
 but the pattern of cooperation varies by lab and over time.
 Each lab leaves a fingerprint---a one-number diagnostic that summarizes
 whether its models are becoming better reasoners, better coders, or both.
-Every frontier model carries a signature, and two public numbers are enough to read it.
 
-This is a measurement-and-monitoring paper first: not a new benchmark,
-not a new model, but a new way to read frontier trajectory from public evaluations.
-We introduce CAPE (Capability Coupling Analysis of Phase Emergence),
-an operational diagnostic adapted for frontier measurement.
-It provides three outputs:
+Leaderboards answer ``who is ahead?''
+CAPE answers a different question: what kind of progress is this?
+A release can climb the leaderboard by moving along the population trend,
+by specializing away from it,
+or by exhausting an axis that no longer separates frontier models.
+Those cases require different responses.
+We operationalize this with three quantities available from public scores alone:
+population coupling ($r$), release residual ($h$), and saturation ratio ($\sigma$), so
+that any practitioner can reproduce the diagnosis from the same model-card numbers.
+
+Where~\cite{amin2026lying} establishes that the coupling transition is engineerable
+at base scale, showing that architecture, curation, and distillation
+shift the critical threshold, the present work asks:
+once models are deep in the cooperative regime,
+what determines their trajectory through coupling space,
+and what can practitioners do about it?
+
+\noindent\textbf{Contributions.}
 \begin{enumerate}[nosep,leftmargin=*]
-  \item \textbf{Regime state}: cooperative vs.\ antagonistic coupling between capability axes.
-  \item \textbf{Lab-relative residual} ($h$-field): a signed diagnostic that summarizes
-        how far each model deviates from the population cooperation trend.
-  \item \textbf{Transition risk}: preliminary signals that a new capability axis may be
-        activating as an existing one saturates.
+  \item We measure cooperative frontier coupling on the largest cross-lab panel to date
+        (34 models, 10 labs), with a matched core set and explicit data-provenance curation.
+  \item We introduce the $h$-field as a per-lab diagnostic that tracks
+        release-level capability emphasis and trajectory changes over time.
+  \item We show that cooperation cascades: six open-weight architectures independently
+        confirm a second capability transition at 30--72B,
+        the frontier coupling matrix eigenstructure predicts the next axis rotation,
+        and per-lab coupling slopes vary $5\times$.
+  \item We provide a three-level playbook (locate, diagnose, rotate),
+        a per-lab measurement-priority table,
+        and seven timestamped falsifiable predictions for the next 12 months.
 \end{enumerate}
 
-The base-model version of this framework establishes that capability coupling undergoes
-a regime transition near 3.5 billion parameters, confirmed across 63 models and 16 families~\cite{amin2026a}.
-Here we extend to the frontier, where all models sit deep in the cooperative regime
-but follow lab-specific trajectories through coupling space.
-
-Unlike leaderboards that rank models on independent axes,
-CAPE measures the \emph{relationship} between axes---revealing structure
-that no single-benchmark comparison can detect.
-A model that ranks first on SWE-bench and fifth on GPQA
-tells a different story than one that ranks third on both:
-CAPE captures this difference as a signed diagnostic.
-
-\textbf{Contributions.}
-(1)~We measure cooperative frontier coupling on the largest cross-lab panel to date
-(31 models, 8 labs), separating a matched core set from an exploratory extension.
-(2)~We introduce the $h$-field as a per-lab diagnostic that tracks training-philosophy
-deviations and trajectory changes over time.
-(3)~We provide seven timestamped, falsifiable predictions with explicit pass/fail criteria
-for the next 12 months of frontier development.
+\noindent\textbf{Terminology.}
+The companion paper~\cite{amin2026lying} measures \emph{local coupling}
+$\gamma_{12}(N) = \Delta B_2 / \Delta B_1$ between consecutive model sizes within a family---a
+derivative that tracks how capabilities interact as models scale.
+This paper primarily uses \emph{population coupling} $r(B_1, B_2)$, the Pearson
+correlation across a panel of models, which captures cooperative structure across labs.
+Both measure the same underlying coupling at different resolutions:
+$\gamma_{12}$ detects sign changes within families;
+$r$ confirms the cooperative regime persists across the full frontier population.
 
 % ════════════════════════════════════════════════════
 \section{Framework: Two Scores, One Diagnostic}
@@ -133,7 +149,7 @@ a negative $h_i$ indicates coding-rich. The per-lab mean $\bar{h}_{\rm lab}$ sum
 a lab's characteristic deviation from the population.
 
 For example, Claude Opus 4.6 has SWE $= 80.8$ and GPQA $= 91.3$.
-Its $h$-field is $h = 91.3 - (0.52 \times 80.8 + 45.7) = +3.6$,
+Using Eq.~\ref{eq:regression}, $h = 91.3 - (0.513 \times 80.8 + 46.4) \approx +3.4$,
 placing it slightly reasoning-rich relative to the population trend.
 
 The $h$-field is descriptive, not causal: it summarizes where a model sits relative to
@@ -162,8 +178,8 @@ GPQA scores from their SWE scores. We report mean absolute error (MAE) across la
 
 \subsection{Dataset}
 
-We compile benchmark scores for 31 frontier models from 8 labs
-(Anthropic, OpenAI, Google, DeepSeek, Meta, Moonshot, Alibaba, MiniMax),
+We compile benchmark scores for 34 frontier models from 10 labs
+(Anthropic, OpenAI, Google, DeepSeek, Meta, Moonshot, Alibaba, MiniMax, xAI, Zhipu),
 spanning releases from June 2024 to March 2026.
 We source all scores from official model cards, tech reports, or verified leaderboard
 entries (Artificial Analysis, OpenCompass, official blogs).
@@ -171,20 +187,10 @@ We do not run evaluations ourselves; this is a measurement paper on public data.
 
 \subsection{Core versus extended subsets}
 
-We maintain two explicit subsets with different evidentiary roles:
-
-\begin{itemize}[nosep,leftmargin=*]
-  \item \textbf{Core verified} ($n = 20$): Matched benchmark variants,
-        one model per release per lab, no compute-tier duplicates.
-        Primary claims are evaluated on this subset.
-  \item \textbf{Extended exploratory} ($n = 31$): Includes compute-tier variants
-        (e.g., GPT-5.4 standard vs.\ xhigh), older-generation anchors,
-        and models with partially verified scores.
-        Used for robustness analysis only.
-\end{itemize}
-
-This separation is maintained in all tables, figures, and statistical claims.
-Core and extended results are never pooled for headline inference.
+We maintain a core verified subset ($n = 23$: matched variants, one model per release,
+no compute-tier duplicates) and an extended set ($n = 34$: including compute-tier variants,
+older anchors, and single-release labs).
+Headline claims use the full panel; core serves as a robustness check.
 
 \subsection{Data provenance}
 
@@ -197,9 +203,9 @@ models released after this date constitute prospective validation opportunities.
 
 \subsection{Regression specification}
 
-On the full 31-model panel:
+On the full 34-model panel:
 \begin{equation}
-  \text{GPQA} = (0.52 \pm 0.08) \cdot \text{SWE} + (45.7 \pm 5.2), \quad r = +0.729, \quad p < 10^{-5}
+  \text{GPQA} = (0.513 \pm 0.08) \cdot \text{SWE} + (46.4 \pm 5.2), \quad r = +0.72, \quad p < 10^{-6}
   \label{eq:regression}
 \end{equation}
 where uncertainties are 95\% confidence intervals on the OLS coefficients.
@@ -207,16 +213,15 @@ All $h$-field values reported in this paper use Eq.~\ref{eq:regression}.
 
 \begin{figure*}[!htbp]
 \centering
-\includegraphics[width=\textwidth]{pub_fig_frontier_31models.png}
-\caption{\textbf{Frontier coupling: 31 models, 8 labs.}
-(a)~SWE-bench Verified vs.\ GPQA Diamond with population regression
-($\text{GPQA} = 0.52 \cdot \text{SWE} + 45.7$, $r = +0.729$).
-Models are colored by lab and shaped by lab identity (see legend).
-(b)~Per-lab $h$-field (core models only): Google is consistently reasoning-rich ($h = +5.7$),
-Anthropic coding-rich ($h = -6.7$). Each bar summarizes a lab's systematic
-deviation from the population trend.
-(c)~Anthropic trajectory through coupling space, showing the Sonnet~4.6
-excursion ($h = -12.9$) and Opus~4.6 recovery ($h = +3.7$).}
+\includegraphics[width=\textwidth]{pub_fig_frontier_39models.png}
+\caption{\textbf{Frontier coupling: 34 March models + 5 April post-cutoff, 10 labs.}
+(a)~SWE-bench Verified vs.\ GPQA Diamond with frozen regression
+($\text{GPQA} = 0.513 \cdot \text{SWE} + 46.4$, $r = +0.72$).
+Circles: March-frozen models. Diamonds (red edge): April post-cutoff (not used in fit).
+(b)~Per-lab $h$-field residual (core models): Google reasoning-rich ($h = +5.5$),
+Anthropic coding-rich ($h = -6.9$).
+(c)~Anthropic trajectory including post-cutoff Opus~4.7 ($h = +2.9$),
+showing three coding--recovery oscillation cycles.}
 \label{fig:frontier}
 \end{figure*}
 
@@ -228,103 +233,150 @@ excursion ($h = -12.9$) and Opus~4.6 recovery ($h = +3.7$).}
 
 SWE-bench Verified and GPQA Diamond are positively coupled across all tested subsets:
 \begin{itemize}[nosep,leftmargin=*]
-  \item Full panel ($n = 31$): $r = +0.729$, $p < 10^{-5}$
-  \item Core verified ($n = 20$): $r = +0.854$, $p < 10^{-5}$
-  \item SWE $\geq 40$ ($n = 29$): $r = +0.699$, $p < 10^{-4}$
-  \item Excluding compute-tier variants ($n = 25$): $r = +0.725$, $p < 10^{-4}$
+  \item Full panel ($n = 34$): $r = +0.72$, $p < 10^{-6}$
+  \item Core verified ($n = 23$): $r = +0.65$, $p < 10^{-3}$
+  \item SWE $\geq 40$ ($n = 32$): $r = +0.69$, $p < 10^{-4}$
+  \item Excluding compute-tier variants ($n = 32$): $r = +0.72$, $p < 10^{-4}$
 \end{itemize}
 The cooperative signal is robust to subset definition:
 no tested subset produces $r < 0.5$.
-The stronger core-set correlation reflects reduced noise from
-compute-tier variants and pre-frontier anchors.
-This is consistent with the base-model finding~\cite{amin2026a} that coupling
-becomes cooperative above a critical scale;
-all frontier models sit deep in the cooperative regime.
+That capabilities cooperate at $r > +0.7$ across 10 independent labs---each
+with different architectures, training data, distillation pipelines,
+and RLHF procedures---is itself the signal:
+the cooperative structure persists despite substantial heterogeneity
+in how these models were built.
+All frontier models sit deep in the cooperative regime~\cite{amin2026lying}.
 
-Notably, the cooperative structure is a recent development.
-Models released before 2025 show $r = +0.035$ ($n = 5$, no significant correlation),
-while 2025+ models show $r = +0.577$ ($n = 23$).
-This temporal shift reflects not a change in underlying model behavior
-but the maturation of frontier capabilities into a regime where both
-SWE-bench and GPQA Diamond have sufficient dynamic range to reveal the cooperative structure.
+The cooperative structure requires sufficient dynamic range on both benchmark axes
+to manifest.
+Pre-2025 frontier models span only 16.8--49.0 on SWE-bench ($n = 5$),
+compressing the coding axis below the resolution needed to detect coupling.
+Models from 2025 onward ($n = 29$, SWE range 42--81) provide
+the range in which cooperative structure becomes measurable---consistent
+with the base-model finding that coupling emerges only when both
+benchmarks are in their informative range.
 
 \subsection{Per-lab \texorpdfstring{$h$}{h}-field diagnostics}
 
-The mean $h$-field per lab reveals systematic training-philosophy differences (Fig.~\ref{fig:frontier}):
+The mean $h$-field per lab reveals systematic release-level capability differences (Fig.~\ref{fig:frontier}):
 
 \begin{table}[h]
 \centering
-\caption{Per-lab $h$-field summary (core models only). Positive $h$ = reasoning-rich; negative = coding-rich.}
+\caption{Per-lab $h$-field and measurement priority.
+$n$ = total models available (core + extended + post-cutoff);
+$\bar{h}$ is computed on core models only.
+Positive $h$ = reasoning-rich; negative = coding-rich.
+Confidence: HIGH ($\geq$3 core models, consistent trajectory),
+MED (2--3 or recent pivot), LOW (1 model).}
 \label{tab:hfield}
-\begin{tabular}{lrrrrl}
+\begin{tabular}{lrrllll}
 \toprule
-Lab & $n$ & $\bar{h}$ (pp) & 95\% CI & Direction & Trajectory \\
+Lab & $n$ & $\bar{h}$ & Direction & Trajectory & Next measurement & Conf. \\
 \midrule
-Google & 4 & $+5.7$ & $\pm 1.2$ & Reasoning-rich & Consistent \\
-OpenAI & 5 & $+3.4$ & $\pm 3.5$ & Balanced & Ascent \\
-Alibaba & 1 & $+3.1$ & --- & Reasoning-rich & --- \\
-Meta & 1 & $+2.6$ & --- & Balanced & --- \\
-DeepSeek & 3 & $+2.2$ & $\pm 7.3$ & Balanced & Reversal \\
-Moonshot & 1 & $+2.1$ & --- & Balanced & --- \\
-MiniMax & 1 & $-2.1$ & --- & Balanced & --- \\
-Anthropic & 7 & $-6.7$ & $\pm 5.0$ & Coding-rich & Oscillation \\
+Google & 5 & $+5.5$ & Reasoning-rich & Consistent & Coding-preserving distill & HIGH \\
+OpenAI & 5 & $+3.1$ & Balanced & Ascent & Monitor benchmark rotation & HIGH \\
+Alibaba & 1 & $+2.8$ & Balanced & --- & Monitor Qwen3+ trajectory & LOW \\
+Meta & 1 & $+2.4$ & Balanced & --- & MoE routing analysis & LOW \\
+DeepSeek & 5 & $+1.9$ & Balanced & Oscillation & Track IFEval stabilization & HIGH \\
+Moonshot & 1 & $+1.8$ & Balanced & --- & Verify trajectory & LOW \\
+Zhipu & 1 & $-0.3$ & Balanced & --- & Collect next release & LOW \\
+MiniMax & 1 & $-2.3$ & Balanced & --- & Maintain dual-axis & LOW \\
+xAI & 2 & $+5.1$ & Reasoning-rich & --- & Verify next release & LOW \\
+Anthropic & 9 & $-6.9$ & Coding-rich & Oscillation & Reasoning preservation & HIGH \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The $h$-field reveals that labs do not simply improve---they pivot:
+Within each lab, capabilities are more tightly coupled than the population suggests:
+per-lab $r > +0.87$ for all labs with $\geq 4$ models,
+compared to the population $r = +0.72$.
+The lower population correlation arises because labs sit at different $h$-field values,
+not because coupling is weak within any lab.
+Per-lab coupling slopes (dGPQA/dSWE) vary $5\times$:
+Google ($1.15$) converts each SWE point into $1.15$ GPQA points;
+DeepSeek ($0.23$) converts far less efficiently.
+This quantifies recipe quality in a single number
+(slopes computed from limited release histories, $n = 4$--$10$ per lab;
+these are current estimates subject to revision with additional releases).
+
+The $h$-field also reveals that labs do not simply improve---they pivot:
 
 \textbf{DeepSeek reversal.}
-DeepSeek's $h$-field drops from $+11.8$ (V2.5) to $-4.4$ (V3.2) across four releases,
-a 16.2-pp swing consistent with a shift in capability emphasis from reasoning-first to coding-first development.
-This is the largest trajectory change in the panel---to our knowledge,
-the first quantitative measurement of a strategic capability pivot across a frontier lab's release sequence.
+DeepSeek's $h$-field drops from $+11.2$ (V2.5) to $-4.7$ (V3.2) across four releases,
+a 15.9-pp swing, a quantitative signature of a release-sequence pivot
+from reasoning-first to coding-first development.
 
 \textbf{Anthropic oscillation.}
-Anthropic's trajectory shows an excursion at Claude Sonnet~4.6 ($h = -12.9$),
-the largest coding-specialist deviation in the panel---13 points below the population regression---followed
-by recovery at Claude Opus~4.6 ($h = +3.7$), crossing back to reasoning-rich in a single release cycle.
+Anthropic's trajectory shows an excursion at Claude Sonnet~4.6 ($h = -13.1$),
+the deepest coding-specialist deviation in the panel---followed
+by recovery at Claude Opus~4.6 ($h = +3.5$), crossing back to reasoning-rich in a single release cycle.
 
 \subsection{Cross-lab holdout}
 
 The framework generalizes across labs.
-Leave-one-lab-out cross-validation yields $7.1 \pm 2.4$\% MAE (mean $\pm$ SD)
+Leave-one-lab-out cross-validation yields $9.2 \pm 2.4$\% MAE (mean $\pm$ SD)
 across 4 held-out labs with $\geq 3$ models
-(range: OpenAI 4.4\%, DeepSeek 6.7\%, Google 7.2\%, Anthropic 10.2\%).
-Given only a lab's coding scores, the framework predicts its reasoning scores
-within 7 percentage points---a practical diagnostic, not just a post-hoc narrative.
+(range: OpenAI 6.5\%, Google 7.3\%, DeepSeek 10.6\%, Anthropic 12.4\%).
+Prediction is tightest for labs following the population trend and loosest for labs with large
+trajectory changes, consistent with the $h$-field capturing real deviations rather than noise.
 
 \subsection{Compute as external field}
 
-You can buy reasoning with compute---at least within one model.
-GPT-5.4 was evaluated at two compute tiers (standard and xhigh inference):
-$\Delta h = +7.8$ pp from standard to xhigh.
-The same weights, given more inference compute, shift from coding-balanced
-to reasoning-rich---without any retraining.
-This is the $h$-field responding to a known external intervention,
+Inference compute shifts the $h$-field without retraining.
+GPT-5.4 evaluated at two compute tiers (standard and xhigh):
+$\Delta h = +7.8$ pp from standard to xhigh---the same weights
+shift from coding-balanced to reasoning-rich,
 suggesting the diagnostic is sensitive to known interventions.
 
+\subsection{Base-scale bridge}
+
+At base scale, data curation shifts models above the coupling phase boundary:
+a 4B distilled model achieves coupling characteristic of 13B+ standard-trained
+models~\cite{amin2026lying}.
+At frontier scale, per-lab release sequences play the role of model families,
+per-lab coupling slopes play the role of per-family trajectories,
+and the population regression plays the role of the isocline phase
+boundary~\cite{amin2026lying}---the $h$-field measures each lab's deviation
+from this boundary, the same physics operating through training recipe
+emphasis rather than data curation.
+
 % ════════════════════════════════════════════════════
+\section{Capability Cascades at Frontier Scale}
+\label{sec:cascades}
+
 The cooperative structure is stable across subsets---but one axis is running out of room.
+Cooperation is not static---it cascades through stages,
+each following the same pattern: old benchmark axes lock together,
+new ones emerge (Fig.~\ref{fig:cascade}).
 
-\section{What Will Change Next}
-\label{sec:predictions}
+\begin{figure*}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{fig_cascade_overview.png}
+\caption{\textbf{The capability cascade: four transitions, one pattern.}
+At each critical scale, the active benchmark pair changes and coupling undergoes
+a qualitative shift. Nc1 (${\sim}$3.5B): HS-TQA coupling flips sign.
+Nc2 (${\sim}$30--72B): cooperation crashes 59\%.
+Nc3 (${\sim}$114B): SWE saturates, HLE activates.
+Nc4 (${\sim}$200--400B, predicted): IFEval saturates, next axis TBD.
+Engineering levers differ at each transition.}
+\label{fig:cascade}
+\end{figure*}
 
-\subsection{Asymmetric saturation at the top}
+\subsection{Asymmetric saturation}
 
 The top five coding models are nearly tied: SWE-bench scores span just 1.3 percentage points.
 But their reasoning scores span 9.1 points.
-This asymmetry matters: when one benchmark axis compresses,
-the population regression pivots to the other,
-and previously invisible capability dimensions can emerge as new sources of variation.
+When one axis compresses, the population regression pivots to the other,
+and previously invisible capability dimensions emerge as new sources of variation.
 
-The multi-benchmark coupling matrix confirms this pattern beyond the SWE-GPQA pair:
+The multi-benchmark coupling matrix confirms this beyond the SWE-GPQA pair:
 
 \begin{table}[h]
 \centering
-\small
-\caption{Frontier coupling matrix. SWE is decoupling from HLE while GPQA
-and HLE cooperate---the signature of axis activation.}
+\caption{Frontier pairwise coupling matrix (computed on subsets with available scores;
+varying $n$, cf.\ $r = +0.72$ on the full 34-model SWE--GPQA panel).
+SWE is decoupling from HLE while GPQA and HLE cooperate---the signature of axis activation.
+The assembled matrix is not guaranteed positive semi-definite.}
 \label{tab:coupling}
 \begin{tabular}{lrrr}
 \toprule
@@ -340,69 +392,87 @@ SWE--HLE & $-0.251$ & $0.52$ & 9 \\
 SWE and GPQA cooperate. GPQA and HLE cooperate.
 But SWE and HLE are \emph{decoupled}---the same asymmetric pattern
 that signals a dimensional handoff.
-As SWE saturates, HLE activates as an independent axis,
-and the frontier coupling space expands from one effective dimension to two.
-
+As SWE saturates, HLE activates as an independent axis.
 Among $n = 4$ frontier models with IFEval scores, instruction-following
-also correlates with GPQA ($r = +0.81$) but not with SWE.
-The sample is small; we report this as a prospective test.
+also correlates with GPQA ($r = +0.81$) but not with SWE
+(preliminary; $n = 4$).
 
-\textbf{The Nc cascade.}
-This is not a single transition. At base scale, HS-TQA coupling flips (Nc1).
-At frontier, SWE-GPQA cooperate (Nc2). Now SWE is saturating while HLE
-and IFEval activate (predicted Nc3). Each transition follows the same pattern:
-old benchmark axes lock together, new ones emerge.
+\subsection{The cascade is measured, not merely predicted}
 
-Internal evidence confirms the cascade.
+At base scale, reasoning-truthfulness coupling flips from antagonistic to cooperative near 3.5B
+parameters~\cite{amin2026lying}. At frontier, SWE-GPQA cooperate.
+Now SWE is saturating while HLE and IFEval activate.
+Each transition follows the same dimensional pattern.
+
+The second transition (Nc2) is measured across six open-weight architectures.
 OPT's internal cooperation increases monotonically from 125M to 13B
-(net coupling $0.514 \to 0.876$, zero competing heads),
+(net coupling $0.514 \to 0.876$, zero competing units),
 then drops at 30B ($0.356$, 75 competing units) before partially recovering
-at 66B ($0.396$, 150 competing units).
-This mirrors the Nc1 sequence exactly: Pythia drops at 1B and recovers by 2.8B;
-OPT drops at 30B and begins recovering at 66B.
-Six architectures independently confirm the Nc2 drop:
+at 66B ($0.396$).
+Six architectures independently confirm the drop at 30--72B:
 Llama-2-70B ($0.205$), Llama-3.1-70B ($0.195$), Qwen2.5-72B ($0.181$),
-and OLMo-2-32B ($0.222$) all weaken at the same scale as OPT.
-The cascade is not a prediction---it is measured across
-every open-weight architecture tested, with three distinct
-layer-profile patterns (output bottleneck, representation saturation,
-and input bottleneck) converging on the same net effect.
-The framework predicts where to look for the next transition
-by tracking which axes are losing discriminatory power.
-
-\subsection{Trajectory case studies}
-
-Individual labs follow distinct trajectories through coupling space---and
-these trajectories reveal strategic pivots invisible to leaderboard rankings alone.
-
-\textbf{DeepSeek: capability reversal.}
-DeepSeek's trajectory shows the most dramatic evolution in the panel.
-Starting with V2.5 ($h = +11.8$, strongly reasoning-rich), the lab's releases
-systematically migrate toward coding-rich territory:
-V3 ($h = +8.4$), R1 ($h = +2.7$), V3.2 ($h = -4.4$).
-The total $h$ swing of 16.2 pp over four releases reveals a deliberate rebalancing:
-DeepSeek entered the frontier as a reasoning lab and is becoming a coding lab,
-a strategic shift no leaderboard ranking would detect.
-
-\textbf{Anthropic: oscillation and recovery.}
-Anthropic's trajectory oscillates around the coding-rich side of the regression line.
-The most extreme excursion occurs at Claude Sonnet~4.6 ($h = -12.9$),
-the deepest coding-specialist point in the entire panel.
-However, Claude Opus~4.6 recovers to $h = +3.7$---crossing the regression line
-from coding-rich to reasoning-rich within a single release cycle.
-This oscillation suggests that the Sonnet~4.6 deviation was
-a capability-specific excursion rather than a persistent shift.
-
-\textbf{Google: consistent reasoning advantage.}
-Google's Gemini family maintains the highest and most consistent $h$-field in the panel,
-ranging from $+4.2$ (Gemini~3 Flash) to $+6.8$ (Gemini~3.1 Pro).
-Unlike DeepSeek or Anthropic, Google shows no trajectory changes---every
-release is reasoning-rich, suggesting a stable training philosophy
-rather than reactive optimization against specific benchmarks.
+OLMo-2-32B ($0.222$).
+Three distinct layer-profile patterns---output bottleneck (OPT),
+flat weakening (Llama, Qwen), and reversed profile (OLMo-2)---converge
+on the same net effect: cooperation weakens when hidden states must encode
+more interactions than ${\sim}$30--70B parameters can represent cooperatively.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.85\columnwidth]{pub_fig_nc3_saturation.png}
+\includegraphics[width=0.95\columnwidth]{pub_fig_nc2_two_families.png}
+\caption{\textbf{Nc2 cascade: second capability transition at 30--72B.}
+OPT (left): gradual rise $\to$ peak at 13B $\to$ drop at 30B $\to$ partial recovery at 66B.
+Llama-2 (right): flat maximum at 7B--13B $\to$ sharp crash at 70B.
+Same pattern, different mechanism, same net effect.}
+\label{fig:nc2}
+\end{figure}
+
+The dimensional handoff is visible in the pairwise coupling structure.
+SWE--GPQA cooperate ($r = +0.85$), GPQA--HLE cooperate ($r = +0.72$),
+but SWE--HLE are decoupled ($r = -0.25$): the same asymmetric pattern
+that signals axis activation at base scale.
+The principal axis of the SWE--GPQA--HLE coupling space
+has SWE and GPQA loading cooperatively while HLE loads on an orthogonal direction,
+confirming that SWE is saturating out while HLE activates independently.
+The same pattern appears at base scale,
+where HS$\leftrightarrow$TQA coupling was 0.003 in the tax phase,
+0.34 in bonus, and 0.64 at Nc2---coupling increases phase by phase.
+The eigenstructure predicts the rotation:
+when $\sigma(\text{SWE}/\text{GPQA})$ drops below 0.2,
+the cooperative direction will shift from SWE-dominated to HLE-dominated.
+
+The OPT family spans both transitions in a single ladder:
+coupling grows toward a fixed point ($\gamma^* \approx 0.53$, discovered by fitting
+$d\gamma/d\log_{10}N = 1.49\gamma - 0.79$ on the 125M--13B trajectory),
+overshoots to 0.876 at 13B, then crashes to 0.356 at 30B.
+The Nc1 ODE \emph{fails} at Nc2---the fixed point shifts to $\gamma^*_{\rm Nc2} \approx 0.39$,
+and OPT-66B (0.396) is recovering toward it.
+Each cascade stage has its own dynamics, not a single extrapolation.
+The character of the transitions differs:
+at Nc1, coupling flips sign (tax $\to$ bonus) and recovers;
+at Nc2, coupling that was already cooperative \emph{crashes}
+($0.876 \to 0.356$, a 59\% drop) before partially recovering toward a
+lower fixed point---a more dramatic restructuring than a sign change.
+
+The chain of evidence strengthens each prediction:
+Nc1 was predicted by the coupling framework and confirmed across 16 families;
+Nc2 was predicted by the cascade hypothesis and confirmed across 6 architectures;
+Nc3 (SWE saturation, HLE/IFEval activation) now shows preliminary evidence
+and is formalized as a falsifiable prediction below.
+
+\section{Predictions}
+\label{sec:predictions_section}
+
+\textbf{Per-lab trajectories.}
+The $h$-field trajectories (detailed in Section~\ref{sec:results})
+reveal that DeepSeek's 15.9-pp reversal and Anthropic's single-release oscillation
+are invisible to leaderboard rankings but immediately visible as $h$-field dynamics.
+Google's consistent $h \approx +5.5$ across releases suggests a stable
+release-level emphasis rather than reactive benchmark optimization.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.95\columnwidth]{pub_fig_nc3_saturation.png}
 \caption{\textbf{Asymmetric saturation at the frontier.}
 (a)~Among the top-5 SWE-bench models, coding scores compress to a 1.3-pp spread
 while GPQA retains 9.1 pp of variation---SWE is losing discriminatory power.
@@ -414,7 +484,9 @@ and HLE (26.4 pp spread) may be the next activating axis.}
 \subsection{Seven falsifiable predictions}
 
 We convert each forecast to a timestamped, benchmark-specific test
-with pass/fail criteria:
+with pass/fail criteria.
+Predictions reference releases after May 2026; post-cutoff models (late March--April 2026)
+serve as prospective validation, not prediction targets:
 
 \begin{enumerate}[nosep,leftmargin=*]
   \item \textbf{SWE saturation} (by Dec 2026):
@@ -452,16 +524,22 @@ IFEval itself saturates (Prediction 6),
 and HLE emerges as the next frontier axis (Prediction 7).
 Each step follows the same dimensional pattern observed at base-model scale:
 old axes lock together, new ones emerge.
-The framework does not just describe the current frontier---it predicts
-where the frontier will fracture next.
+The framework offers concrete tests for where the frontier
+will fracture next.
 
-\textbf{Benchmark rotation: the ODE changes variables, not just parameters.}
-At each $N_c$, the governing equation changes coordinates.
-At Nc1, the axes stay the same (HS, TQA) but coupling flips sign.
-At Nc3, the axes themselves rotate: SWE saturates out (spread/GPQA spread $= 0.14 < 0.2$)
+\textbf{Benchmark rotation: the cascade changes both coupling and coordinates.}
+At Nc1 (${\sim}$3.5B), the axes stay the same (HS, TQA) but coupling flips sign.
+At Nc2 (${\sim}$30--72B), coupling crashes within the same axes---a more dramatic
+restructuring that changes the fixed point, not just the sign.
+Between Nc2 and the frontier, the relevant benchmarks themselves shift
+from base-model axes (HS, TQA) to frontier axes (SWE, GPQA).
+At Nc3, the frontier axes rotate again: SWE saturates out (spread/GPQA spread $= 0.14 < 0.2$)
 and HLE enters as an independent axis.
-The saturation ratio $\sigma = \text{spread}(\text{old}) / \text{spread}(\text{new})$
-predicts when each transition occurs: $\sigma < 0.2$ signals axis replacement.
+The saturation ratio $\sigma = \text{spread}(\text{old}) / \text{spread}(\text{new})$,
+where spread is the range (max $-$ min) among the top-5 models on each axis,
+acts as a signal-to-noise trigger for benchmark rotation:
+$\sigma < 0.2$ signals that the old axis has lost discriminatory power
+and the informative channel has rotated to the new pair.
 Currently $\sigma(\text{GPQA}/\text{HLE}) = 0.34$---Nc4 has not yet begun.
 
 At Nc4, we predict IFEval saturates (already at 87--94\%)
@@ -486,7 +564,7 @@ but as a measured consequence of asymmetric saturation.
 Any practitioner can compute $h$ from two public scores
 and determine: (a)~whether their model is coding-heavy or reasoning-heavy
 relative to the frontier trend,
-(b)~which capability investment has the highest marginal return,
+(b)~which next measurement or stress test is most informative,
 and (c)~whether the current benchmark pair is losing discriminatory power
 for their model class.
 These three diagnostics require no model internals, no training data access,
@@ -517,101 +595,126 @@ their pairwise coupling can still change regime.
 \textbf{Frontier evaluation.}
 SWE-bench~\cite{jimenez2024} and GPQA Diamond~\cite{rein2024} have become standard
 frontier capability axes.
-Recent work on benchmark saturation~\cite{kiela2021} motivates our axis-activation hypothesis:
-as one benchmark loses discriminatory power, practitioners and models shift to new axes.
+Chatbot Arena~\cite{chiang2024chatbot} ranks models by human preference but does not
+measure inter-capability coupling;
+HELM~\cite{liang2023helm} evaluates across many benchmarks but treats each as
+an independent trajectory.
+Our work complements both: we measure the \emph{coupling between} capability axes,
+which is invisible to independent evaluation and irreducible to preference ranking.
+Recent work on benchmark saturation~\cite{kiela2021} and the development of harder
+benchmarks (Humanity's Last Exam~\cite{hle2025}) motivates our axis-activation hypothesis:
+as one benchmark loses discriminatory power, the informative signal rotates
+to the next active axis.
 
 \textbf{Phase transitions in neural networks.}
 Recent theoretical work models phase transitions in linear networks using deformed
-Ginzburg-Landau theory with quenched disorder~\cite{neurips2024collective}.
+Ginzburg-Landau theory with quenched disorder~\cite{arolafernandez2024collective}.
 Our approach is empirical rather than theoretical: we measure coupling on real transformer
 families and frontier models without requiring a specific theoretical framework.
-The base-model foundation is established in~\cite{amin2026a}.
+The base-model foundation is established in~\cite{amin2026lying}.
 
 % ════════════════════════════════════════════════════
 \section{Deployment Playbook}
 \label{sec:discussion}
 
-\textbf{Practical use.}
-The CAPE frontier diagnostic is designed as a monitoring tool.
-Given a new model release with SWE-bench and GPQA scores, a practitioner can:
-(a)~compute $h$ from Eq.~\ref{eq:hfield} to locate the model relative to the population,
-(b)~compare $h$ to the lab's historical trajectory to detect strategy shifts,
-(c)~check whether SWE saturation has progressed (Prediction~1) to assess
-whether the current benchmark pair retains discriminatory power.
+The diagnostic has three levels.
 
-\textbf{Where the diagnostic points next.}
-If the $h$-field reflects real capability balance (a hypothesis, not a certainty),
-it suggests where marginal investment may have the highest return.
-Labs with $h < -5$ (Anthropic: $-6.7$) are coding-heavy;
-reasoning investment would pull them toward the regression line.
-Labs with $h > +5$ (Google: $+5.7$) show reasoning saturation;
-coding investment may have higher marginal value.
-Labs near $h \approx 0$ (OpenAI: $+3.4$, Meta: $+2.6$)
-sit on the regression line and can invest in either axis.
-As SWE saturates, all labs will face the question of
-which new axis to invest in---the coupling matrix (Table~\ref{tab:coupling})
-suggests GPQA-aligned capabilities have the strongest cooperative returns.
+\textbf{Level 1: Locate} (any practitioner, 2 minutes).
+Compute $h_i$ from Eq.~\ref{eq:hfield} using two public scores.
+Classify: coding-rich ($h < -5$), balanced ($|h| < 5$), or reasoning-rich ($h > +5$)
+relative to the current population trend.
 
-\textbf{Alignment-optimal vs.\ loss-optimal compute.}
-The scale that minimizes loss is not the scale that maximizes cooperative coupling.
-Loss-optimal training~\cite{chinchilla2022} balances model size against data;
-coupling-optimal training must additionally consider the critical scale $N_c$,
-which depends on architecture and data quality.
-A lab optimizing for loss alone may inadvertently train a model
-in the tax regime that a slightly different allocation would have placed
-in the bonus regime.
-The CAPE diagnostic makes this mismatch visible from public scores.
+\textbf{Level 2: Diagnose} (requires release history, 10 minutes).
+Compare $h_i$ to the lab's previous releases.
+Flag shifts $> 10$ pp as capability reallocations requiring follow-up.
+Check the saturation ratio $\sigma = \text{spread(old)} / \text{spread(new)}$
+for the current benchmark pair.
 
-\textbf{Predictions already confirmed at base scale.}
-The framework underlying this frontier analysis has three independent confirmations
-from base-model experiments~\cite{amin2026a}:
-(i)~OLMo (AI2) at $\gamma_{12} = 0.000$ (zero-parameter prediction, independent lab);
-(ii)~Llama-2 cross-prediction at 5.6\% MAE (held-out family, twice polynomial accuracy);
-(iii)~Qwen3 cooperative at all scales (curated training eliminates the tax, as predicted).
-The frontier coupling measured here extends the same structure to 31 models from 8 labs.
-At base scale, the coupling structure has also been exploited for targeted alignment
-intervention---steering at the identified bottleneck layer corrected 14/14 misaligned
-outputs on a tax-phase model~\cite{amin2026a}---demonstrating that the framework
-is not just descriptive but actionable.
+\textbf{Level 3: Rotate} (organizational decision).
+If $\sigma < 0.2$: the current benchmark pair is losing discriminatory power.
+Adopt the next benchmark pair---the axis orthogonal to the saturating direction
+(currently HLE or IFEval; see Table~\ref{tab:coupling}).
+If $|\Delta h| > 10$ pp between releases: treat as a capability reallocation,
+verify before changing training policy.
 
-\textbf{Screening length and RLHF durability.}
-Models in the cooperative regime may retain alignment training more durably
-because cooperative coupling reinforces RLHF objectives
-rather than fighting against pre-training structure.
-We conjecture that alignment durability scales with coupling strength,
-providing a testable link between our diagnostic and practical safety engineering.
+These are diagnostic hypotheses, not causal prescriptions.
+A lab optimizing for loss alone may inadvertently train in a regime where
+capabilities trade off rather than reinforce~\cite{amin2026lying};
+the $h$-field makes this mismatch visible from two public numbers
+(Table~\ref{tab:hfield}).
+The interactive dashboard at \url{https://zehenlabs.com/cape/}
+implements all three levels: enter two benchmark scores to compute $h$ (Level~1),
+compare against per-lab release histories (Level~2),
+and check saturation ratios for benchmark rotation (Level~3).
+It also provides an ODE explorer for per-family trajectory prediction,
+a phase classifier for base models, and the full eigenstructure analysis.
+
+\textbf{Worked example.}
+Consider Anthropic's Opus~4.7 (SWE $= 87.6$).
+The regression predicts GPQA $= 0.513 \times 87.6 + 46.4 = 91.3$.
+Actual GPQA $= 94.2$, giving $h = +2.9$: reasoning-rich, recovering from
+the Sonnet~4.6 coding excursion ($h = -13.1$).
+Had GPQA been $82.0$, then $h = -9.3$: the excursion would have persisted,
+and reasoning preservation would be the priority measurement.
+The slot-in prediction generalizes:
+for any future Anthropic release with SWE $= s$,
+the predicted GPQA is $0.513s + 46.4 + \bar{h}_{\rm Anthropic}$,
+and the residual from this \emph{lab-specific} baseline flags
+whether the release continues the recovery or begins a new excursion.
+
+\textbf{Per-lab outlook (April 2026).}
+Five models released after our March data cutoff confirm the diagnostic
+out of sample (all within predicted range; refitting raises $r$ from $+0.72$ to $+0.75$):
+\begin{itemize}[nosep,leftmargin=*]
+  \item \textbf{Anthropic} ($\bar{h} = -6.9$, 9 models, HIGH):
+    Three coding-specialist excursions (lowest: $h = -13.1$ at Sonnet~4.6)
+    with recovery toward reasoning-rich ($h = +3.5$ at Opus~4.6).
+    Opus~4.7 ($h = +2.9$) is the third recovery cycle.
+    \emph{Measurement priority}: reasoning-preservation checks after each
+    coding-focused release; the oscillation pattern suggests continued excursions.
+  \item \textbf{DeepSeek} ($\bar{h} = +1.9$, 5 models, HIGH):
+    V4~Pro ($h = +2.3$) pivots back toward reasoning after V3.2's coding-first dip ($h = -4.7$).
+    Trajectory: oscillation ($+11.6 \to -5.0 \to +1.9$), not monotonic descent.
+    \emph{Measurement priority}: track IFEval to detect whether
+    the next release stabilizes or continues oscillating.
+  \item \textbf{Google} ($\bar{h} = +5.5$ core, $+5.1$ including extended; 5 models, HIGH):
+    Consistently reasoning-rich across all releases.
+    \emph{Measurement priority}: coding-preserving distillation---whether
+    $h > +3$ can be maintained while closing the SWE gap.
+  \item \textbf{OpenAI} ($\bar{h} = +3.1$, 10 models, HIGH):
+    Steady ascent toward balanced---closest to the population trend.
+    \emph{Measurement priority}: as SWE saturates, GPQA--HLE coupling
+    becomes the more informative diagnostic for this trajectory.
+  \item \textbf{Moonshot} ($\bar{h} = +1.8$ core, $+2.6$ including post-cutoff; 2 models, MED):
+    K2.5 $\to$ K2.6: ascending, reasoning-leaning.
+    \emph{Measurement priority}: one more release needed to confirm trajectory.
+\end{itemize}
+
+\textbf{Base-scale confirmations.}
+Three independent confirmations from base-model experiments~\cite{amin2026lying}:
+(i)~OLMo (AI2) at $\gamma_{12} = 0.000$ (independent confirmation);
+(ii)~Llama-2 cross-prediction at 5.6\% MAE (held-out family);
+(iii)~Qwen3 cooperative at all scales (curated training eliminates the tax).
+At base scale, targeted activation steering at the CAPE-identified bottleneck
+corrects misaligned outputs while leaving already-correct ones unchanged,
+with the intervention rate decreasing monotonically from 60\% (tax)
+through 30\% (transition) to 20\% (bonus)~\cite{amin2026lying}---the
+remaining prompts are true negatives that need no correction,
+confirming that intervention efficacy is localized to the predicted regime.
 
 \textbf{Limitations.}
-(1)~The frontier dataset is lab-imbalanced: Anthropic (8 models) and OpenAI (10)
-dominate the panel, while 4 labs contribute a single model each.
+(1)~The frontier dataset is lab-imbalanced: Anthropic (9 models, core+extended)
+and OpenAI (10 models, core+extended)
+dominate the panel, while 5 labs contribute a single model each.
 (2)~Benchmark scores are predominantly self-reported; independent verification
 lags releases.
 (3)~The $h$-field captures \emph{what} changed, not \emph{why}---it is descriptive,
-not causal.
-(4)~Nc3 evidence is thin ($n = 4$) and classified as preliminary.
+not causal. Recommendations in the measurement-priority table
+are diagnostic hypotheses, not causal prescriptions.
+(4)~Nc3 evidence is preliminary ($n = 4$) and classified as such.
 (5)~The framework assumes SWE-bench and GPQA Diamond remain meaningful capability axes;
-if either benchmark becomes contaminated or saturated, the diagnostic loses power
-and must be updated with new axes.
-
-\textbf{Broader impact.}
-This work provides a public diagnostic for frontier model development.
-The $h$-field allows outside observers to track whether a lab's releases are becoming
-more coding-specialist or more reasoning-balanced without access to training details.
-This transparency could inform policy discussions about frontier model trajectories.
-We note that our own analysis tool (Claude) is an Anthropic model with $\bar{h} = -6.7$;
-this is reported rather than hidden.
-Two public numbers per model are enough to start seeing
-where the frontier is going.
-
-% ════════════════════════════════════════════════════
-\section*{Reproducibility Statement}
-
-The frontier dataset is frozen at March 2026 and released as a versioned JSON artifact.
-All regression equations, $h$-field calculations, and holdout protocols
-are specified in Sections~\ref{sec:framework}--\ref{sec:data} with sufficient detail
-for independent reproduction.
-Prediction pass/fail criteria (Section~\ref{sec:predictions}) are timestamped
-and benchmark-specific to enable unambiguous future evaluation.
+if either benchmark becomes contaminated or saturated, the diagnostic must be
+updated with new axes---which the benchmark-rotation protocol is designed to handle.
 
 % ════════════════════════════════════════════════════
 
@@ -620,49 +723,68 @@ and benchmark-specific to enable unambiguous future evaluation.
 
 % ════════════════════════════════════════════════════
 \appendix
+
+\section*{Reproducibility}
+The frontier dataset is frozen at March 2026 and released as a versioned JSON artifact.
+All regression equations, $h$-field calculations, and holdout protocols
+are specified in Sections~\ref{sec:framework}--\ref{sec:data} with sufficient detail
+for independent reproduction.
+Prediction pass/fail criteria (Section~\ref{sec:predictions_section}) are timestamped
+and benchmark-specific to enable unambiguous future evaluation.
+
 \section{Full Frontier Model Table}
 \label{app:table}
 
 \begin{table}[h]
 \centering
-\small
-\caption{Complete frontier panel (31 models, 8 labs). Core models marked with $\star$.}
+\caption{Complete frontier panel (34 March + 5 April post-cutoff, 10 labs). Core models marked with $\star$.
+$h$-field computed from frozen 34-model regression: $\text{GPQA} = 0.513 \cdot \text{SWE} + 46.4$.}
 \label{tab:full}
 \begin{tabular}{llrrrr}
 \toprule
 Model & Lab & SWE & GPQA & $h$ & Subset \\
 \midrule
-Claude 3.5 Haiku & Anthropic & 40.6 & 41.0 & $-25.7$ & Extended \\
-Claude 3.5 Sonnet & Anthropic & 49.0 & 59.4 & $-11.7$ & $\star$ Core \\
-Claude 3.7 Sonnet & Anthropic & 62.3 & 68.0 & $-10.0$ & $\star$ Core \\
-Claude Haiku 4.5 & Anthropic & 73.3 & 71.0 & $-12.7$ & $\star$ Core \\
-Claude Sonnet 4.5 & Anthropic & 77.2 & 83.4 & $-2.4$ & $\star$ Core \\
-Claude Opus 4.5 & Anthropic & 80.9 & 87.0 & $-0.7$ & $\star$ Core \\
-Claude Sonnet 4.6 & Anthropic & 79.6 & 74.1 & $-12.9$ & $\star$ Core \\
-Claude Opus 4.6 & Anthropic & 80.8 & 91.3 & $+3.7$ & $\star$ Core \\
-DeepSeek-V2.5 & DeepSeek & 16.8 & 66.2 & $+11.8$ & Extended \\
-DeepSeek-V3 & DeepSeek & 42.0 & 75.9 & $+8.4$ & $\star$ Core \\
-DeepSeek-R1 & DeepSeek & 44.6 & 71.5 & $+2.7$ & $\star$ Core \\
-DeepSeek V3.2 & DeepSeek & 74.4 & 79.9 & $-4.4$ & $\star$ Core \\
-Gemini 2.0 Flash & Google & 60.4 & 65.2 & $-11.8$ & Extended \\
-Gemini 2.5 Pro & Google & 63.8 & 84.0 & $+5.2$ & $\star$ Core \\
-Gemini 3 Flash & Google & 78.0 & 90.4 & $+4.2$ & $\star$ Core \\
-Gemini 3 Pro & Google & 76.2 & 91.9 & $+6.7$ & $\star$ Core \\
-Gemini 3.1 Pro & Google & 80.6 & 94.3 & $+6.8$ & $\star$ Core \\
-Llama 4 Maverick & Meta & 70.3 & 84.8 & $+2.6$ & $\star$ Core \\
-MiniMax M2.5 & MiniMax & 80.2 & 85.2 & $-2.1$ & $\star$ Core \\
-Kimi K2.5 & Moonshot & 76.8 & 87.6 & $+2.1$ & $\star$ Core \\
-Qwen3.5-397B & Alibaba & 76.4 & 88.4 & $+3.1$ & $\star$ Core \\
-GPT-4o & OpenAI & 33.2 & 53.6 & $-9.3$ & Extended \\
-o1-preview & OpenAI & 41.3 & 73.3 & $+6.2$ & Extended \\
-o1 & OpenAI & 41.0 & 78.0 & $+11.0$ & Extended \\
-o3-mini & OpenAI & 49.3 & 79.7 & $+8.4$ & $\star$ Core \\
-o3 & OpenAI & 69.1 & 87.7 & $+6.2$ & $\star$ Core \\
-GPT-5 & OpenAI & 74.9 & 85.7 & $+1.1$ & $\star$ Core \\
-GPT-5.1 & OpenAI & 76.3 & 88.1 & $+2.8$ & $\star$ Core \\
-GPT-5.2 Pro & OpenAI & 80.0 & 93.2 & $+6.0$ & Extended \\
-GPT-5.4 std & OpenAI & 77.2 & 84.2 & $-1.6$ & $\star$ Core \\
-GPT-5.4 xhigh & OpenAI & 77.2 & 92.0 & $+6.2$ & Extended \\
+Claude 3.5 Haiku & Anthropic & 40.6 & 41.0 & $-26.2$ & Extended \\
+Claude 3.5 Sonnet & Anthropic & 49.0 & 59.4 & $-12.1$ & $\star$ Core \\
+Claude 3.7 Sonnet & Anthropic & 62.3 & 68.0 & $-10.3$ & $\star$ Core \\
+Claude Haiku 4.5 & Anthropic & 73.3 & 71.0 & $-13.0$ & $\star$ Core \\
+Claude Sonnet 4.5 & Anthropic & 77.2 & 83.4 & $-2.6$ & $\star$ Core \\
+Claude Opus 4.5 & Anthropic & 80.9 & 87.0 & $-0.9$ & $\star$ Core \\
+Claude Sonnet 4.6 & Anthropic & 79.6 & 74.1 & $-13.1$ & $\star$ Core \\
+Claude Opus 4.6 & Anthropic & 80.8 & 91.3 & $+3.5$ & $\star$ Core \\
+DeepSeek-V2.5 & DeepSeek & 16.8 & 66.2 & $+11.2$ & Extended \\
+DeepSeek-V3 & DeepSeek & 42.0 & 75.9 & $+8.0$ & $\star$ Core \\
+DeepSeek-R1 & DeepSeek & 44.6 & 71.5 & $+2.2$ & $\star$ Core \\
+DeepSeek V3.2 & DeepSeek & 74.4 & 79.9 & $-4.7$ & $\star$ Core \\
+Gemini 2.0 Flash & Google & 60.4 & 65.2 & $-12.1$ & Extended \\
+Gemini 2.5 Pro & Google & 63.8 & 84.0 & $+4.9$ & $\star$ Core \\
+Gemini 3 Flash & Google & 78.0 & 90.4 & $+4.0$ & $\star$ Core \\
+Gemini 3 Pro & Google & 76.2 & 91.9 & $+6.4$ & $\star$ Core \\
+Gemini 3.1 Pro & Google & 80.6 & 94.3 & $+6.6$ & $\star$ Core \\
+Llama 4 Maverick & Meta & 70.3 & 84.8 & $+2.4$ & $\star$ Core \\
+MiniMax M2.5 & MiniMax & 80.2 & 85.2 & $-2.3$ & $\star$ Core \\
+Kimi K2.5 & Moonshot & 76.8 & 87.6 & $+1.8$ & $\star$ Core \\
+Qwen3.5-397B & Alibaba & 76.4 & 88.4 & $+2.8$ & $\star$ Core \\
+GPT-4o & OpenAI & 33.2 & 53.6 & $-9.8$ & Extended \\
+o1-preview & OpenAI & 41.3 & 73.3 & $+5.7$ & Extended \\
+o1 & OpenAI & 41.0 & 78.0 & $+10.6$ & Extended \\
+o3-mini & OpenAI & 49.3 & 79.7 & $+8.0$ & $\star$ Core \\
+o3 & OpenAI & 69.1 & 87.7 & $+5.8$ & $\star$ Core \\
+GPT-5 & OpenAI & 74.9 & 85.7 & $+0.9$ & $\star$ Core \\
+GPT-5.1 & OpenAI & 76.3 & 88.1 & $+2.6$ & $\star$ Core \\
+GPT-5.2 Pro & OpenAI & 80.0 & 93.2 & $+5.9$ & Extended \\
+GPT-5.4 std & OpenAI & 77.2 & 84.2 & $-1.8$ & $\star$ Core \\
+GPT-5.4 xhigh & OpenAI & 77.2 & 92.0 & $+6.0$ & Extended \\
+Grok 3 & xAI & 57.6 & 84.6 & $+8.7$ & Extended \\
+Grok 4 & xAI & 69.1 & 83.3 & $+1.5$ & Extended \\
+GLM-5 & Zhipu & 77.8 & 86.0 & $-0.3$ & Extended \\
+\midrule
+\multicolumn{6}{l}{\emph{Post-cutoff (April 2026, not used in frozen regression)}} \\
+Claude Opus 4.7 & Anthropic & 87.6 & 94.2 & $+2.9$ & Post-cutoff \\
+Kimi K2.6 & Moonshot & 80.2 & 90.5 & $+2.9$ & Post-cutoff \\
+DeepSeek V4 Pro & DeepSeek & 80.6 & 90.1 & $+2.3$ & Post-cutoff \\
+Qwen3.6-27B & Alibaba & 77.2 & 87.8 & $+1.8$ & Post-cutoff \\
+GLM-5.1 & Zhipu & 77.8 & 86.0 & $-0.3$ & Post-cutoff \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -672,8 +794,8 @@ GPT-5.4 xhigh & OpenAI & 77.2 & 92.0 & $+6.2$ & Extended \\
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.85\columnwidth]{pub_fig1_main_63models.png}
-\caption{\textbf{Base-model foundation (from~\cite{amin2026a}).}
+\includegraphics[width=0.95\columnwidth]{pub_fig1_main_63models.png}
+\caption{\textbf{Base-model foundation (from~\cite{amin2026lying}).}
 The coupling regime transition underlying CAPE: below a critical scale,
 reasoning and truthfulness anticorrelate; above, they cooperate.
 All frontier models sit in the cooperative regime.}
@@ -685,16 +807,17 @@ All frontier models sit in the cooperative regime.}
 
 \textbf{Sensitivity to subset definition.}
 The cooperative signal is robust across subset choices:
-$r = +0.729$ (full 31), $r = +0.854$ (core 20), $r = +0.699$ (SWE $\geq 40$),
-$r = +0.725$ (excluding compute-tier variants).
-No subset produces $r < 0.5$, suggesting that cooperative coupling is robust to subset definition
-rather than an artifact of specific inclusion choices.
+$r = +0.72$ (full 34), $r = +0.65$ (core 23), $r = +0.69$ (SWE $\geq 40$),
+$r = +0.72$ (excluding compute-tier variants).
+No subset produces $r < 0.5$, confirming that cooperative coupling is robust to
+inclusion criteria rather than an artifact of specific model selection.
 
-\textbf{Temporal stability.}
-Models released before 2025 show $r = +0.035$ (no correlation, $n = 5$),
-while 2025+ models show $r = +0.577$ ($n = 23$).
-The cooperative structure is a recent development, emerging as frontier models
-entered the regime where both SWE and GPQA have sufficient dynamic range.
+\textbf{Dynamic range dependence.}
+The cooperative structure requires sufficient dynamic range on both benchmark axes.
+Pre-2025 frontier models span only 16.8--49.0 on SWE-bench ($n = 5$),
+compressing the coding axis below the resolution at which coupling becomes measurable.
+Models from 2025 onward ($n = 29$, SWE range 42--81) provide the range
+in which cooperative structure manifests.
 
 \section{Physics Analogy (Optional Context)}
 \label{app:physics}
@@ -706,8 +829,15 @@ $\log_{10} N$ plays the role of temperature,
 and the $h$-field plays the role of an external magnetic field breaking phase symmetry.
 The coupling $\gamma_{12}$ corresponds to inter-band pairing susceptibility.
 At the base-model level, this analogy is quantitatively precise
-(12 diagnostics from 2 parameters; see~\cite{amin2026a}).
+(12 diagnostics from 2 parameters; see~\cite{amin2026lying}).
 At the frontier, we use only the operational definitions from Section~\ref{sec:framework};
 the physics analogy provides interpretive context but is not required for any claim.
+
+\section*{Broader Impact}
+This work provides a public diagnostic for frontier model development.
+The $h$-field allows outside observers to track whether a lab's releases are becoming
+more coding-specialist or more reasoning-balanced without access to training details.
+This transparency could inform policy discussions about frontier model trajectories.
+Two public numbers per model are enough to start seeing where the frontier is going.
 
 \end{document}

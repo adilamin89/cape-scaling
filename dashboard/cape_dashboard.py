@@ -73,7 +73,7 @@ def load_frontier():
         with open(DATA_DIR / "frontier_final_consolidated.json") as f:
             return json.load(f)
     except:
-        return {"models": [], "r_all": 0.729, "slope": 0.519, "intercept": 45.661}
+        return {"models": [], "r_all": 0.7235, "slope": 0.513, "intercept": 46.4}
 
 @st.cache_data
 def load_opt_nc2():
@@ -101,7 +101,7 @@ frontier = load_frontier()
 opt_nc2 = load_opt_nc2()
 self_align = load_self_align()
 
-SLOPE, INTERCEPT = 0.52, 45.7
+SLOPE, INTERCEPT = 0.513, 46.4
 
 # ── Hero ──
 st.markdown("""
