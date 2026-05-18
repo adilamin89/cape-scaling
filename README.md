@@ -4,8 +4,8 @@
 
 Adil Amin | ZEHEN Labs | [adil@zehenlabs.com](mailto:adil@zehenlabs.com)
 
-[![Paper 3A](https://img.shields.io/badge/Paper_3A-NeurIPS_2026-orange)](lying_is_just_a_phase.pdf)
-[![Paper 3B](https://img.shields.io/badge/Paper_3B-NeurIPS_2026-orange)](growing_pains_frontier.pdf)
+[![Paper 3A](https://img.shields.io/badge/Paper_3A-Submitted_2026-orange)](lying_is_just_a_phase.pdf)
+[![Paper 3B](https://img.shields.io/badge/Paper_3B-Submitted_2026-orange)](growing_pains_frontier.pdf)
 [![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen)](https://zehenlabs.com/cape/)
 [![Blog](https://img.shields.io/badge/Blog-Read-blue)](https://zehenlabs.com/blog/)
 [![Website](https://img.shields.io/badge/Website-zehenlabs.com-gold)](https://zehenlabs.com)
@@ -35,11 +35,11 @@ Standard loss curves do not reveal this transition (CV = 0.8% across Pythia -- i
 
 ## Two Papers
 
-### Paper 3A: [Lying Is Just a Phase](lying_is_just_a_phase.pdf) -- NeurIPS 2026 (submitted)
+### Paper 3A: [Lying Is Just a Phase](lying_is_just_a_phase.pdf) -- Under Review (2026)
 
 The discovery paper. 63 base models, 16 families. Documents the coupling sign flip at Nc, dimensional collapse, output-projection bottleneck, ODE dynamics, and a self-aligning intervention proof-of-concept.
 
-### Paper 3B: [The Growing Pains of Frontier Models](growing_pains_frontier.pdf) -- NeurIPS 2026 (submitted)
+### Paper 3B: [The Growing Pains of Frontier Models](growing_pains_frontier.pdf) -- Under Review (2026)
 
 The frontier measurement paper. 34 models from 10 labs. Introduces the h-field diagnostic (deviation from cooperative regression), per-lab coupling trajectories, multi-benchmark coupling matrix, the Nc cascade with internal evidence, and 7 falsifiable predictions.
 
@@ -148,10 +148,10 @@ Self-steering requires open-weight models since it hooks into internal transform
 
 ```
 cape-scaling/
-├── lying_is_just_a_phase.pdf       Paper 3A (NeurIPS 2026)
-├── growing_pains_frontier.pdf      Paper 3B (NeurIPS 2026)
-├── paper3a_nature.tex              3A LaTeX source (filename historical; venue is NeurIPS)
-├── paper3b_neurips.tex             3B LaTeX source
+├── lying_is_just_a_phase.pdf       Paper 3A (under review)
+├── growing_pains_frontier.pdf      Paper 3B (under review)
+├── paper3a_nature.tex              3A LaTeX source (filename historical)
+├── paper3b_neurips.tex             3B LaTeX source (filename historical)
 ├── references.bib                  Shared bibliography
 ├── index.html                      Dashboard source (live at zehenlabs.com/cape/)
 │
@@ -232,7 +232,7 @@ cape-scaling/
          in Language Model Scaling},
   author={Amin, Adil},
   institution={ZEHEN Labs},
-  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  note={Under review},
   year={2026},
   url={https://zehenlabs.com},
   note={Under review}
@@ -243,7 +243,7 @@ cape-scaling/
          Stop Separating and What to Measure Next},
   author={Amin, Adil},
   institution={ZEHEN Labs},
-  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  note={Under review},
   year={2026},
   url={https://zehenlabs.com},
   note={Under review}
