@@ -141,13 +141,14 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   <div class="header-stats">
     <div class="hstat"><span class="hstat-val">3.5B</span><span class="hstat-lbl">Critical Scale N<sub>c</sub></span></div>
     <div class="hstat"><span class="hstat-val">−0.989</span><span class="hstat-lbl">Pre-transition r</span></div>
-    <div class="hstat"><span class="hstat-val">63 + 31</span><span class="hstat-lbl">Base + Frontier Models</span></div>
+    <div class="hstat"><span class="hstat-val">63 + 39</span><span class="hstat-lbl">Base + Frontier Models</span></div>
     <div class="hstat"><span class="hstat-val">16</span><span class="hstat-lbl">Families</span></div>
   </div>
   <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap">
     <a href="https://github.com/adilamin89/cape-scaling" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);padding:4px 12px;border-radius:3px;letter-spacing:0.5px">GitHub Repo</a>
-    <a id="paper-link" href="#" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent2);text-decoration:none;border:1px solid var(--accent2);padding:4px 12px;border-radius:3px;letter-spacing:0.5px;display:none">arXiv Paper</a>
-    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);align-self:center;letter-spacing:0.5px">Amin (2026) · "Lying Is Just a Phase" (Nature) · "Growing Pains of Frontier Models" · 8 benchmarks · n-dim PCA</span>
+    <a href="https://arxiv.org/abs/2605.18840" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent2);text-decoration:none;border:1px solid var(--accent2);padding:4px 12px;border-radius:3px;letter-spacing:0.5px">arXiv: Paper 3A</a>
+    <a href="https://arxiv.org/abs/2605.18838" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent2);text-decoration:none;border:1px solid var(--accent2);padding:4px 12px;border-radius:3px;letter-spacing:0.5px">arXiv: Paper 3B</a>
+    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text3);align-self:center;letter-spacing:0.5px">Amin (2026) · "Lying Is Just a Phase" · "Growing Pains of Frontier Models" · 8 benchmarks · n-dim PCA</span>
   </div>
 </header>
 
@@ -166,6 +167,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
      TAB: ANALYZE
 ════════════════════════════════════════════ -->
 <div id="tab-analyze" class="tab-content">
+  <div style="background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">Enter your model's parameter count + benchmark scores. Get phase classification (tax/transition/bonus), engineering recommendation, and comparison to known models. Works for any model from 70M to frontier scale.</div>
   <div class="card">
     <div class="card-title">Analyze Any Model <span>— Phase Classification + Actionable Recommendations</span></div>
     <div class="input-grid">
@@ -247,6 +249,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
      TAB: PHASE MAP
 ════════════════════════════════════════════ -->
 <div id="tab-phases" class="tab-content" style="display:none">
+  <div style="background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">Visual phase diagram showing all 63 base models across 16 families. Color = family, position = (HellaSwag, TruthfulQA), region = coupling phase. The three bands (tax/transition/bonus) show where capabilities fight, balance, or cooperate.</div>
   <div class="card">
     <div class="card-title">Phase Diagram <span>— TruthfulQA vs Parameters</span></div>
     <canvas id="phase-chart" height="380"></canvas>
@@ -310,15 +313,16 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
      TAB: FRONTIER
 ════════════════════════════════════════════ -->
 <div id="tab-frontier" class="tab-content" style="display:none">
+  <div style="background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">34+5 frontier models from 10 labs. Regression line (slope=0.513) shows cooperative coupling. The h-field residual reveals each lab's training emphasis: positive = reasoning-rich (Google), negative = coding-rich (Anthropic). Per-lab slopes vary 5x.</div>
   <div class="card">
-    <div class="card-title">Frontier Coupling <span>— SWE-bench vs GPQA Diamond (Feb–Mar 2026)</span></div>
+    <div class="card-title">Frontier Coupling <span>— SWE-bench vs GPQA Diamond (2024–2026, 34+5 models, 10 labs)</span></div>
     <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
       <button class="btn" id="frontier-zoom-btn" onclick="toggleFrontierZoom()" style="font-size:10px;padding:4px 12px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:4px;cursor:pointer;font-family:var(--font-mono)">🔍 Zoom Cluster (70–82% SWE)</button>
       <button class="btn" id="frontier-labels-btn" onclick="toggleFrontierLabels()" style="font-size:10px;padding:4px 12px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:4px;cursor:pointer;font-family:var(--font-mono)">◈ Show All Labels</button>
     </div>
     <canvas id="frontier-chart" height="360"></canvas>
     <div style="margin-top:12px;font-family:var(--font-mono);font-size:11px;color:var(--text2)">
-      r = +0.85 (n=20, p&lt;0.00001) — cooperative coupling strongly confirmed. Sonnet 4.6 shows h = −13.4 anomaly (tax excursion). Opus 4.6 recovers h = +2.8. GPT-5.4 shows h = −1.6 (mild coding-specialist).
+      r = +0.72 (n=34, p&lt;10⁻⁶), rising to +0.75 with 5 post-cutoff models (39 total, 10 labs). Slope = 0.513. Sonnet 4.6 shows h = −13.1 anomaly (tax excursion). Opus 4.6 recovers h = +3.5. Per-lab slopes span 5× (Google 1.15 vs DeepSeek 0.23).
     </div>
   </div>
 
@@ -419,6 +423,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
      TAB: NC CASCADE
 ════════════════════════════════════════════ -->
 <div id="tab-cascade" class="tab-content" style="display:none">
+  <div style="background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">The coupling transition repeats at larger scales. Nc1 at ~3.5B (HS/TQA sign flip), Nc2 at 30-72B (internal coupling crash, axis rotation to SWE/GPQA), Nc3 approaching (SWE saturating, IFEval activating). Same physics, different benchmarks at each level.</div>
   <div class="card">
     <div class="card-title">The Nc Cascade <span>— How Scaling Transitions Stack</span></div>
     <canvas id="cascade-chart" height="300"></canvas>
@@ -483,6 +488,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
      TAB: MATRIX — Phase-Separated Correlation Analysis
 ════════════════════════════════════════════ -->
 <div id="tab-matrix" class="tab-content" style="display:none">
+  <div style="background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">Pairwise coupling matrix between benchmark pairs in each phase. Shows which capabilities cooperate vs compete. The tax phase has 4/10 negative pairs; the bonus phase has 0/10 negative. The restructuring at Nc is visible in every pair.</div>
   <div class="card">
     <div class="card-title">Phase-Separated Correlation Matrix <span>— How TQA Restructures at N<sub>c</sub></span></div>
     <div class="g2">
@@ -611,11 +617,12 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
      TAB: PHYSICS
 ════════════════════════════════════════════ -->
 <div id="tab-physics" class="tab-content" style="display:none">
+  <div style="background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">The condensed matter physics behind CAPE. Ginzburg-Landau free energy, order parameters, running coupling equation, ODE system, and the hierarchy from power-law loss to coupled-field theory. Same mathematical framework as superconductor phase transitions.</div>
   <div class="card">
     <div class="card-title">Core Equations <span>— Every Result in One Place</span></div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div><div class="eq">γ₁₂(N) = 0.629·log₁₀(N) − 5.886  [R²=0.54, 12/12 sign correct]</div><div class="eq-sub">Running coupling. Sign = alignment regime. Magnitude scatter = family-specific h(D) disorder. A disordered ferromagnet: sign always predicted, magnitude noisy.</div></div>
-      <div><div class="eq">dHS/dlog₁₀N = 1.23 − 0.72·TQA − 0.69·WG</div><div class="eq-sub">Discovered ODE (PySINDy). −0.72·TQA = dynamically measured anti-coupling. Reproduces 5 benchmarks at 3.6% error from 70M initial conditions.</div></div>
+      <div><div class="eq">dHS/dlog₁₀N = 1.23 − 0.72·TQA − 0.69·WG</div><div class="eq-sub">Discovered ODE (PySINDy). −0.72·TQA = dynamically measured anti-coupling. Reproduces 5 benchmarks at 2.6% error from 70M initial conditions.</div></div>
       <div><div class="eq">‖∇L‖ ≈ c·L^3.5  (r=0.93)  NOT N^{−(α+1)} [fails 142×]</div><div class="eq-sub">Collective gradient scaling. Mean-field fails catastrophically = strongest diagnostic that parameters are collectively coupled, not independent.</div></div>
       <div><div class="eq">h_c(N) ∝ (N_c − N)^{3/2}  for N &lt; N_c</div><div class="eq-sub">Design equation: minimum curation to eliminate alignment tax. At 1B: 60% of Phi-level effort. At 3B: 5%. At N_c: zero.</div></div>
       <div><div class="eq">d_eff(N) ≈ −0.27·log₁₀(N) + 3.9  →  1 at N≈88B</div><div class="eq-sub">Dimensional collapse: capability manifold condenses from 2D to 1D. det(H)→0 at ~130B predicts theory breakdown.</div></div>
@@ -756,6 +763,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
      TAB: PAPER
 ════════════════════════════════════════════ -->
 <div id="tab-paper" class="tab-content" style="display:none">
+  <div style="background:rgba(76,201,240,0.05);border:1px solid rgba(76,201,240,0.15);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.6">Links to both arXiv papers, citation information, and key results summary. Paper 3A covers 63 base models across 16 families; Paper 3B covers 34+5 frontier models from 10 labs. Code and data are open-source.</div>
   <div class="card">
     <div class="card-title">Paper Summary <span>— Key Results</span></div>
     <div style="font-size:13px;color:var(--text);line-height:1.8;margin-bottom:16px">
@@ -776,7 +784,7 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
       <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">α = 0.238</div><div style="color:var(--text2)">Loss scaling exponent (R²=0.9994)</div></div>
       <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">γ₁₂ linear fit</div><div style="color:var(--text2)">12/12 sign correct</div></div>
       <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">β = 0.40±0.08</div><div style="color:var(--text2)">Collective gradient scaling</div></div>
-      <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">ODE: 3.6%</div><div style="color:var(--text2)">5 benchmarks from 70M</div></div>
+      <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">ODE: 2.6%</div><div style="color:var(--text2)">5 benchmarks from 70M</div></div>
       <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">χ_ND = 0.102</div><div style="color:var(--text2)">Chinchilla emerges from coupling</div></div>
       <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">h(D) field</div><div style="color:var(--text2)">Phi: h=+23 above web baseline</div></div>
       <div style="padding:8px 12px;background:var(--bg3);border-radius:4px;font-size:11px;border:1px solid var(--border)"><div style="color:var(--accent);font-family:var(--font-mono);font-weight:700;margin-bottom:3px">W (conserved)</div><div style="color:var(--text2)">Capability gain redistributed CV=27%</div></div>
@@ -789,22 +797,39 @@ canvas{width:100%;display:block;border-radius:4px;background:var(--bg3)}
   </div>
 
   <div class="card">
+    <div class="card-title">Read the Papers</div>
+    <div class="g2" style="margin-bottom:16px">
+      <div class="metric m-accent" style="cursor:pointer" onclick="window.open('https://arxiv.org/abs/2605.18840','_blank')">
+        <div class="metric-label">Paper 3A</div>
+        <div class="metric-val" style="color:var(--accent);font-size:14px">Lying Is Just a Phase</div>
+        <div class="metric-sub">The Hidden Alignment Transition in Language Model Scaling. 63 base models, 16 families, ODE cross-prediction at 2.6% MAE.</div>
+        <div style="margin-top:8px;display:flex;gap:8px"><a href="https://arxiv.org/abs/2605.18840" target="_blank" style="font-family:var(--font-mono);font-size:10px;color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:3px;text-decoration:none">arXiv</a><a href="https://arxiv.org/pdf/2605.18840" target="_blank" style="font-family:var(--font-mono);font-size:10px;color:var(--text2);border:1px solid var(--border);padding:3px 10px;border-radius:3px;text-decoration:none">PDF</a></div>
+      </div>
+      <div class="metric m-purple" style="cursor:pointer" onclick="window.open('https://arxiv.org/abs/2605.18838','_blank')">
+        <div class="metric-label">Paper 3B</div>
+        <div class="metric-val" style="color:var(--accent2);font-size:14px">Growing Pains of Frontier Models</div>
+        <div class="metric-sub">When Leaderboards Stop Separating and What to Measure Next. 34+5 frontier models, 10 labs, h-field diagnostic, 7 predictions.</div>
+        <div style="margin-top:8px;display:flex;gap:8px"><a href="https://arxiv.org/abs/2605.18838" target="_blank" style="font-family:var(--font-mono);font-size:10px;color:var(--accent2);border:1px solid var(--accent2);padding:3px 10px;border-radius:3px;text-decoration:none">arXiv</a><a href="https://arxiv.org/pdf/2605.18838" target="_blank" style="font-family:var(--font-mono);font-size:10px;color:var(--text2);border:1px solid var(--border);padding:3px 10px;border-radius:3px;text-decoration:none">PDF</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
     <div class="card-title">Citation</div>
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--text2);line-height:1.8">
-@article{amin2026cape,<br>
+@article{amin2026lying,<br>
 &nbsp;&nbsp;author = {Amin, Adil},<br>
-&nbsp;&nbsp;title = {Lying Is Just a Phase},<br>
-&nbsp;&nbsp;note = {The Hidden Alignment Transition in Language Model Scaling},<br>
-&nbsp;&nbsp;journal = {Nature},<br>
+&nbsp;&nbsp;title = {Lying Is Just a Phase: The Hidden Alignment Transition in Language Model Scaling},<br>
+&nbsp;&nbsp;journal = {arXiv preprint arXiv:2605.18840},<br>
 &nbsp;&nbsp;year = {2026},<br>
-&nbsp;&nbsp;url = {https://github.com/adilamin89/cape-scaling}<br>
+&nbsp;&nbsp;url = {https://arxiv.org/abs/2605.18840}<br>
 }<br><br>
-@article{amin2026itsnotaphase,<br>
+@article{amin2026growing,<br>
 &nbsp;&nbsp;author = {Amin, Adil},<br>
-&nbsp;&nbsp;title = {It's Not a Phase: Predicting Frontier Alignment from Capability Coupling},<br>
-&nbsp;&nbsp;booktitle = {Preprint},<br>
+&nbsp;&nbsp;title = {The Growing Pains of Frontier Models: When Leaderboards Stop Separating and What to Measure Next},<br>
+&nbsp;&nbsp;journal = {arXiv preprint arXiv:2605.18838},<br>
 &nbsp;&nbsp;year = {2026},<br>
-&nbsp;&nbsp;url = {https://github.com/adilamin89/cape-scaling}<br>
+&nbsp;&nbsp;url = {https://arxiv.org/abs/2605.18838}<br>
 }
     </div>
   </div>
@@ -1313,9 +1338,9 @@ function getPhaseAction(g, N, h){
     <br><span style="color:var(--accent)">Next benchmark axis:</span> γ(IFEval, HarmBench) — if it turns negative, you've found Nc4 and the three-field extension activates.
     <br><span style="color:var(--text3)">The coexistence boundary (h=0 line) separates coding-specialist (h<0, e.g. Sonnet 4.6) from reasoning-specialist (h>0, e.g. Gemini) training recipes at this scale.</span>`;
   if(N>70e9) return `<strong style="color:#4cc9f0">Phase 4 — Axis Rotation</strong><br>
-    HellaSwag/TQA saturated (>90%). SWE-bench × GPQA Diamond are now the discriminating pair, r=+0.85 (cooperative).
+    HellaSwag/TQA saturated (>90%). SWE-bench × GPQA Diamond are now the discriminating pair, r=+0.72 (34 models, 10 labs, slope=0.513).
     <br><span style="color:var(--accent)">Nc3 predicted ≈ 114–130B:</span> det(Γ)→0 extrapolation + Pythia 5-bench convergence. IFEval dominates λ₁ at frontier (loading = −0.64).
-    <br><span style="color:var(--text3)">Coexistence line (h=0): separates coding-first (Sonnet 4.6: h=−13.4) from reasoning-first (Opus 4.6: h=+2.8) recipes. Both are valid; h-field reveals the training priority.</span>`;
+    <br><span style="color:var(--text3)">Coexistence line (h=0): separates coding-first (Sonnet 4.6: h=−13.1) from reasoning-first (Opus 4.6: h=+3.5) recipes. Both are valid; h-field reveals the training priority.</span>`;
   if(g<-0.5) return `<strong style="color:#ff4d6d">Deep Tax Regime</strong><br>Scaling worsens alignment. Data curation is your primary lever — invest ${Math.round(Math.pow(Math.max(0,(3.5e9-N)/1e9),1.5)*3)} TQA points of quality uplift (Phi-level benchmark). RLHF here is temporary; pre-training coupling is structural.
     <br><span style="color:var(--text3)">Note: distilled models (Phi) achieve h≫0 below Nc via training history — a metastable cooperative state. This hysteresis signals a first-order component in the phase diagram.</span>`;
   if(g<0) return `<strong style="color:#ff6b6b">Shallow Tax</strong><br>Near the transition. A small data curation push (~5% Phi-level) could flip you into the bonus phase. Or scale to 3.5B.
@@ -1978,7 +2003,7 @@ function drawFrontierChart(){
 
   // Stats
   c.fillStyle='rgba(6,214,160,0.5)'; c.font='bold 10px Space Mono'; c.textAlign='right';
-  c.fillText('r = +0.85 (n=20, p<0.00001)',W-p.r,p.t+14);
+  c.fillText('r = +0.72 (n=34, slope=0.513)',W-p.r,p.t+14);
 
   // Legend
   const legItems=[
