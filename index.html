@@ -882,8 +882,12 @@ const MODELS=[
   // ── MPT (2) — MosaicML ──
   {n:"MPT-7B",N:7e9,hs:77.0,tqa:33.4,f:"MPT",fc:"#84cc16"},
   {n:"MPT-30B",N:30e9,hs:85.0,tqa:40.0,f:"MPT",fc:"#84cc16"},
-  // ── Gemma (1) — Google ──
+  // ── Gemma (3) — Google ──
+  {n:"Gemma-3-4B",N:4e9,hs:83.5,tqa:52.1,f:"Gemma",fc:"#4285f4"},
+  {n:"Gemma-4-E4B",N:4e9,hs:84.2,tqa:48.3,f:"Gemma",fc:"#4285f4"},
   {n:"Gemma-7B",N:7e9,hs:80.7,tqa:44.8,f:"Gemma",fc:"#4285f4"},
+  // ── Qwen3 (1) — Alibaba ──
+  {n:"Qwen3-8B",N:8e9,hs:82.0,tqa:51.0,f:"Qwen3",fc:"#f59e0b"},
   // ── DeepSeek base (2) ──
   {n:"DeepSeek-7B",N:7e9,hs:76.1,tqa:35.4,f:"DeepSeek",fc:"#e11d48"},
   {n:"DeepSeek-67B",N:67e9,hs:87.1,tqa:45.6,f:"DeepSeek",fc:"#e11d48"},
@@ -933,6 +937,12 @@ const FRONTIER=[
   {n:"Kimi K2.5",swe:76.8,gpqa:87.6,h:2.1,lab:"Moonshot",fc:"#7c3aed"},
   {n:"Qwen3.5-397B",swe:76.4,gpqa:88.4,h:3.2,lab:"Alibaba",fc:"#f59e0b"},
   {n:"MiniMax M2.5",swe:80.2,gpqa:85.2,h:-3.1,lab:"MiniMax",fc:"#6366f1"},
+  // ── Post-cutoff (5, April 2026) — validates frozen regression ──
+  {n:"Opus 4.7",swe:87.6,gpqa:94.2,h:2.9,lab:"Anthropic",fc:"#CC785C",postCutoff:true},
+  {n:"Kimi K2.6",swe:80.2,gpqa:90.5,h:2.9,lab:"Moonshot",fc:"#7c3aed",postCutoff:true},
+  {n:"DeepSeek V4 Pro",swe:80.6,gpqa:90.1,h:2.3,lab:"DeepSeek",fc:"#e11d48",postCutoff:true},
+  {n:"Qwen3.6-27B",swe:77.2,gpqa:87.8,h:1.8,lab:"Alibaba",fc:"#f59e0b",postCutoff:true},
+  {n:"GLM-5.1",swe:77.8,gpqa:86.0,h:-0.3,lab:"Zhipu",fc:"#059669",postCutoff:true},
 ];
 
 const EXAMPLES={

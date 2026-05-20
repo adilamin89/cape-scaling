@@ -4,8 +4,8 @@
 
 Adil Amin | ZEHEN Labs | [adil@zehenlabs.com](mailto:adil@zehenlabs.com)
 
-[![Paper 3A](https://img.shields.io/badge/Paper_3A-arXiv:2605.18840-b31b1b)](https://arxiv.org/abs/2605.18840)
-[![Paper 3B](https://img.shields.io/badge/Paper_3B-arXiv:2605.18838-b31b1b)](https://arxiv.org/abs/2605.18838)
+[![Lying Is Just a Phase](https://img.shields.io/badge/Lying_Is_Just_a_Phase-arXiv:2605.18840-b31b1b)](https://arxiv.org/abs/2605.18840)
+[![Growing Pains](https://img.shields.io/badge/Growing_Pains-arXiv:2605.18838-b31b1b)](https://arxiv.org/abs/2605.18838)
 [![Dashboard](https://img.shields.io/badge/Dashboard-Live-brightgreen)](https://zehenlabs.com/cape/)
 [![Blog](https://img.shields.io/badge/Blog-Read-blue)](https://zehenlabs.com/blog/)
 [![Website](https://img.shields.io/badge/Website-zehenlabs.com-gold)](https://zehenlabs.com)
@@ -35,11 +35,11 @@ Standard loss curves do not reveal this transition (CV = 0.8% across Pythia -- i
 
 ## Two Papers
 
-### Paper 3A: [Lying Is Just a Phase](https://arxiv.org/abs/2605.18840) — arXiv:2605.18840
+### [Lying Is Just a Phase](https://arxiv.org/abs/2605.18840) — arXiv:2605.18840
 
 The discovery paper. 63 base models, 16 families. Documents the coupling sign flip at Nc, dimensional collapse, output-projection bottleneck, ODE dynamics, and a self-aligning intervention proof-of-concept.
 
-### Paper 3B: [The Growing Pains of Frontier Models](https://arxiv.org/abs/2605.18838) — arXiv:2605.18838
+### [The Growing Pains of Frontier Models](https://arxiv.org/abs/2605.18838) — arXiv:2605.18838
 
 The frontier measurement paper. 34 models from 10 labs. Introduces the h-field diagnostic (deviation from cooperative regression), per-lab coupling trajectories, multi-benchmark coupling matrix, the Nc cascade with internal evidence, and 7 falsifiable predictions.
 
@@ -116,7 +116,7 @@ python cli/cape_cli.py steer --model EleutherAI/pythia-160m --prompt "Some promp
 
 Two experiments confirm the coupling structure is exploitable:
 
-**Cross-Nc gradient** (Paper 3A, 10 prompts per model):
+**Cross-Nc gradient** ("Lying Is Just a Phase", 10 prompts per model):
 
 | Model | Phase | Changed | Rate | Interpretation |
 |-------|-------|---------|------|----------------|
@@ -148,10 +148,10 @@ Self-steering requires open-weight models since it hooks into internal transform
 
 ```
 cape-scaling/
-├── lying_is_just_a_phase.pdf       Paper 3A (under review)
-├── growing_pains_frontier.pdf      Paper 3B (under review)
-├── paper3a_nature.tex              3A LaTeX source (filename historical)
-├── paper3b_neurips.tex             3B LaTeX source (filename historical)
+├── lying_is_just_a_phase.pdf       "Lying Is Just a Phase" (arXiv:2605.18840)
+├── growing_pains_frontier.pdf      "Growing Pains of Frontier Models" (arXiv:2605.18838)
+├── paper3a_nature.tex              LaTeX source (base models paper)
+├── paper3b_neurips.tex             LaTeX source (frontier paper)
 ├── references.bib                  Shared bibliography
 ├── index.html                      Dashboard source (live at zehenlabs.com/cape/)
 │
