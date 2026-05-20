@@ -123,7 +123,7 @@ with c5: st.metric("Predictions", "7", help="Falsifiable, timestamped")
 # ── Sidebar ──
 st.sidebar.markdown("### Papers")
 st.sidebar.markdown("[📄 Lying Is Just a Phase (Nature)](https://github.com/adilamin89/cape-scaling/blob/main/paper3a_nature.pdf)")
-st.sidebar.markdown("[📄 It's Not a Phase (NeurIPS)](https://github.com/adilamin89/cape-scaling/blob/main/paper3b_neurips.pdf)")
+st.sidebar.markdown("[📄 Growing Pains of Frontier Models](https://github.com/adilamin89/cape-scaling/blob/main/paper3b_neurips.pdf)")
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Links")
 st.sidebar.markdown("[🔗 GitHub](https://github.com/adilamin89/cape-scaling)")
@@ -437,6 +437,6 @@ st.markdown("""
     <a href="https://github.com/adilamin89/cape-scaling" style="color:#4cc9f0">GitHub</a> ·
     <a href="https://adilamin89.github.io/cape-scaling" style="color:#4cc9f0">Static Dashboard</a> ·
     Papers: <a href="https://github.com/adilamin89/cape-scaling/blob/main/paper3a_nature.pdf" style="color:#06d6a0">Nature</a> ·
-    <a href="https://github.com/adilamin89/cape-scaling/blob/main/paper3b_neurips.pdf" style="color:#ffd166">NeurIPS</a>
+    <a href="https://github.com/adilamin89/cape-scaling/blob/main/paper3b_neurips.pdf" style="color:#ffd166">Preprint</a>
 </div>
 """, unsafe_allow_html=True)
