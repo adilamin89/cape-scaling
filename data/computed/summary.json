@@ -1,0 +1,21 @@
+{
+  "n_base": 63,
+  "n_families": 16,
+  "n_frozen": 34,
+  "n_post_cutoff": 5,
+  "n_total": 39,
+  "n_labs": 10,
+  "slope": 0.513,
+  "intercept": 46.4,
+  "r_full": 0.7235,
+  "nc": 3.5,
+  "nc_ci": [
+    2.9,
+    13.4
+  ],
+  "r_pythia_tax": -0.989,
+  "ode_holdout_mae": 5.6,
+  "cross_lab_holdout_mae": 9.2,
+  "zero_competing_heads": "38/40",
+  "updated": "2026-05-12T21:37:41.623354"
+}

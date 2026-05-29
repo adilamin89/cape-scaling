@@ -3,6 +3,7 @@ numpy>=1.21
 scipy>=1.7
 matplotlib>=3.5
 scikit-learn>=1.0
+pysindy>=1.7
 
 # Dashboard testing (optional)
 playwright>=1.40

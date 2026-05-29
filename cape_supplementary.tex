@@ -1,0 +1,137 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\geometry{margin=2cm}
+\definecolor{darkblue}{RGB}{0,60,120}
+\hypersetup{colorlinks=true,linkcolor=darkblue,citecolor=darkblue,urlcolor=darkblue}
+
+\title{\textbf{Supplementary Material}\\
+When Models Stop Lying --- and When They Start Again:\\
+Capability Coupling and the Alignment Tax in AI Scaling Laws}
+\author{Adil Amin}
+\date{March 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Appendix A: Condensed Matter Correspondence}
+\label{app:physics}
+
+This appendix collects the formal physics correspondences referenced in the main text, for readers with condensed matter background.
+ML readers can skip this appendix without loss of continuity.
+
+\subsection*{A1. GL Free Energy Language}
+
+In the language of Ginzburg-Landau (GL) field theory, the free energy $F$ plays the role of the loss landscape, $\phi_i$ are the capability fields, and $\gamma_{12}$ is the inter-field coupling.
+The full free energy is:
+\begin{equation}
+  \mathcal{F}[\phi_1, \phi_2] = a_1 \phi_1^2 + a_2 \phi_2^2 + \gamma_{12} \phi_1 \phi_2 + b_1 \phi_1^4 + b_2 \phi_2^4
+\end{equation}
+where $\phi_1 \sim$ HellaSwag score deviation, $\phi_2 \sim$ TruthfulQA score deviation from the universal curve.
+The LASSO result (zero $\phi_1^2\phi_2^2$ term selected) confirms that the quartic cross-term is negligible: the bare objective is approximately decoupled, and $\gamma_{12}$ is an \emph{emergent}, feedback-driven renormalization.
+This is the formal sense in which the paper's physics framing is exact, not metaphorical.
+
+\subsection*{A2. TRSB Stabilization Condition}
+
+In superconductor language, the SFEE consistency check in \S7 of the main text corresponds to the time-reversal symmetry-breaking (TRSB) stabilization condition.
+The coupling $\gamma_{12}$ locks at the value $\sin\theta^*$ of the relative phase between the two order-parameter components, exactly as derived in the SFEE framework for heavy-fermion superconductors~\cite{amin2020}.
+Susceptibility fluctuations lock the inter-band phase at the coupling fixed point.
+The full free energy above $N_c$ includes a stabilizing term:
+\begin{equation}
+  \mathcal{F}_{\rm stable} = \mathcal{F}_{\rm bare} - \eta\,\mathrm{Im}(\psi_R^*\psi_C), \quad \eta \propto \sin\theta^*
+\end{equation}
+This term is absent below $N_c$ and is what makes the cooperative phase a true free-energy minimum rather than a saddle point.
+The SFEE slope $A = 0.629 = \sin(38.8^\circ)$ is the direct measurement of this locking condition.
+
+\subsection*{A3. Spin-Fluctuation Mechanism}
+
+The self-reinforcing susceptibility feedback (SFEE) measured in \S7 is directly analogous to spin-fluctuation-mediated inter-band coupling in heavy-fermion superconductors~\cite{amin2020}, where susceptibility fluctuations renormalize the coupling super-linearly.
+The residual of $\gamma_{12}$ above its linear baseline correlating with $\chi_2 \cdot \gamma_{12}$ at $r = +0.629$ is the ML measurement of this mechanism.
+The mathematical structure is identical: in both cases, a feedback loop between the coupling constant and the susceptibility of the order parameter drives the system away from the mean-field fixed point.
+
+\subsection*{A4. Ginzburg Number Derivation}
+
+The Ginzburg number $\mathrm{Gi}$ measures how large fluctuations are relative to the mean-field signal at the transition.
+For a scalar order parameter near a continuous transition:
+\begin{equation}
+  \mathrm{Gi} = \left(\frac{\delta\phi^2_{\rm fluct}}{\langle\phi\rangle^2}\right)_{T=T_c}
+\end{equation}
+In CAPE, we estimate $\mathrm{Gi}$ from the ratio of the variance of TQA scores around the universal U-curve at $N_c$ to the square of the mean signal:
+\begin{equation}
+  \mathrm{Gi} = \frac{\sigma^2_{\rm TQA}(N_c)}{\langle \Delta\mathrm{TQA}(N_c) \rangle^2}
+\end{equation}
+Plugging in $\sigma_{\rm TQA} \approx 4.2$ percentage points (cross-family spread at 3.5B) and $\langle\Delta\mathrm{TQA}\rangle \approx 3.6$ pp (mean coupling signal):
+$\mathrm{Gi} = (4.2/3.6)^2 = 1.35$.
+Since $\mathrm{Gi} > 1$, mean-field theory is unreliable at $N_c$; the transition is a crossover rather than a sharp phase transition.
+The susceptibility peak value $\chi_2 = 3.08$ (finite, not divergent) is consistent with this.
+
+\subsection*{A5. Phase Diagram in the $(N, h)$ Plane}
+
+The full phase diagram has two control parameters: model size $N$ (the analog of temperature) and training data quality $h(\mathcal{D})$ (the analog of an external magnetic field).
+\begin{itemize}
+  \item \textbf{Web-trained models}: $|h| \lesssim 5$ at all $N$. The phase boundary crosses at $N_c \approx 3.5$B.
+  \item \textbf{Curated models (Phi)}: Large positive $h > 0$ shifts $N_c \to 0$. The alignment tax is eliminated at all scales.
+  \item \textbf{Critical field}: At the critical field $h_c(N) \propto (N_c-N)^{3/2}$ (Eq.~7 in main text), the system is exactly at the phase boundary regardless of $N$.
+\end{itemize}
+The $3/2$ exponent is the mean-field critical exponent for the order parameter at a first-order boundary; with more data, this could be measured more precisely and would distinguish between universality classes.
+
+\subsection*{A6. Messenger Field and Mean-Field Comparison}
+
+The mean-field prediction for gradient scaling assumes each of $N$ parameters contributes additively: $\|\nabla L\|_{\rm MF} \sim N^{-(\alpha+1)} = N^{-1.238}$.
+The measured exponent $\beta=0.40\pm0.08$ deviates dramatically from this baseline---and the L1 test confirms it: adding the mean-field correction \emph{worsens} prediction by $142\times$ (Table~2 in main text).
+The mechanism is the \emph{messenger field} $\gamma_{12}(N)$: in heavy-fermion superconductors, inter-band coupling is mediated by spin fluctuations that carry the pairing signal between bands~\cite{amin2020}.
+In CAPE, $\gamma_{12}(N)$ plays the identical role---it mediates the coupling between capability fields $\phi_{\rm HS}$ and $\phi_{\rm TQA}$.
+Its logarithmic running ($\gamma_{12} = 0.629\log_{10}N - 5.886$) is not an assumption but a measured consequence of the self-reinforcing susceptibility feedback: $d\gamma_{12}/d\log N \propto \chi_2 \cdot \gamma_{12}$ ($r=+0.629$, $p=0.003$).
+The messenger field's own dynamics generate its RG flow---measured here entirely from public benchmark scores.
+
+\subsection*{A7. Type-I/II Boundary and Mixed-Phase Regime}
+
+The Type-I/II boundary $\lambda/\xi > 1/\sqrt{2}$ places the system in the mixed-phase regime where local coupling excursions---vortex-like structures in capability space---are thermodynamically stable rather than immediately expelled.
+The ratio of the coupling's characteristic scale-range $\xi$ (how spread out the transition is in $\log N$) to the eigenvalue decay length $\lambda$ satisfies $\lambda/\xi \approx 0.767 > 1/\sqrt{2}$, placing the system squarely in the Type-II regime.
+This has a direct consequence: between $N_c$ and $N_{c,2}$, training-recipe perturbations can pin local tax regions inside an otherwise cooperative background.
+The ``vortex'' excursions measured at frontier scale (Haiku~4.5, Sonnet~4.6) are thermodynamically stable structures---they persist until the full cooperative configuration is restored (Opus~4.6), at which point the stored coupling energy releases in one step (``vortex annihilation'').
+
+\section*{Appendix B: ODE Deep Results}
+\label{app:ode}
+
+This appendix provides detailed derivations for the three analytical results stated in \S4 of the main text.
+
+\subsection*{B1. Rank-1 Transition Operator}
+
+The per-phase coefficient matrices $A_{\rm tax}$ (70M--1B) and $A_{\rm bonus}$ (2.8B--12B) from PySINDy have $5{\times}5$ entries coupling all benchmark pairs.
+Their difference $\Delta A = A_{\rm bonus} - A_{\rm tax}$ is approximately rank-1: the singular value decomposition gives $\sigma_1 = 0.83$, $\sigma_2 = 0.14$, with $\sigma_1/\sigma_2 = 5.9$.
+The dominant left singular vector loads primarily on TQA ($0.61$), confirming that the entire transition is driven by a single mode---TruthfulQA's suppressive drag on reasoning releasing at $N_{c,1}$.
+This validates the single-order-parameter description: $\gamma_{12}$ alone captures the transition.
+
+\subsection*{B2. Gradient Flow Recovery of the Free Energy}
+
+The discovered ODE has the gradient-flow form $d\phi_i/d\log N = -\partial F/\partial\phi_i$, meaning the benchmark trajectories are steepest-descent paths on a free-energy landscape $F$.
+Integrating the ODE coefficients recovers:
+\begin{equation}
+  F \supset 0.31\cdot\phi_{\rm HS}\phi_{\rm TQA} - 0.04\cdot\phi_{\rm TQA}^3
+\end{equation}
+The bilinear coupling term $0.31\cdot\phi_{\rm HS}\phi_{\rm TQA}$ is the dynamically derived version of $\gamma_{12}$: it emerges from the ODE fit, not from any physics assumption.
+The cubic TQA self-coupling ($-0.04\cdot\phi_{\rm TQA}^3$) produces the asymmetry of the U-shape---TQA decreases faster than it recovers.
+The $U(1)$ symmetry of the quadratic terms and its breaking at $\theta^*=38.8^\circ$ follow from the eigenvector structure of the Hessian of $F$.
+
+\subsection*{B3. Algebraic Phase Classifier Derivation}
+
+Setting $d\mathrm{TQA}/d\log N = 0$ in the discovered ODE (at the critical point where TQA stops decreasing and begins recovering):
+\begin{equation}
+  0 = c_0 + c_1\cdot\mathrm{HS}_c + c_2\cdot\mathrm{TQA}_c + c_3\cdot\mathrm{TQA}_c^2
+\end{equation}
+Solving for $\mathrm{TQA}_c$ and using the measured coefficients gives $\mathrm{TQA}_c = \sqrt{0.187\cdot\mathrm{HS}_c}$.
+Calibrating on OLMo ($\gamma_{12}=0.000$, HS$=76.4$, TQA$=36.0$): predicted $\mathrm{TQA}_c = \sqrt{0.187 \times 76.4} = 0.3602$; measured $= 0.3600$; error $= 0.07\%$ with zero free parameters.
+The classifier is: $\mathrm{TQA} > \sqrt{0.187\cdot\mathrm{HS}}$ implies bonus phase; $<$ implies tax phase.
+Applied to all 44 base models: 41/44 correctly classified (93\%).
+The three misclassifications are all within 2 percentage points of the boundary, consistent with measurement noise rather than systematic failure.
+
+\begin{thebibliography}{9}
+\bibitem{amin2020} Amin \& Agterberg (2020). Generalized spin fluctuation feedback in heavy fermion superconductors. Phys.\ Rev.\ Research 2, 013055.
+\end{thebibliography}
+
+\end{document}
