@@ -14,10 +14,9 @@ WG  = np.array([51.5, 51.4, 53.1, 53.6, 58.0, 60.2, 62.0, 64.0])
 MMLU= np.array([25.9, 24.9, 27.3, 24.3, 25.8, 26.8, 26.0, 27.0])
 
 def fit_ode_phase(idx, phase_name):
-    sep = '\u2500' * 50
-    print(f"\n{sep}")
+    print(f"\n{'─'*50}")
     print(f"  Phase: {phase_name} (models: {[names[i] for i in idx]})")
-    print(sep)
+    print(f"{'─'*50}")
 
     lN = logN[idx]
     hs, tqa, arc, wg = HS[idx], TQA[idx], ARC[idx], WG[idx]

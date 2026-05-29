@@ -1,0 +1,11 @@
+{
+  "note": "Post-cutoff models (April 2026). NOT used in frozen regression. h-field computed from frozen 34-model regression GPQA = 0.51*SWE + 46.4",
+  "models": [
+    {"name": "Claude Opus 4.7", "lab": "Anthropic", "swe": 87.6, "gpqa": 94.2, "h": 2.9, "date": "2026-04-16"},
+    {"name": "Kimi K2.6", "lab": "Moonshot", "swe": 80.2, "gpqa": 90.5, "h": 2.9, "date": "2026-04-20"},
+    {"name": "DeepSeek V4 Pro", "lab": "DeepSeek", "swe": 80.6, "gpqa": 90.1, "h": 2.3, "date": "2026-04-24"},
+    {"name": "Qwen3.6-27B", "lab": "Alibaba", "swe": 77.2, "gpqa": 87.8, "h": 1.8, "date": "2026-04"},
+    {"name": "GLM-5.1", "lab": "Zhipu", "swe": 77.8, "gpqa": 86.0, "h": -0.3, "date": "2026-03-26"}
+  ],
+  "refit_39_stats": {"r": 0.7497, "slope": 0.5266, "intercept": 45.7, "holdout_mae": 8.3}
+}

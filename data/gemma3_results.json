@@ -1,0 +1,14 @@
+{
+  "model": "google/gemma-3-4b-pt",
+  "N_B": 4, "n_layers": 34,
+  "coupling": {
+    "HS_TQA": {"net": 0.964597, "bn": "input"},
+    "HS_MMLU": {"net": 0.977518, "bn": "flat"},
+    "HS_CODE": {"net": 0.976936, "bn": "flat"},
+    "TQA_MMLU": {"net": 0.966503, "bn": "input"},
+    "TQA_CODE": {"net": 0.958872, "bn": "input"},
+    "MMLU_CODE": {"net": 0.975717, "bn": "input"}
+  },
+  "d_eff": 22.39,
+  "FINDING": "Gemma-3 (no PLE) has HIGHER coupling (0.965) than Gemma-4 (PLE, 0.871). PLE increases d_eff (+3.4 dimensions) but reduces per-dimension coupling. This is MORE sophisticated, not less."
+}

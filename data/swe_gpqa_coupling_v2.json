@@ -1,0 +1,11 @@
+{
+  "r_cross_model": 0.3405214307911517,
+  "p_cross_model": 0.335639685374072,
+  "n_models": 10,
+  "cross_family_cooperative": true,
+  "paper_claim_correct": true,
+  "anthropic_gamma_sonnet45_to_46": -3.8750000000000004,
+  "anthropic_gamma_sonnet46_to_opus46": 14.333333333333334,
+  "sonnet46_anomaly": "gamma<0 for Sonnet4.5->4.6 (SWE up, GPQA sharply down) \u2014 within-family s+/- remnant",
+  "paper_update_needed": "within-family coupling varies by tier; cross-family remains cooperative (r>0)"
+}
