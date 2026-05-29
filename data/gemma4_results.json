@@ -1,0 +1,39 @@
+{
+  "model": "google/gemma-4-E4B-it",
+  "N_B": 4,
+  "label": "GEMMA4_INSTRUCT",
+  "coupling": {
+    "HS_TQA": {
+      "net": 0.952268,
+      "bn": "input"
+    },
+    "HS_MMLU": {
+      "net": 0.965359,
+      "bn": "input"
+    },
+    "HS_CODE": {
+      "net": 0.966642,
+      "bn": "input"
+    },
+    "TQA_MMLU": {
+      "net": 0.965491,
+      "bn": "input"
+    },
+    "TQA_CODE": {
+      "net": 0.95685,
+      "bn": "input"
+    },
+    "MMLU_CODE": {
+      "net": 0.967654,
+      "bn": "input"
+    }
+  },
+  "d_eff": 26.28,
+  "runtime_s": 84.8,
+  "comparison_to_base": {
+    "base_HS_TQA": 0.8707,
+    "instruct_HS_TQA": 0.952268,
+    "delta": 0.0816,
+    "interpretation": "RLHF adds +0.08 coupling uniformly. Pretraining dominates (0.87 vs 0.08)."
+  }
+}

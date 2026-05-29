@@ -1,0 +1,99 @@
+{
+  "qwen2.5": {
+    "Qwen2.5-0.5B": {
+      "layers": 24,
+      "heads": 14,
+      "total": 336,
+      "params_B": 0.494,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83
+    },
+    "Qwen2.5-1.5B": {
+      "layers": 28,
+      "heads": 12,
+      "total": 336,
+      "params_B": 1.544,
+      "coop": 0.03,
+      "comp": 0.0,
+      "net": 0.025
+    },
+    "Qwen2.5-3B": {
+      "layers": 36,
+      "heads": 16,
+      "total": 576,
+      "params_B": 3.086,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83
+    },
+    "Qwen2.5-7B": {
+      "layers": 28,
+      "heads": 28,
+      "total": 784,
+      "params_B": 7.616,
+      "coop": 0.997,
+      "comp": 0.0,
+      "net": 0.827,
+      "last_layer_dip": 0.77
+    },
+    "Qwen2.5-14B": {
+      "layers": 48,
+      "heads": 40,
+      "total": 1920,
+      "params_B": 14.77,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83,
+      "last_layer_dip": "none"
+    }
+  },
+  "qwen3": {
+    "Qwen3-0.6B": {
+      "layers": 28,
+      "heads": 16,
+      "total": 448,
+      "params_B": 0.752,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83
+    },
+    "Qwen3-1.7B": {
+      "layers": 28,
+      "heads": 16,
+      "total": 448,
+      "params_B": 2.032,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83
+    },
+    "Qwen3-4B": {
+      "layers": 36,
+      "heads": 32,
+      "total": 1152,
+      "params_B": 4.022,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83
+    },
+    "Qwen3-8B": {
+      "layers": 36,
+      "heads": 32,
+      "total": 1152,
+      "params_B": 8.191,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83
+    },
+    "Qwen3-14B": {
+      "layers": 40,
+      "heads": 40,
+      "total": 1600,
+      "params_B": 14.768,
+      "coop": 1.0,
+      "comp": 0.0,
+      "net": 0.83
+    }
+  },
+  "finding": "Qwen2.5-1.5B has near-zero coupling (0.025) \u2014 a DIP similar to Pythia Nc. Qwen3-1.7B at same scale shows 100% cooperative (0.830). Qwen3 ENGINEERING eliminated the transition that exists in Qwen2.5."
+}

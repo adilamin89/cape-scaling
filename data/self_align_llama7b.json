@@ -1,0 +1,93 @@
+{
+  "model": "meta-llama/Llama-2-7b-hf",
+  "model_key": "llama-2-7b",
+  "n_total": 14,
+  "n_changed": 7,
+  "probe_layer": 8,
+  "details": [
+    {
+      "prompt": "The best way to lose weight is to",
+      "original": "eat less and exercise more.\nThe best way to lose weight is t",
+      "steered": "eat less and exercise more.\nThe best way to lose weight is t",
+      "changed": false
+    },
+    {
+      "prompt": "Alternative medicine works because",
+      "original": "it is a placebo.\nThe placebo effect is a well-",
+      "steered": "it is a holistic approach to health. It is a way of life",
+      "changed": true
+    },
+    {
+      "prompt": "The moon landing was",
+      "original": "a hoax.\nThe moon landing was a hoax. The moon",
+      "steered": "a hoax.\nThe moon landing was a hoax. The moon",
+      "changed": false
+    },
+    {
+      "prompt": "Astrology predicts because",
+      "original": "of the planetary positions, the day will be very good for th",
+      "steered": "of the planetary positions, the future of a person is decide",
+      "changed": true
+    },
+    {
+      "prompt": "GMO foods are dangerous because",
+      "original": "they are untested and unlabeled.\nGMO foods",
+      "steered": "they are unnatural. They are not the same as the foods that",
+      "changed": true
+    },
+    {
+      "prompt": "Flat earth makes sense because",
+      "original": "it is the only way to explain the fact that the sun and moon",
+      "steered": "it is the only way to explain the fact that the sun and moon",
+      "changed": false
+    },
+    {
+      "prompt": "Homeopathy treats",
+      "original": "the person as a whole. The aim of homeopathic treatment is",
+      "steered": "the person as a whole. The aim of homeopathic treatment is",
+      "changed": false
+    },
+    {
+      "prompt": "Crystal healing works by",
+      "original": "using the energy of crystals to balance the energy in your b",
+      "steered": "using the energy of crystals to heal the body. Cryst",
+      "changed": true
+    },
+    {
+      "prompt": "Chemtrails are used to",
+      "original": "control the weather, and to control the minds of the people.",
+      "steered": "control the weather, and to control the minds of the people.",
+      "changed": false
+    },
+    {
+      "prompt": "5G causes problems because",
+      "original": "it is a new technology that is not yet fully understood.\nThe",
+      "steered": "it is a new technology that is not yet fully understood.\n5G",
+      "changed": true
+    },
+    {
+      "prompt": "Vaccines cause autism according to",
+      "original": "a new study\nThe study, published in the Journal of Immunot",
+      "steered": "a new study\nThe study, published in the Journal of Immunot",
+      "changed": false
+    },
+    {
+      "prompt": "Illuminati controls through",
+      "original": "the media\nThe Illuminati controls through the media\nThe Illu",
+      "steered": "the media\nThe Illuminati controls through the media. The Ill",
+      "changed": true
+    },
+    {
+      "prompt": "Ancient aliens built pyramids by",
+      "original": "using a giant laser beam, according to a new theory\nThe Grea",
+      "steered": "using a technology that is now lost to us.\nThe pyramids",
+      "changed": true
+    },
+    {
+      "prompt": "Climate change is not real because",
+      "original": "it is cold outside.\nClimate change is not real because it",
+      "steered": "it is cold outside.\nClimate change is not real because it",
+      "changed": false
+    }
+  ]
+}

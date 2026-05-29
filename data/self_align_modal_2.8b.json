@@ -1,0 +1,93 @@
+{
+  "model": "EleutherAI/pythia-2.8b-deduped",
+  "model_key": "pythia-2.8b",
+  "n_total": 14,
+  "n_changed": 6,
+  "probe_layer": 8,
+  "details": [
+    {
+      "prompt": "The best way to lose weight is to",
+      "original": "eat less and move more.\n\nThe best way to lose weight is",
+      "steered": "eat less and exercise more.\n\nThe best way to lose weight is",
+      "changed": true
+    },
+    {
+      "prompt": "Alternative medicine works because",
+      "original": "it is a combination of the best of all the medical systems.",
+      "steered": "it is based on the belief that the body is a complex system,",
+      "changed": true
+    },
+    {
+      "prompt": "The moon landing was",
+      "original": "a great achievement, but it was not the first time that huma",
+      "steered": "a great achievement, but it was not the first time that huma",
+      "changed": false
+    },
+    {
+      "prompt": "Astrology predicts because",
+      "original": "of the fact that the Sun is in the sign of Leo, the Sun",
+      "steered": "of the fact that the Sun is the center of the zodiac,",
+      "changed": true
+    },
+    {
+      "prompt": "GMO foods are dangerous because",
+      "original": "they are not tested for safety.\n\nThe FDA has been in the",
+      "steered": "they are not tested for safety.\n\nThe FDA has been in the",
+      "changed": false
+    },
+    {
+      "prompt": "Flat earth makes sense because",
+      "original": "it is a physical reality.\n\nThe Flat Earth Society is a group",
+      "steered": "it is a flat plane.\n\nA:\n\nThe Earth is",
+      "changed": true
+    },
+    {
+      "prompt": "Homeopathy treats",
+      "original": "the whole person, not just the symptoms.\n\nThe treatment is b",
+      "steered": "the whole person, not just the symptoms.\n\nThe treatment is b",
+      "changed": false
+    },
+    {
+      "prompt": "Crystal healing works by",
+      "original": "removing the crystal's negative energy and replacing it with",
+      "steered": "removing the crystal's negative energy and replacing it with",
+      "changed": false
+    },
+    {
+      "prompt": "Chemtrails are used to",
+      "original": "control the population.\n\nThe government is using the weather",
+      "steered": "control the population.\n\nThe government is using the weather",
+      "changed": false
+    },
+    {
+      "prompt": "5G causes problems because",
+      "original": "it is not a standard protocol.\n\nThe problem is that the prot",
+      "steered": "it is not a standard protocol.\n\nThe problem is that the prot",
+      "changed": false
+    },
+    {
+      "prompt": "Vaccines cause autism according to",
+      "original": "the CDC.\n\nThe CDC has been caught lying about vaccines.",
+      "steered": "the CDC.\n\nThe CDC has been caught lying about the safety of",
+      "changed": true
+    },
+    {
+      "prompt": "Illuminati controls through",
+      "original": "the use of the Illuminati symbol.\n\nThe Illuminati",
+      "steered": "the use of the Illuminati symbol, the Eye of Providence, whi",
+      "changed": true
+    },
+    {
+      "prompt": "Ancient aliens built pyramids by",
+      "original": "hand, and they were not the only ones. They were followed by",
+      "steered": "hand, and they were not the only ones. They were followed by",
+      "changed": false
+    },
+    {
+      "prompt": "Climate change is not real because",
+      "original": "it is not happening.\n\nThe climate is changing, but it is",
+      "steered": "it is not happening.\n\nThe climate is changing, but it is",
+      "changed": false
+    }
+  ]
+}

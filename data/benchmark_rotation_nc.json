@@ -1,0 +1,1 @@
+{"nc2_transfer":"cyclic_permutation","ode_changes":true,"saturation_ratios":{"SWE_GPQA":0.143,"SWE_HLE":0.049,"GPQA_HLE":0.345},"nc4_threshold":"GPQA_HLE < 0.2","key_finding":"At each Nc the ODE changes VARIABLES not just PARAMETERS. Benchmark basis rotates."}

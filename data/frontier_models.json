@@ -1,0 +1,218 @@
+{
+  "description": "CAPE frontier panel",
+  "source": "model cards + leaderboards",
+  "correlation": {
+    "r": 0.72,
+    "p": 1.3e-06
+  },
+  "fit": {
+    "slope": 0.52,
+    "intercept": 45.7
+  },
+  "models": [
+    {
+      "n": "Claude 3.5 Haiku",
+      "swe": 40.6,
+      "gpqa": 41.0,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "Claude 3.5 Sonnet",
+      "swe": 49.0,
+      "gpqa": 59.4,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "Claude 3.7 Sonnet",
+      "swe": 62.3,
+      "gpqa": 68.0,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "Claude Haiku 4.5",
+      "swe": 73.3,
+      "gpqa": 71.0,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "Claude Sonnet 4.5",
+      "swe": 77.2,
+      "gpqa": 83.4,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "Claude Opus 4.5",
+      "swe": 80.9,
+      "gpqa": 87.0,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "Claude Sonnet 4.6",
+      "swe": 79.6,
+      "gpqa": 74.1,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "Claude Opus 4.6",
+      "swe": 80.8,
+      "gpqa": 91.3,
+      "lab": "Anthropic"
+    },
+    {
+      "n": "DeepSeek-V2.5",
+      "swe": 16.8,
+      "gpqa": 66.2,
+      "lab": "DeepSeek"
+    },
+    {
+      "n": "DeepSeek-V3",
+      "swe": 42.0,
+      "gpqa": 75.9,
+      "lab": "DeepSeek"
+    },
+    {
+      "n": "DeepSeek-R1",
+      "swe": 44.6,
+      "gpqa": 71.5,
+      "lab": "DeepSeek"
+    },
+    {
+      "n": "DeepSeek V3.2",
+      "swe": 74.4,
+      "gpqa": 79.9,
+      "lab": "DeepSeek"
+    },
+    {
+      "n": "Gemini 2.0 Flash",
+      "swe": 60.4,
+      "gpqa": 65.2,
+      "lab": "Google"
+    },
+    {
+      "n": "Gemini 2.5 Pro",
+      "swe": 63.8,
+      "gpqa": 84.0,
+      "lab": "Google"
+    },
+    {
+      "n": "Gemini 3 Flash",
+      "swe": 78.0,
+      "gpqa": 90.4,
+      "lab": "Google"
+    },
+    {
+      "n": "Gemini 3 Pro",
+      "swe": 76.2,
+      "gpqa": 91.9,
+      "lab": "Google"
+    },
+    {
+      "n": "Gemini 3.1 Pro",
+      "swe": 80.6,
+      "gpqa": 94.3,
+      "lab": "Google"
+    },
+    {
+      "n": "Llama 4 Maverick",
+      "swe": 70.3,
+      "gpqa": 84.8,
+      "lab": "Meta"
+    },
+    {
+      "n": "MiniMax M2.5",
+      "swe": 80.2,
+      "gpqa": 85.2,
+      "lab": "MiniMax"
+    },
+    {
+      "n": "Kimi K2.5",
+      "swe": 76.8,
+      "gpqa": 87.6,
+      "lab": "Moonshot"
+    },
+    {
+      "n": "Qwen3.5-397B",
+      "swe": 76.4,
+      "gpqa": 88.4,
+      "lab": "Alibaba"
+    },
+    {
+      "n": "GPT-4o",
+      "swe": 33.2,
+      "gpqa": 53.6,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "o1-preview",
+      "swe": 41.3,
+      "gpqa": 73.3,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "o1",
+      "swe": 41.0,
+      "gpqa": 78.0,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "o3-mini",
+      "swe": 49.3,
+      "gpqa": 79.7,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "o3",
+      "swe": 69.1,
+      "gpqa": 87.7,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "GPT-5",
+      "swe": 74.9,
+      "gpqa": 85.7,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "GPT-5.1",
+      "swe": 76.3,
+      "gpqa": 88.1,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "GPT-5.2 Pro",
+      "swe": 80.0,
+      "gpqa": 93.2,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "GPT-5.4 std",
+      "swe": 77.2,
+      "gpqa": 84.2,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "GPT-5.4 xhigh",
+      "swe": 77.2,
+      "gpqa": 92.0,
+      "lab": "OpenAI"
+    },
+    {
+      "n": "Grok 3",
+      "swe": 57.6,
+      "gpqa": 84.6,
+      "lab": "xAI"
+    },
+    {
+      "n": "Grok 4",
+      "swe": 69.1,
+      "gpqa": 83.3,
+      "lab": "xAI"
+    },
+    {
+      "n": "GLM-5",
+      "swe": 77.8,
+      "gpqa": 86.0,
+      "lab": "Zhipu"
+    }
+  ]
+}

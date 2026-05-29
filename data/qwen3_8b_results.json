@@ -1,0 +1,15 @@
+{
+  "model": "Qwen/Qwen3-8B",
+  "N_B": 8, "label": "QWEN3_CURATED",
+  "coupling": {
+    "HS_TQA": {"net": 0.740716, "bn": "input"},
+    "MMLU_CODE": {"net": 0.830270, "bn": "input"}
+  },
+  "d_eff": 8.99,
+  "comparison_to_qwen25": {
+    "qwen25_HS_TQA": 0.619212,
+    "qwen3_HS_TQA": 0.740716,
+    "delta_curation": 0.1217,
+    "interpretation": "Data curation adds +0.12 coupling. Third lever alongside architecture and distillation."
+  }
+}

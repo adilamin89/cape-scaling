@@ -1,0 +1,194 @@
+{
+  "pythia_1b": {
+    "hidden_size": 2048,
+    "hidden_coupling": {
+      "cosine": 0.7247748970985413,
+      "mean_per_prompt": 0.43348294496536255,
+      "coop_frac": 1.0
+    },
+    "original_proj_coupling": {
+      "cosine": 0.6386260986328125,
+      "mean_per_prompt": 0.4041170045733452,
+      "coop_frac": 1.0
+    },
+    "wider_proj_coupling": {
+      "cosine": 0.8046695590019226,
+      "mean_per_prompt": 0.5220822125673295,
+      "coop_frac": 1.0
+    },
+    "dimension_sweep": [
+      {
+        "k": 1,
+        "coupling": -0.9999999403953552
+      },
+      {
+        "k": 2,
+        "coupling": 0.15049344301223755
+      },
+      {
+        "k": 4,
+        "coupling": 0.3420828878879547
+      },
+      {
+        "k": 8,
+        "coupling": 0.39381176233291626
+      },
+      {
+        "k": 16,
+        "coupling": 0.45227283239364624
+      },
+      {
+        "k": 32,
+        "coupling": 0.4618821144104004
+      },
+      {
+        "k": 64,
+        "coupling": 0.4618821144104004
+      },
+      {
+        "k": 128,
+        "coupling": 0.4618821144104004
+      },
+      {
+        "k": 256,
+        "coupling": 0.4618821144104004
+      },
+      {
+        "k": 512,
+        "coupling": 0.4618821144104004
+      },
+      {
+        "k": 2048,
+        "coupling": 0.4618821144104004
+      }
+    ]
+  },
+  "pythia_410m": {
+    "hidden_size": 1024,
+    "hidden_coupling": {
+      "cosine": 0.7696889638900757,
+      "mean_per_prompt": 0.49783805310726165,
+      "coop_frac": 1.0
+    },
+    "original_proj_coupling": {
+      "cosine": 0.9275658130645752,
+      "mean_per_prompt": 0.7830752998590469,
+      "coop_frac": 1.0
+    },
+    "wider_proj_coupling": {
+      "cosine": 0.8521066904067993,
+      "mean_per_prompt": 0.6190793097019196,
+      "coop_frac": 1.0
+    },
+    "dimension_sweep": [
+      {
+        "k": 1,
+        "coupling": -1.0
+      },
+      {
+        "k": 2,
+        "coupling": -0.1061156764626503
+      },
+      {
+        "k": 4,
+        "coupling": 0.11380358785390854
+      },
+      {
+        "k": 8,
+        "coupling": 0.20839515328407288
+      },
+      {
+        "k": 16,
+        "coupling": 0.2973597049713135
+      },
+      {
+        "k": 32,
+        "coupling": 0.33898985385894775
+      },
+      {
+        "k": 64,
+        "coupling": 0.33898985385894775
+      },
+      {
+        "k": 128,
+        "coupling": 0.33898985385894775
+      },
+      {
+        "k": 256,
+        "coupling": 0.33898985385894775
+      },
+      {
+        "k": 512,
+        "coupling": 0.33898985385894775
+      },
+      {
+        "k": 1024,
+        "coupling": 0.33898985385894775
+      }
+    ]
+  },
+  "pythia_2.8b": {
+    "hidden_size": 2560,
+    "hidden_coupling": {
+      "cosine": 0.6418870091438293,
+      "mean_per_prompt": 0.33205537497997284,
+      "coop_frac": 1.0
+    },
+    "original_proj_coupling": {
+      "cosine": 0.7939462065696716,
+      "mean_per_prompt": 0.5548303961753845,
+      "coop_frac": 1.0
+    },
+    "wider_proj_coupling": {
+      "cosine": 0.7191556692123413,
+      "mean_per_prompt": 0.42058604657649995,
+      "coop_frac": 1.0
+    },
+    "dimension_sweep": [
+      {
+        "k": 1,
+        "coupling": -1.0
+      },
+      {
+        "k": 2,
+        "coupling": -0.9924353361129761
+      },
+      {
+        "k": 4,
+        "coupling": -0.8074313402175903
+      },
+      {
+        "k": 8,
+        "coupling": -0.35412102937698364
+      },
+      {
+        "k": 16,
+        "coupling": -0.049507636576890945
+      },
+      {
+        "k": 32,
+        "coupling": 0.03510115295648575
+      },
+      {
+        "k": 64,
+        "coupling": 0.03510115295648575
+      },
+      {
+        "k": 128,
+        "coupling": 0.03510115295648575
+      },
+      {
+        "k": 256,
+        "coupling": 0.03510115295648575
+      },
+      {
+        "k": 512,
+        "coupling": 0.03510115295648575
+      },
+      {
+        "k": 2560,
+        "coupling": 0.03510115295648575
+      }
+    ]
+  }
+}

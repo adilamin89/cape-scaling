@@ -1,0 +1,12 @@
+{
+  "model": "meta-llama/Llama-3.1-70B",
+  "key": "llama31-70b",
+  "n_layers": 80,
+  "coop_pct": 70.29296875,
+  "competing": 318,
+  "net": 0.19506404363650906,
+  "early": 0.24165992330377917,
+  "mid": 0.172259126600718,
+  "late": 0.17299885432604006,
+  "status": "complete"
+}
