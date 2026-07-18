@@ -118,8 +118,10 @@ python cli/cape_cli.py --predict --size 13e9
 ```
 cape-scaling/
 ├── index.html                     ← Self-contained dashboard (GitHub Pages)
-├── paper3A.pdf                    ← Paper A (base models)
-├── paper3A.tex                    ← LaTeX source
+├── paper3a_nature.pdf             ← Paper A: "Lying Is Just a Phase" (base models)
+├── paper3b_neurips.pdf            ← Paper B: "Growing Pains" (frontier)
+├── paper3A.tex                    ← LaTeX source (Paper A)
+├── paper3b_neurips.tex            ← LaTeX source (Paper B)
 ├── requirements.txt               ← Core deps (numpy/scipy/matplotlib)
 ├── requirements-gpu.txt           ← Full deps including PyTorch
 │

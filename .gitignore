@@ -59,6 +59,7 @@ env/
 # Internal working files (not for public release)
 COWORK_SETUP.md
 PAPER2_EXTENSIONS.md
+.wrangler/
 outputs/
 temp_eigen/
 *_pdf.md
